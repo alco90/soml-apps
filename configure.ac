@@ -28,6 +28,8 @@ AC_CHECK_LIB([ocomm], [o_log], [AC_DEFINE([HAVE_LIBOCOMM], [1], [Define if liboc
 AC_CHECK_LIB([sigar], [sigar_open], [AC_DEFINE([HAVE_LIBSIGAR], [1], [Define if libsigar is installed.])], [missing_libs+=" libsigar"])
 AC_CHECK_HEADER([libsigar/sigar.h], [AC_DEFINE([HAVE_SIGAR_H_IN_LIBSIGAR], [1], [Define if sigar.h is should be included as #include <libsigar/sigar.h>])])
 
+AC_CHECK_LIB([trace], [trace_create], [AC_DEFINE([HAVE_LIBTRACE], [1], [Define if libtrace is installed.])], [missing_libs+=" libtrace"])
+
 AC_CHECK_LIB([pcap], [pcap_open_live], [AC_DEFINE([HAVE_LIBPCAP], [1], [Define if libpcap is installed.])], [missing_libs+=" libpcap"])
 
 # Checks for header files.
@@ -52,6 +54,7 @@ AC_C_BIGENDIAN
 
 AC_CONFIG_FILES([Makefile
 		omf_node_metrics/Makefile
+		omf_trace/Makefile
 		src/Makefile
 		])
 
