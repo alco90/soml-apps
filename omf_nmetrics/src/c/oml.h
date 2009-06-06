@@ -58,7 +58,7 @@ static OmlMPDef oml_cpu_def[] = {
 };
 
 static OmlMPDef oml_network_def[] = {
-  {"name", OML_STRING_VALUE},
+  {"name", OML_STRING_PTR_VALUE},
   {"rx_packets", OML_LONG_VALUE},
   {"rx_bytes", OML_LONG_VALUE},
   {"rx_errors", OML_LONG_VALUE},

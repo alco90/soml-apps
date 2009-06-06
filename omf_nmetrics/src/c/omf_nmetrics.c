@@ -33,9 +33,9 @@
 #include <string.h>
 
 #define USE_OPTS
-#include "nmetrics_opts.h"
+#include "opts.h"
 
-#include "nmetrics_oml.h"
+#include "oml.h"
 
 #include "o_log.h"
 
@@ -43,7 +43,11 @@ OmlMP*   cpu_mp;
 OmlMP*   memory_mp;
 OmlMP*   net_mp;
 
+#ifdef HAVE_SIGAR_H_IN_LIBSIGAR
+#include <libsigar/sigar.h>
+#else
 #include <sigar.h>
+#endif
 
 typedef struct _if_monitor_t {
   char           if_name[64];

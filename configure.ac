@@ -53,7 +53,7 @@ AC_CHECK_FUNCS([gethostbyname gettimeofday inet_ntoa memmove memset socket sqrt 
 AC_C_BIGENDIAN
 
 AC_CONFIG_FILES([Makefile
-		omf_node_metrics/Makefile
+		omf_nmetrics/Makefile
 		omf_trace/Makefile
 		src/Makefile
 		])
