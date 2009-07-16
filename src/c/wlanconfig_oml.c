@@ -41,7 +41,7 @@
 #include <pcap.h>
 #include <errno.h>
 #include <unistd.h>
-#include "log.h"
+#include "ocomm/o_log.h"
 
 
 static OmlMPDef oml_def[] = {  
