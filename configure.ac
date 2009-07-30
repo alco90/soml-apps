@@ -25,12 +25,12 @@ AC_CHECK_LIB([popt], [poptGetContext], [AC_DEFINE([HAVE_LIBPOPT], [1], [Define i
 AC_CHECK_LIB([pthread], [pthread_create], [AC_DEFINE([HAVE_LIBPTHREAD], [1], [Define if libpthread is installed.])], [missing_libs+=" libpthread"])
 AC_CHECK_LIB([oml2], [omlc_init], [AC_DEFINE([HAVE_LIBOML2], [1], [Define if liboml2 is installed.])], [missing_libs+=" liboml2"])
 AC_CHECK_LIB([ocomm], [o_log], [AC_DEFINE([HAVE_LIBOCOMM], [1], [Define if libocomm is installed.])], [missing_libs+=" libocomm"])
-AC_CHECK_LIB([sigar], [sigar_open], [AC_DEFINE([HAVE_LIBSIGAR], [1], [Define if libsigar is installed.])], [missing_libs+=" libsigar"])
-AC_CHECK_HEADER([libsigar/sigar.h], [AC_DEFINE([HAVE_SIGAR_H_IN_LIBSIGAR], [1], [Define if sigar.h is should be included as #include <libsigar/sigar.h>])])
-
 AC_CHECK_LIB([trace], [trace_create], [AC_DEFINE([HAVE_LIBTRACE], [1], [Define if libtrace is installed.])], [missing_libs+=" libtrace"])
 
 AC_CHECK_LIB([pcap], [pcap_open_live], [AC_DEFINE([HAVE_LIBPCAP], [1], [Define if libpcap is installed.])], [missing_libs+=" libpcap"])
+
+AC_CHECK_LIB([sigar], [sigar_open], [AC_DEFINE([HAVE_LIBSIGAR], [1], [Define if libsigar is installed.])], [missing_libs+=" libsigar"])
+AC_CHECK_HEADER([libsigar/sigar.h], [AC_DEFINE([HAVE_SIGAR_H_IN_LIBSIGAR], [1], [Define if sigar.h is should be included as #include <libsigar/sigar.h>])])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h unistd.h oml2/omlc.h ocomm/o_log.h])
@@ -53,6 +53,7 @@ AC_CHECK_FUNCS([gethostbyname gettimeofday inet_ntoa memmove memset socket sqrt 
 AC_C_BIGENDIAN
 
 AC_CONFIG_FILES([Makefile
+		iperf/Makefile
 		omf_nmetrics/Makefile
 		omf_trace/Makefile
 		src/Makefile
