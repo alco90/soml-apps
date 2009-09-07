@@ -53,6 +53,7 @@ AC_CHECK_FUNCS([gethostbyname gettimeofday inet_ntoa memmove memset socket sqrt 
 AC_C_BIGENDIAN
 
 AC_CONFIG_FILES([Makefile
+		gps/Makefile
 		iperf/Makefile
 		omf_nmetrics/Makefile
 		omf_trace/Makefile
@@ -61,6 +62,7 @@ AC_CONFIG_FILES([Makefile
 		otg/src/cpp/generator/Makefile
 		otg/src/cpp/port/Makefile
 		simple/Makefile
+		wlanconfig/Makefile
 		src/Makefile
 		])
 

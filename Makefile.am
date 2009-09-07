@@ -1,3 +1,3 @@
 ACLOCAL_AMFLAGS = -I m4 -Wnone
 
-SUBDIRS = iperf omf_nmetrics omf_trace otg simple src
+SUBDIRS = gps iperf omf_nmetrics omf_trace otg simple src wlanconfig
