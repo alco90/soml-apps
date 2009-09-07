@@ -60,6 +60,7 @@ AC_CONFIG_FILES([Makefile
 		otg/src/cpp/core/Makefile
 		otg/src/cpp/generator/Makefile
 		otg/src/cpp/port/Makefile
+		simple/Makefile
 		src/Makefile
 		])
 
