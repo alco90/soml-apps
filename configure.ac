@@ -1,5 +1,5 @@
 AC_PREREQ([2.6])
-AC_INIT([oml-client], [1.0.0], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
+AC_INIT([oml-client], [2.3.1], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
