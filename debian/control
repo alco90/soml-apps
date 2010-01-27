@@ -1,0 +1,28 @@
+Source: oml-client
+Section: net
+Priority: extra
+Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
+Build-Depends: debhelper (>= 5), autoconf, automake, libtool, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml-dev (>= 2.3.4)
+Standards-Version: 3.7.2
+
+Package: oml-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsigar, libpopt0, liboml (>= 2.3.4), libtrace3, libc6
+Description: OML Client Applications
+ A collection of applications that use the OML client library to
+ collect measurements generated from a variety of different sources.
+ iperf_oml2 is a version of the popular iperf tool modified to send
+ measurements using OML; wlanconfig_oml2 provides WLAN information
+ taken from the wlanconfig program; gps_oml2 records GPS position
+ information from an external GPS device; trace_oml2 provides packet
+ capture analysis from libtrace; and nmetrics_oml2 provides
+ measurements of node statistics derived from libsigar.
+
+Package: otg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml (= ${Source-Version}), libc6
+Description: Orbit Traffic Generator
+ OTG provides an instrumented traffic source/sink pair, with
+ measurement collection on the transmitted and received traffic
+ streams using OML.
+

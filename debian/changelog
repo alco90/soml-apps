@@ -1,0 +1,5 @@
+oml-client (2.4.pre0-1) testing; urgency=low
+
+  * Initial release. (Closes: #000242)
+
+ -- Jolyon White <jolyon.white@nicta.com.au>  Sun, 31 Jan 2010 15:24:58 +1100
