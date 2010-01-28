@@ -1,4 +1,4 @@
-/*--------------------------------------------------------------- 
+/*---------------------------------------------------------------
  *
  * Gps.cpp
  * by Olivier Mehani <olivier.mehani@inria.fr>
@@ -19,17 +19,15 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#include "ocomm/o_log.h"
+#include <ocomm/o_log.h>
+#include <oml2/omlc.h>
 #include <iostream>
 using namespace std;
 #include "Gps.hpp"
-//#include "Locale.hpp"
-extern "C" {
-#include <oml2/omlc.h>
-}
-static OmlMPDef oml_def[] = { 
+
+static OmlMPDef oml_def[] = {
 {"longitute", OML_DOUBLE_VALUE},
-{"latitude", OML_DOUBLE_VALUE}, 
+{"latitude", OML_DOUBLE_VALUE},
 {"Xposition", OML_DOUBLE_VALUE},
 {"Yposition", OML_DOUBLE_VALUE},
 {"DistanceFromOrigin", OML_DOUBLE_VALUE},
@@ -43,7 +41,7 @@ static OmlMP* oml_mp = NULL;
 /* public members */
 
 Gps::Gps( char* device ) {
-    
+
     int len = strlen(device);
     GpsDevice = new char[len + 1];
     strncpy(GpsDevice, device, len);
@@ -55,14 +53,14 @@ Gps::Gps( char* device ) {
     Warning = true;
     Latitude = 0.;
     Longitude = 0;
-    
+
     Initialized = false;
     InitLatitude = 0;
     InitLongitude = 0;
-    
+
     oml_mp = omlc_add_mp("gps", oml_def);
-    
-    
+
+
 }
 
 Gps::~Gps( void ) {
@@ -82,14 +80,14 @@ void Gps::Update() {
     bool newdata = false;
 
     if (IsValid()) {
-	do {
-	    line = ReadLine();
+    do {
+        line = ReadLine();
         //cout<< "current GPS device information " << line << endl;
-	    newdata |= ParseNMEA(line);
-	} while(line.length() > 0);
-	if (!Initialized && newdata) {
-	    SetBaseCoordinates(Latitude, Longitude);
-	}
+        newdata |= ParseNMEA(line);
+    } while(line.length() > 0);
+    if (!Initialized && newdata) {
+        SetBaseCoordinates(Latitude, Longitude);
+    }
     }
 }
 
@@ -102,28 +100,28 @@ void Gps::SetBaseCoordinates(float latitude, float longitude) {
 
 void Gps::AcquireBaseCoordinates() {
     while (!Initialized) {
-	Update();
+    Update();
     }
 }
 
     float Gps::GetInitLatitude() {
-	if(Initialized)
-	    return InitLatitude;
-	return 0;
+    if(Initialized)
+        return InitLatitude;
+    return 0;
     }
 
     float Gps::GetInitLongitude() {
-	if(Initialized)
-	    return InitLongitude;
-	return 0;
+    if(Initialized)
+        return InitLongitude;
+    return 0;
     }
 
 float Gps::GetLastLatitude() {
-	return Latitude;
+    return Latitude;
 }
 
 float Gps::GetLastLongitude() {
-	return Longitude;
+    return Longitude;
 }
 
 float Gps::GetLastXCoordinate() {
@@ -154,14 +152,14 @@ bool Gps::GetWarning() {
 
 void Gps::OpenDevice(char* device) {
     if (!IsValid()) {
-	Initialized = false;
-	GpsDescriptor = open(device, O_ASYNC|O_NONBLOCK|O_RDONLY);
+    Initialized = false;
+    GpsDescriptor = open(device, O_ASYNC|O_NONBLOCK|O_RDONLY);
     }
 }
 
     void Gps::CloseDevice() {
-	if(IsValid())
-	    close(GpsDescriptor);
+    if(IsValid())
+        close(GpsDescriptor);
     }
 
 std::string Gps::ReadLine() {
@@ -169,16 +167,16 @@ std::string Gps::ReadLine() {
     std::string str;
     int len;
     if (IsValid()) {
-	do {
-	    len = read(GpsDescriptor, &buf, 1);
-	    if (len > 0) {
-		if (buf == '$')
-		    str.erase();
-		else if (buf == '\n' && ! str.empty())
-		    return str;
-		str.append(1, buf);
-	    }
-	} while (len > 0);
+    do {
+        len = read(GpsDescriptor, &buf, 1);
+        if (len > 0) {
+        if (buf == '$')
+            str.erase();
+        else if (buf == '\n' && ! str.empty())
+            return str;
+        str.append(1, buf);
+        }
+    } while (len > 0);
     }
     return "";
 }
@@ -191,11 +189,11 @@ bool Gps::ParseNMEA(std::string line) {
     ssize_t beg, end;
     std::string aTime, aDate, aLatitude, aLatitudeDirection, aLongitude, aLongitudeDirection, speedKnots;
     if (line.empty())
-	return false;
+    return false;
     c_line = line.c_str();
 
     if (strncmp(c_line, "$GPRMC", 6))
-	return false;
+    return false;
 
     /* Time */
     beg = line.find_first_of(',') + 1;
@@ -251,9 +249,9 @@ void Gps::ParseDateTime(std::string Date, std::string Time) {
     char buf[16]; /* Should still hold the seconds for a long time */
 
     if(Date.length() < 6 || Time.length() < 6) {
-	fprintf(stderr, "bad date or time format\n");
-	Warning = true;
-	return;
+    fprintf(stderr, "bad date or time format\n");
+    Warning = true;
+    return;
     }
     DateTime = 0;
     aDateTime.append(Time.substr(0,Time.find_first_of('.')));
@@ -269,9 +267,9 @@ void Gps::ParseLatitude(std::string latitude, std::string dir) {
     float minutes;
 
     if(latitude.length() < 7 || dir.length() != 1) {
-	fprintf(stderr, "missing latitude or direction\n");
-	Warning = true;
-	return;
+    fprintf(stderr, "missing latitude or direction\n");
+    Warning = true;
+    return;
     }
 
     /* FIXME: will this be working with all GPS's frames ? */
@@ -281,7 +279,7 @@ void Gps::ParseLatitude(std::string latitude, std::string dir) {
     Latitude = degrees + minutes / 60.;
 
     if(dir.c_str()[0] != 'N')
-	Latitude = -Latitude;
+    Latitude = -Latitude;
 }
 
 void Gps::ParseLongitude(std::string longitude, std::string dir) {
@@ -289,9 +287,9 @@ void Gps::ParseLongitude(std::string longitude, std::string dir) {
     float minutes;
 
     if(longitude.length() < 8 || dir.length() != 1) {
-	fprintf(stderr, "missing longitude or direction\n");
-	Warning = true;
-	return;
+    fprintf(stderr, "missing longitude or direction\n");
+    Warning = true;
+    return;
     }
 
     /* FIXME: will this be working with all GPS's frames ? */
@@ -301,27 +299,21 @@ void Gps::ParseLongitude(std::string longitude, std::string dir) {
     Longitude = degrees + minutes / 60.;
 
     if(dir.c_str()[0] != 'E')
-	Longitude = -Longitude;
+    Longitude = -Longitude;
 }
 void Gps::ParseSpeed(std::string speedKnots){
     speedKps = atof( speedKnots.c_str())*1.852;
-    
+
 }
 
 int main( int argc, char **argv ) {
     int* argc_;
     const char** argv_;
     omlc_init(argv[0], &argc, (const char**)argv, o_log);
-    
 
-    
-    Gps      *theGPS      = NULL;
-
-    
-    theGPS = new Gps(argv[1]);
-    
+    Gps *theGPS = new Gps(argv[1]);
     cout << "argv " <<argv[1] <<endl;
-    
+
     omlc_start();
     while(1){
         theGPS->Update();
@@ -340,7 +332,6 @@ int main( int argc, char **argv ) {
         }
         sleep(1);
     }
-        
 
     return 0;
 } // end main
