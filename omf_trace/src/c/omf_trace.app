@@ -4,17 +4,17 @@ defApplication('max:app:omf_trace', 'omf_trace') do |a|
   a.version(1, 0, 0)
   a.shortDescription = 'A short description'
   a.description = %{
-A longer description describing in more detail what this application 
+A longer description describing in more detail what this application
 is doing and useful for.
 }
 
-  a.defProperty('filter', 'Filter expression BPFEXP', ?f, 
+  a.defProperty('filter', 'Filter expression BPFEXP', ?f,
 		:type => :string)
-  a.defProperty('snaplen', '???', ?s, 
+  a.defProperty('snaplen', '???', ?s,
 		:type => :int, :unit => 'bytes')
-  a.defProperty('promisc', '???', ?p, 
+  a.defProperty('promisc', '???', ?p,
 		:type => :flag)
-  a.defProperty('interface', 'Interface to trace', ?i, 
+  a.defProperty('interface', 'Interface to trace', ?i,
 		:type => :string)
 
   a.defMeasurement("radiotap") do |m|
@@ -43,6 +43,28 @@ is doing and useful for.
     m.defMetric('ip_sum', 'long', 'Checksum')
     m.defMetric('ip_src', 'string', ' Source Address')
     m.defMetric('ip_dst', 'string', ' Destination Address')
+	m.defMetric('ip_sizeofpacket', 'long', ' Size of the Packet')
+	m.defMetric('ip_ts', 'double', ' timestamp of the measurement')
+  end
+
+  a.defMeasurement("tcp") do |m|
+    m.defMetric('tcp_source', 'long', ' Source Port')
+    m.defMetric('tcp_dest', 'long', ' Destination Port')
+    m.defMetric('tcp_seq', 'long', ' TCP sequence Number')
+    m.defMetric('tcp_ack_seq', 'long', ' Acknowledgment Number')
+    m.defMetric('tcp_window', 'long', ' Window Size')
+    m.defMetric('tcp_checksum', 'long', ' Checksum')
+    m.defMetric('tcp_urgptr', 'long', ' Urgent Pointer')
+	m.defMetric('tcp_packet_size', 'long', ' Size of the Packet')
+	m.defMetric('tcp_ts', 'double', ' timestamp of the measurement')
+  end
+
+  a.defMeasurement("udp") do |m|
+    m.defMetric('udp_source', 'long', ' Source Port')
+    m.defMetric('udp_dest', 'long', ' Destination Port')
+    m.defMetric('udp_len', 'long', ' Length of Datagram')
+    m.defMetric('udp_checksum', 'long', ' Checksum')
+    m.defMetric('udp_ts', 'double', ' timestamp of the measurement')
   end
 
   a.defMeasurement("sensor") do |m|

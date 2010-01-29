@@ -18,9 +18,10 @@
 static void
 omlc_inject_ip(
   libtrace_ip_t* ip,
-  libtrace_packet_t *packet
+  libtrace_packet_t *packet,
+  double time_now
 ) {
-    OmlValueU v[9];
+    OmlValueU v[11];
     char* cp;
     char buf_addr_src[INET_ADDRSTRLEN];
     char buf_addr_dst[INET_ADDRSTRLEN];
@@ -35,7 +36,7 @@ omlc_inject_ip(
 //strcpy(addr_src, cp);
     //cp = inet_ntoa(ip->ip_dst);
     //strcpy(addr_dst, cp);
-    
+
     omlc_set_long(v[0], ip->ip_tos);
     omlc_set_long(v[1], ip->ip_len);
     omlc_set_long(v[2], ip->ip_id);
@@ -45,14 +46,50 @@ omlc_inject_ip(
     omlc_set_long(v[6], ip->ip_sum);
     omlc_set_const_string(v[7], addr_src );
     omlc_set_const_string(v[8], addr_dst);
+    omlc_set_long(v[9], trace_get_capture_length(packet));
+    omlc_set_double(v[10], time_now)
     omlc_inject(g_oml_mps->ip, v);
 }
 
 static void
 omlc_inject_tcp(
   libtrace_tcp_t* tcp,
-  void* payload
+  libtrace_packet_t *packet,
+  void* payload,
+  double time_now
 ) {
+    OmlValueU v[9];
+    uint16_t source = tcp->source;
+
+    omlc_set_long(v[0], trace_get_source_port(packet));
+    omlc_set_long(v[1], trace_get_destination_port(packet));
+    omlc_set_long(v[2], tcp->seq);
+    omlc_set_long(v[3], tcp->ack_seq);
+    omlc_set_long(v[4], tcp->window);
+    omlc_set_long(v[5], tcp->check);
+    omlc_set_long(v[6], tcp->urg_ptr);
+    omlc_set_long(v[7], trace_get_capture_length(packet));
+    omlc_set_double(v[8], time_now)
+    omlc_inject(g_oml_mps->tcp, v);
+
+}
+
+static void
+omlc_inject_udp(
+  libtrace_udp_t* udp,
+  libtrace_packet_t *packet,
+  void* payload,
+  double time_now
+) {
+    OmlValueU v[5];
+
+    omlc_set_long(v[0], trace_get_source_port(packet));
+    omlc_set_long(v[1], trace_get_destination_port(packet));
+    omlc_set_long(v[2], udp->len);
+    omlc_set_long(v[3], udp->check);
+    omlc_set_double(v[4], time_now)
+    omlc_inject(g_oml_mps->udp, v);
+
 }
 
 static void
@@ -71,8 +108,8 @@ omlc_inject_radiotap(
   uint8_t n_db_strength;
   uint16_t attenuation;
   uint16_t attenuation_db;
-  int8_t txpower; 
-  uint8_t antenna; 
+  int8_t txpower;
+  uint8_t antenna;
   trace_get_wireless_tsft (linkptr,linktype, &tsft);
   trace_get_wireless_rate (linkptr, linktype, &rate);
   trace_get_wireless_freq (linkptr, linktype, &freq);
@@ -96,15 +133,16 @@ omlc_inject_radiotap(
   omlc_set_long(v[9], txpower);
   omlc_set_long(v[10], antenna);
   omlc_set_long(v[11], trace_get_source_mac(packet));
-  omlc_set_long(v[12], trace_get_destination_mac(packet)); 
+  omlc_set_long(v[12], trace_get_destination_mac(packet));
   omlc_inject(g_oml_mps->radiotap, v);
 
 
 
 }
-static void 
+static void
 per_packet(
-  libtrace_packet_t* packet
+  libtrace_packet_t* packet,
+  long start_time
 ) {
   double                last_ts;
   uint32_t              remaining;
@@ -116,10 +154,13 @@ per_packet(
   void*                 linkptr;
   libtrace_linktype_t   linktype;
   last_ts = trace_get_seconds(packet);
+  size_t size_of_packet = 0;
+  struct timeval tv = trace_get_timeval(packet);
+  double now = tv.tv_sec - start_time + 0.000001 * tv.tv_usec;
 
   /* Get link Packet */
-  linkptr = trace_get_packet_buffer( packet, &linktype,	&remaining);  	
-  
+  linkptr = trace_get_packet_buffer( packet, &linktype, &remaining);
+
   if(linktype == 15){
     omlc_inject_radiotap( linktype, linkptr, packet);
   }
@@ -135,43 +176,46 @@ per_packet(
   case 0x0800: {
     libtrace_ip_t* ip = (libtrace_ip_t*)l3;
     transport = trace_get_payload_from_ip(ip, &proto, &remaining);
-    omlc_inject_ip(ip, packet);
+    omlc_inject_ip(ip, packet, now);
+    //size_of_packet =  trace_get_capture_length(ip);
     if (!transport) return;
     break;
   }
   case 0x86DD:
     transport = trace_get_payload_from_ip6((libtrace_ip6_t*)l3,
-					   &proto,
-					   &remaining);
+                       &proto,
+                       &remaining);
     if (!transport)
       return;
-    
+
     break;
   default:
     return;
   }
-
   /* Parse the udp/tcp/icmp payload */
   switch(proto) {
   case 1:
     // icmp;
     return;
-
   case 6: {
-    libtrace_tcp_t* tcp = (libtrace_tcp_t*)transport;
+
+        libtrace_tcp_t* tcp = trace_get_tcp(packet);
     payload = trace_get_payload_from_tcp(tcp, &remaining);
-    omlc_inject_tcp(tcp, payload);
-    if (!payload) return;
+    omlc_inject_tcp(tcp, packet, payload, now);
+    if (!payload)
+            return;
     break;
   }
-  
-  case 17:
-    payload = trace_get_payload_from_udp((libtrace_udp_t*)transport,
-					 &remaining);
+  case 17:{
+
+    libtrace_udp_t* udp = trace_get_udp(packet);
+    payload = trace_get_payload_from_udp(udp,
+                     &remaining);
+        omlc_inject_udp(udp, packet, payload, now);
     if (!payload)
       return;
     break;
-	
+  }
   default:
     return;
   }
@@ -185,6 +229,9 @@ run(
   libtrace_t* trace;
   libtrace_packet_t* packet;
   libtrace_filter_t* filter = NULL;
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  long start_time = tv.tv_sec;
 
 
   trace = trace_create(opts->interface);
@@ -198,7 +245,7 @@ run(
       trace_perror(trace, "ignoring: ");
     }
   }
-   
+
   if (opts->filter) {
     filter = trace_create_filter(opts->filter);
 
@@ -206,7 +253,7 @@ run(
       trace_perror(trace, "ignoring: ");
     }
   }
-  
+
   if (opts->promisc) {
     if (trace_config(trace, TRACE_OPTION_PROMISC, &opts->promisc)) {
       trace_perror(trace, "ignoring: ");
@@ -220,7 +267,7 @@ run(
 
   packet = trace_create_packet();
   while (trace_read_packet(trace, packet) > 0) {
-    per_packet(packet);
+    per_packet(packet, start_time);
   }
 
   trace_destroy_packet(packet);
@@ -254,7 +301,7 @@ main(
   int argc,
   const char *argv[]
 ) {
-  omlc_init(argv[0], &argc, argv, NULL); 
+  omlc_init(argv[0], &argc, argv, NULL);
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
@@ -272,7 +319,7 @@ main(
 
   // Do some work
 
-	run(g_opts, g_oml_mps);
+    run(g_opts, g_oml_mps);
 
 
 
