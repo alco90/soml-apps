@@ -1,3 +1,9 @@
+oml-client (2.3.5-ubuntu2) karmic; urgency=low
+
+  * Change to karmic repository and Ubuntu package version numbering.
+
+ -- Jolyon White <jolyon.white@nicta.com.au>  Mon, 15 Mar 2010 16:46:42 +1100
+
 oml-client (2.3.5-1) testing; urgency=low
 
   * Initial release. (Closes: #000242)
