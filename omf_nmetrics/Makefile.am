@@ -5,6 +5,7 @@ progname = omf_nmetrics
 bin_PROGRAMS = nmetrics_oml2
 nmetrics_oml2_SOURCES = src/c/omf_nmetrics.c
 nmetrics_oml2_LDADD = -loml2 -locomm -lsigar -lpopt
+nmetrics_oml2_CPPFLAGS = $(LIBSIGAR_CFLAGS)
 
 BUILT_SOURCES = \
 	$(progname)_popt.h \

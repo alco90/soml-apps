@@ -2,7 +2,7 @@
  *  OML application reporting various node metrics, such as cpu, memory, ...
  *
  * Description:  This application is using the libsigar library to report regularily
- *    through the OML framework on various node metrics, such as cpu load, memory 
+ *    through the OML framework on various node metrics, such as cpu load, memory
  *    and network usage.
  *
  * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2008
@@ -46,11 +46,7 @@ OmlMP*   cpu_mp;
 OmlMP*   memory_mp;
 OmlMP*   net_mp;
 
-#ifdef HAVE_SIGAR_H_IN_LIBSIGAR
-#include <libsigar/sigar.h>
-#else
 #include <sigar.h>
-#endif
 
 typedef struct _if_monitor_t {
   char           if_name[64];
@@ -69,7 +65,7 @@ typedef struct _if_monitor_t {
   sigar_uint64_t start_tx_overruns;
   sigar_uint64_t start_tx_collisions;
   sigar_uint64_t start_tx_carrier;
-  
+
   struct _if_monitor_t* next;
 } if_monitor_t;
 
@@ -84,7 +80,7 @@ main(
   if_monitor_t* first = NULL;
   if_monitor_t* if_p;
 
-  omlc_init(argv[0], &argc, argv, NULL); 
+  omlc_init(argv[0], &argc, argv, NULL);
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
@@ -128,7 +124,7 @@ cpu(
   sigar_cpu_t c;
 
   sigar_cpu_get(sigar_p, &c);
-  
+
   // NOTE: We cast from a u_64 to a long
   v[0].longValue = (long)c.user;
   v[1].longValue = (long)c.sys;
@@ -232,7 +228,7 @@ run(
       network_if(sigar_p, if_p);
       if_p = if_p->next;
     }
-    
+
     sigar_close(sigar_p);
     sleep(g_opts->sample_interval);
   }
