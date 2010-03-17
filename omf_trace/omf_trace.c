@@ -1,5 +1,6 @@
 
 #include <libtrace.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -10,10 +11,6 @@
 #include <netinet/in.h>
 #define OML_FROM_MAIN
 #include "omf_trace_oml.h"
-
-
-
-
 
 static void
 omlc_inject_ip(
@@ -91,6 +88,43 @@ omlc_inject_udp(
     omlc_inject(g_oml_mps->udp, v);
 
 }
+static int trace_get_wireless_retries(void *link,
+    libtrace_linktype_t linktype, uint8_t *data_retries)
+{
+  uint8_t *p;
+  void *l;
+  uint16_t type;
+
+  if (link == NULL || data_retries == NULL) return false;
+    switch (linktype) {
+    case TRACE_TYPE_80211_RADIO:
+    if ((p = (uint8_t *) trace_get_radiotap_field(link,
+      TRACE_RADIOTAP_RTS_RETRIES))) {
+      *data_retries = *p;
+      return 0;
+    } else break;
+    default:
+      return 1;
+    }
+    return 1;
+}
+
+void
+mac_to_s (uint8_t *mac, char *s, int n)
+{
+  if (mac == NULL)
+    {
+      strncpy (s, "address NULL", n);
+    }
+  else
+    {
+      snprintf (s, n, "%02x:%02x:%02x:%02x:%02x:%02x",
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    }
+}
+
+#define MAC_OCTETS 6
+#define MAC_STRING_LENGTH (3*MAC_OCTETS)
 
 static void
 omlc_inject_radiotap(
@@ -110,6 +144,10 @@ omlc_inject_radiotap(
   uint16_t attenuation_db;
   int8_t txpower;
   uint8_t antenna;
+  uint8_t *mac_source;
+  uint8_t *mac_dst;
+  char macS[MAC_STRING_LENGTH];
+  char macD[MAC_STRING_LENGTH];
   trace_get_wireless_tsft (linkptr,linktype, &tsft);
   trace_get_wireless_rate (linkptr, linktype, &rate);
   trace_get_wireless_freq (linkptr, linktype, &freq);
@@ -121,6 +159,11 @@ omlc_inject_radiotap(
   trace_get_wireless_tx_attenuation_db (linkptr, linktype, &attenuation_db);
   trace_get_wireless_tx_power_dbm (linkptr, linktype, &txpower);
   trace_get_wireless_antenna (linkptr, linktype, &antenna);
+  mac_source = trace_get_source_mac(packet);
+  mac_dst = trace_get_destination_mac(packet);
+  mac_to_s (mac_source, macS, sizeof(macS) / sizeof(macS[0]));
+  mac_to_s (mac_dst, macD, sizeof(macD) / sizeof(macD[0]));
+
   omlc_set_long(v[0], tsft);
   omlc_set_long(v[1], rate);
   omlc_set_long(v[2], freq);
@@ -132,18 +175,16 @@ omlc_inject_radiotap(
   omlc_set_long(v[8], attenuation_db);
   omlc_set_long(v[9], txpower);
   omlc_set_long(v[10], antenna);
-  omlc_set_long(v[11], trace_get_source_mac(packet));
-  omlc_set_long(v[12], trace_get_destination_mac(packet));
+  omlc_set_const_string(v[11], macS);
+  omlc_set_const_string(v[12], macD);
   omlc_inject(g_oml_mps->radiotap, v);
-
-
-
 }
+
 static void
 per_packet(
-  libtrace_packet_t* packet,
-  long start_time
-) {
+           libtrace_packet_t* packet,
+           long start_time
+           ) {
   double                last_ts;
   uint32_t              remaining;
   void*                 l3;
@@ -157,12 +198,13 @@ per_packet(
   size_t size_of_packet = 0;
   struct timeval tv = trace_get_timeval(packet);
   double now = tv.tv_sec - start_time + 0.000001 * tv.tv_usec;
-
   /* Get link Packet */
   linkptr = trace_get_packet_buffer( packet, &linktype, &remaining);
 
-  if(linktype == 15){
-    omlc_inject_radiotap( linktype, linkptr, packet);
+  if(g_opts->radiotap){
+    if(linktype == 15){
+      omlc_inject_radiotap( linktype, linkptr, packet);
+    }
   }
 
   l3 = trace_get_layer3(packet, &ethertype, &remaining);
@@ -183,8 +225,8 @@ per_packet(
   }
   case 0x86DD:
     transport = trace_get_payload_from_ip6((libtrace_ip6_t*)l3,
-                       &proto,
-                       &remaining);
+                                           &proto,
+                                           &remaining);
     if (!transport)
       return;
 
@@ -197,21 +239,19 @@ per_packet(
   case 1:
     // icmp;
     return;
-  case 6: {
-
-        libtrace_tcp_t* tcp = trace_get_tcp(packet);
-    payload = trace_get_payload_from_tcp(tcp, &remaining);
+  case 6:{
+    libtrace_tcp_t* tcp = trace_get_tcp(packet);
+    payload = trace_get_payload_from_tcp(tcp,  &remaining);
     omlc_inject_tcp(tcp, packet, payload, now);
     if (!payload)
-            return;
+      return;
     break;
   }
   case 17:{
-
     libtrace_udp_t* udp = trace_get_udp(packet);
     payload = trace_get_payload_from_udp(udp,
-                     &remaining);
-        omlc_inject_udp(udp, packet, payload, now);
+                                         &remaining);
+    omlc_inject_udp(udp, packet, payload, now);
     if (!payload)
       return;
     break;
@@ -221,6 +261,15 @@ per_packet(
   }
 }
 
+void iferr(libtrace_t *trace)
+{
+  libtrace_err_t err = trace_get_err(trace);
+  if (err.err_num==0)
+    return;
+  printf("Error: %s\n",err.problem);
+  exit(1);
+}
+
 static int
 run(
   opts_t* opts,
@@ -228,7 +277,7 @@ run(
 ) {
   libtrace_t* trace;
   libtrace_packet_t* packet;
-  libtrace_filter_t* filter = NULL;
+  libtrace_filter_t* filter;
   struct timeval tv;
   gettimeofday(&tv, NULL);
   long start_time = tv.tv_sec;
@@ -248,10 +297,11 @@ run(
 
   if (opts->filter) {
     filter = trace_create_filter(opts->filter);
-
-    if (trace_config(trace, TRACE_OPTION_FILTER, &filter)) {
+    printf("FILTER %s \n", opts->filter);
+    if (trace_config(trace, TRACE_OPTION_FILTER, filter)) {
       trace_perror(trace, "ignoring: ");
     }
+    iferr(trace);
   }
 
   if (opts->promisc) {
@@ -259,11 +309,13 @@ run(
       trace_perror(trace, "ignoring: ");
     }
   }
-
-  if (trace_start(trace)) {
-    trace_perror(trace, "Starting trace");
-    return 1;
+  if (trace_start(trace)==-1) {
+    iferr(trace);
   }
+  //if (trace_start(trace)) {
+    //trace_perror(trace, "Starting trace");
+   // return 1;
+  //}
 
   packet = trace_create_packet();
   while (trace_read_packet(trace, packet) > 0) {
@@ -297,11 +349,14 @@ run(
 }
 
 int
-main(
-  int argc,
-  const char *argv[]
-) {
+main(int argc, const char *argv[])
+{
+  fprintf(stderr, " *** trace_oml2 -- modified for debugging -- 2010-03-16 ***\n");
   omlc_init(argv[0], &argc, argv, NULL);
+  char str[50] = "int:";
+  char radiotap_dev[68] = "/proc/sys/net/";
+  FILE *radio_dev_type;
+  char *value_radio;
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
@@ -312,19 +367,27 @@ main(
     fprintf(stderr, "Missing interface\n");
     return 1;
   }
+  printf("filter %s\n", g_opts->filter);
 
+  if(g_opts->radiotap){
+    strcat(radiotap_dev, g_opts->interface);
+    strcat(radiotap_dev,"/dev_type");
+    printf("value of dev_type %s \n", radiotap_dev);
+
+    radio_dev_type = fopen(radiotap_dev,"rb");
+    if(radio_dev_type == NULL){
+      printf("You need to enable radiotap in %s, by putting the value 803.\n We disactivate radiotap measurements.\n", radiotap_dev);
+      g_opts->radiotap = 0;
+    }
+  }
+  strcat(str,g_opts->interface);
+  strcpy(g_opts->interface, str);
   // Initialize measurment points
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
 
   // Do some work
-
-    run(g_opts, g_oml_mps);
-
-
-
-
-
+  run(g_opts, g_oml_mps);
 
   return(0);
 }

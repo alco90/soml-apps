@@ -16,6 +16,8 @@ is doing and useful for.
 		:type => :flag)
   a.defProperty('interface', 'Interface to trace', ?i,
 		:type => :string)
+  a.defProperty('radiotap', 'Enable radiotap', ?r,
+		:type => :flag)
 
   a.defMeasurement("radiotap") do |m|
       m.defMetric('tsft', 'long', ' wireless Timer Syncronisation Function')
@@ -29,8 +31,8 @@ is doing and useful for.
       m.defMetric('attenuation_dB', 'long', ' Transmit Attenuation in dB')
       m.defMetric('power', 'long', ' Transmit Power in dBm')
       m.defMetric('antenna', 'long', ' Wireless Antenna')
-      m.defMetric('sourceMAC', 'long', ' Source MAC Address')
-      m.defMetric('dstMAC', 'long', ' Destination MAC Address')
+      m.defMetric('sourceMAC', 'string', ' Source MAC Address')
+      m.defMetric('dstMAC', 'string', ' Destination MAC Address')
  end
 
   a.defMeasurement("ip") do |m|
