@@ -1,0 +1,7 @@
+2010-03-17    <jolyon.white@nicta.com.au>
+
+	* oml2-apps: Initial release of OML Applications from their own
+	source repository (separate from core OML).
+
+	* configure.ac: Add checks for library headers; don't generate the
+	build system if there are missing headers.
