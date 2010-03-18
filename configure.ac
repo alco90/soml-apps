@@ -75,7 +75,6 @@ AC_CONFIG_FILES([Makefile
 		otg/src/cpp/port/Makefile
 		simple/Makefile
 		wlanconfig/Makefile
-		src/Makefile
 		])
 
 		
