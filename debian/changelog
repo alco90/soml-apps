@@ -1,3 +1,10 @@
+oml-client (2.3.6-ubuntu2) karmic; urgency=low
+
+  * Fix dependency version of liboml in otg package (was (= ${SourceVersion}),
+    should be (>= 2.3.4)).
+
+ -- Jolyon White <jolyon.white@nicta.com.au>  Fri, 19 Mar 2010 14:07:23 +1100
+
 oml-client (2.3.6-ubuntu1) karmic; urgency=low
 
   * New upstream release.

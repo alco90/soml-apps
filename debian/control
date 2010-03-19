@@ -20,7 +20,7 @@ Description: OML Client Applications
 
 Package: otg
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml (= ${Source-Version}), libc6
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml (>= 2.3.4), libc6
 Description: Orbit Traffic Generator
  OTG provides an instrumented traffic source/sink pair, with
  measurement collection on the transmitted and received traffic
