@@ -30,10 +30,6 @@ omlc_inject_ip(
     strcpy(addr_src,buf_addr_src);
     strcpy(addr_dst,buf_addr_dst);
 
-//strcpy(addr_src, cp);
-    //cp = inet_ntoa(ip->ip_dst);
-    //strcpy(addr_dst, cp);
-
     omlc_set_long(v[0], ip->ip_tos);
     omlc_set_long(v[1], ip->ip_len);
     omlc_set_long(v[2], ip->ip_id);
@@ -312,10 +308,6 @@ run(
   if (trace_start(trace)==-1) {
     iferr(trace);
   }
-  //if (trace_start(trace)) {
-    //trace_perror(trace, "Starting trace");
-   // return 1;
-  //}
 
   packet = trace_create_packet();
   while (trace_read_packet(trace, packet) > 0) {
@@ -327,23 +319,6 @@ run(
     trace_perror(trace, "Reading packets");
   }
   trace_destroy(trace);
-
-
-
-  /*
-  long val = 1;
-  do {
-    OmlValueU v[3];
-
-    omlc_set_long(v[0], val);
-    omlc_set_double(v[1], 1.0 / val);
-    omlc_set_const_string(v[2], "foo");
-    omlc_inject(oml_mps->sensor, v);
-
-    val += 2;
-    if (opts->loop) sleep(opts->delay);
-  } while (opts->loop);
-  */
 
   return 0;
 }
@@ -367,16 +342,14 @@ main(int argc, const char *argv[])
     fprintf(stderr, "Missing interface\n");
     return 1;
   }
-  printf("filter %s\n", g_opts->filter);
 
   if(g_opts->radiotap){
     strcat(radiotap_dev, g_opts->interface);
     strcat(radiotap_dev,"/dev_type");
-    printf("value of dev_type %s \n", radiotap_dev);
 
     radio_dev_type = fopen(radiotap_dev,"rb");
     if(radio_dev_type == NULL){
-      printf("You need to enable radiotap in %s, by putting the value 803.\n We disactivate radiotap measurements.\n", radiotap_dev);
+      printf("WARNING:  You need to enable radiotap in %s, by putting the value 803.\n Radiotap measurements are disabled for this run.\n", radiotap_dev);
       g_opts->radiotap = 0;
     }
   }
