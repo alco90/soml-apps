@@ -126,15 +126,15 @@ cpu(
   sigar_cpu_get(sigar_p, &c);
 
   // NOTE: We cast from a u_64 to a long
-  v[0].longValue = (long)c.user;
-  v[1].longValue = (long)c.sys;
-  v[2].longValue = (long)c.nice;
-  v[3].longValue = (long)c.idle;
-  v[4].longValue = (long)c.wait;
-  v[5].longValue = (long)c.irq;
-  v[6].longValue = (long)c.soft_irq;
-  v[7].longValue = (long)c.stolen;
-  v[8].longValue = (long)c.total;
+  omlc_set_uint64(v[0], c.user);
+  omlc_set_uint64(v[1], c.sys);
+  omlc_set_uint64(v[2], c.nice);
+  omlc_set_uint64(v[3], c.idle);
+  omlc_set_uint64(v[4], c.wait);
+  omlc_set_uint64(v[5], c.irq);
+  omlc_set_uint64(v[6], c.soft_irq);
+  omlc_set_uint64(v[7], c.stolen);
+  omlc_set_uint64(v[8], c.total);
   omlc_inject(mp_p, v);
 }
 
@@ -149,12 +149,12 @@ memory(
   sigar_mem_get(sigar_p, &m);
 
   // NOTE: We cast from a u_64 to a long
-  v[0].longValue = (long)(m.ram / 1000);
-  v[1].longValue = (long)(m.total / 1000);
-  v[2].longValue = (long)(m.used / 1000);
-  v[3].longValue = (long)(m.free / 1000);
-  v[4].longValue = (long)(m.actual_used / 1000);
-  v[5].longValue = (long)(m.actual_free / 1000);
+  omlc_set_uint64(v[0], (m.ram ));
+  omlc_set_uint64(v[1], (m.total ));
+  omlc_set_uint64(v[2],(m.used ));
+  omlc_set_uint64(v[3], (m.free ));
+  omlc_set_uint64(v[4], (m.actual_used ));
+  omlc_set_uint64(v[5], (m.actual_free ));
   omlc_inject(mp_p, v);
 }
 
@@ -187,20 +187,20 @@ network_if(
   static char name[34] = "foo";
 
   omlc_set_const_string(v[0], net_if->if_name);
-  v[1].longValue = (long)(is.rx_packets - net_if->start_rx_packets);
-  v[2].longValue = (long)(is.rx_bytes - net_if->start_rx_bytes);
-  v[3].longValue = (long)(is.rx_errors - net_if->start_rx_errors);
-  v[4].longValue = (long)(is.rx_dropped - net_if->start_rx_dropped);
-  v[5].longValue = (long)(is.rx_overruns - net_if->start_rx_overruns);
-  v[6].longValue = (long)(is.rx_frame - net_if->start_rx_frame);
-  v[7].longValue = (long)(is.tx_packets - net_if->start_tx_packets);
-  v[8].longValue = (long)(is.tx_bytes - net_if->start_tx_bytes);
-  v[9].longValue = (long)(is.tx_errors - net_if->start_tx_errors);
-  v[10].longValue = (long)(is.tx_dropped - net_if->start_tx_dropped);
-  v[11].longValue = (long)(is.tx_overruns - net_if->start_tx_overruns);
-  v[12].longValue = (long)(is.tx_collisions - net_if->start_tx_collisions);
-  v[13].longValue = (long)(is.tx_carrier); // - net_if->start_tx_carrier);
-  v[14].longValue = (long)(is.speed / 1000000);
+  omlc_set_uint64(v[1], (is.rx_packets - net_if->start_rx_packets));
+  omlc_set_uint64(v[2], (is.rx_bytes - net_if->start_rx_bytes));
+  omlc_set_uint64(v[3], (is.rx_errors - net_if->start_rx_errors));
+  omlc_set_uint64(v[4], (is.rx_dropped - net_if->start_rx_dropped));
+  omlc_set_uint64(v[5], (is.rx_overruns - net_if->start_rx_overruns));
+  omlc_set_uint64(v[6], (is.rx_frame - net_if->start_rx_frame));
+  omlc_set_uint64(v[7], (is.tx_packets - net_if->start_tx_packets));
+  omlc_set_uint64(v[8], (is.tx_bytes - net_if->start_tx_bytes));
+  omlc_set_uint64(v[9], (is.tx_errors - net_if->start_tx_errors));
+  omlc_set_uint64(v[10], (is.tx_dropped - net_if->start_tx_dropped));
+  omlc_set_uint64(v[11], (is.tx_overruns - net_if->start_tx_overruns));
+  omlc_set_uint64(v[12], (is.tx_collisions - net_if->start_tx_collisions));
+  omlc_set_uint64(v[13], (is.tx_carrier)); // - net_if->start_tx_carrier);
+  omlc_set_uint64(v[14], (is.speed / 1000000));
 
   omlc_inject(net_mp, v);
 }

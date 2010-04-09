@@ -310,7 +310,7 @@ void PerfSocket::ReportBW( max_size_t inBytes,
     } else {
 
         OmlValueU v[5];
-        v[0].longValue = (long) mSock;
+        omlc_set_int32(v[0], mSock);
         v[1].doubleValue = (double) inStart;
         v[2].doubleValue = (double) inStop;
         omlc_set_double(v[3], (double) inBytes);
@@ -373,14 +373,14 @@ void PerfSocket::ReportBW_Jitter_Loss( max_size_t inBytes,
 			    mGps->GetDistanceFromBase(), mGps->GetLastTime()); 
     } else {
         OmlValueU v[9];
-        v[0].longValue = (long) mSock;
+        omlc_set_int32(v[0], mSock);
         v[1].doubleValue = (double) inStart;
         v[2].doubleValue = (double) inStop;
         omlc_set_double(v[3], (double) inBytes);
         omlc_set_double(v[4], (double) inBytes / (inStop - inStart));
         v[5].doubleValue = (double) (mJitter*1000.0);
-        v[6].longValue = (long) inErrorcnt;
-        v[7].longValue = (long) inDatagrams;
+        omlc_set_int32(v[6], inErrorcnt);
+        omlc_set_int32(v[7], inDatagrams);
         v[8].doubleValue = (double)  ((100.0 * inErrorcnt) / inDatagrams) ;
         omlc_inject(udp_measure, v);
         
@@ -416,11 +416,11 @@ void PerfSocket::ReportPeer( int inSock ) {
 
     sReporting.Lock();
     OmlValueU v[5];
-        v[0].longValue = (long) inSock;
+        omlc_set_int32(v[0], inSock);
         omlc_set_const_string(v[1], local_addr);
-        v[2].longValue = (long) local.getPort();
+        omlc_set_int32(v[2], local.getPort());
         omlc_set_const_string(v[3], remote_addr);
-        v[4].longValue = (long) remote.getPort();
+        omlc_set_int32(v[4], remote.getPort());
         
         omlc_inject(peer_information, v);
     

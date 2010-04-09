@@ -39,10 +39,10 @@
 #include <oml2/omlc.h>
 
 static OmlMPDef oml_def[] = {
-  {"macAddress", OML_STRING_PTR_VALUE},
+  {"macAddress", OML_STRING_VALUE},
   {"RSSI", OML_LONG_VALUE},
   {"DBM", OML_LONG_VALUE},
-  {"myMacAddress", OML_STRING_PTR_VALUE},
+  {"myMacAddress", OML_STRING_VALUE},
   {NULL, (OmlValueT)0},
 };
 static OmlMP* oml_mp = NULL;

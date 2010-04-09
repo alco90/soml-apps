@@ -40,7 +40,7 @@ omlc_inject_ip(
     omlc_set_const_string(v[7], addr_src );
     omlc_set_const_string(v[8], addr_dst);
     omlc_set_long(v[9], trace_get_capture_length(packet));
-    omlc_set_double(v[10], time_now)
+    omlc_set_double(v[10], time_now);
     omlc_inject(g_oml_mps->ip, v);
 }
 
@@ -62,7 +62,7 @@ omlc_inject_tcp(
     omlc_set_long(v[5], tcp->check);
     omlc_set_long(v[6], tcp->urg_ptr);
     omlc_set_long(v[7], trace_get_capture_length(packet));
-    omlc_set_double(v[8], time_now)
+    omlc_set_double(v[8], time_now);
     omlc_inject(g_oml_mps->tcp, v);
 
 }
@@ -80,7 +80,7 @@ omlc_inject_udp(
     omlc_set_long(v[1], trace_get_destination_port(packet));
     omlc_set_long(v[2], udp->len);
     omlc_set_long(v[3], udp->check);
-    omlc_set_double(v[4], time_now)
+    omlc_set_double(v[4], time_now);
     omlc_inject(g_oml_mps->udp, v);
 
 }

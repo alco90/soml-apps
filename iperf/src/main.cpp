@@ -78,7 +78,7 @@ OmlMP* tcp_measure;
 OmlMP* udp_measure;
 OmlMP* peer_information; 
 static OmlMPDef tcp_receiverport[] = {
-  {"ID", OML_LONG_VALUE},
+  {"ID", OML_INT32_VALUE},
   {"Begin_interval", OML_DOUBLE_VALUE},
   {"End_interval", OML_DOUBLE_VALUE},
   {"Transfer", OML_DOUBLE_VALUE},
@@ -86,23 +86,23 @@ static OmlMPDef tcp_receiverport[] = {
   {NULL, (OmlValueT)0}
 };
 static OmlMPDef udp_receiverport[] = {
-  {"ID", OML_LONG_VALUE},
+  {"ID", OML_INT32_VALUE},
   {"Begin_interval", OML_DOUBLE_VALUE},
   {"End_interval", OML_DOUBLE_VALUE},
   {"Transfer", OML_DOUBLE_VALUE},
   {"Bandwidth", OML_DOUBLE_VALUE},
   {"Jitter", OML_DOUBLE_VALUE},
-  {"Packet_Lost", OML_LONG_VALUE},
-  {"Total_Packet", OML_LONG_VALUE},
+  {"Packet_Lost", OML_INT32_VALUE},
+  {"Total_Packet", OML_INT32_VALUE},
   {"PLR", OML_DOUBLE_VALUE},
   {NULL, (OmlValueT)0}
 };
 static OmlMPDef peer_info[] = {
-  {"ID", OML_LONG_VALUE},
+  {"ID", OML_INT32_VALUE},
   {"local_address", OML_STRING_VALUE},
-  {"local_port", OML_LONG_VALUE},
+  {"local_port", OML_INT32_VALUE},
   {"foreign_address", OML_STRING_VALUE},
-  {"foreign_port", OML_LONG_VALUE},
+  {"foreign_port", OML_INT32_VALUE},
   {NULL, (OmlValueT)0}
 };
 
