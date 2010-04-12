@@ -1,3 +1,7 @@
+2010-04-12    <jolyon.white@nicta.com.au>
+
+	* oml2-apps: Fix bugs in wlanconfig_oml2.
+
 2010-03-17    <jolyon.white@nicta.com.au>
 
 	* oml2-apps: Initial release of OML Applications from their own
