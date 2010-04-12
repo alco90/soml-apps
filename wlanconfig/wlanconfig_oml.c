@@ -146,7 +146,7 @@ main(int argc, const char *argv[])
           v[2].longValue = atol(command);
           omlc_set_const_string(v[3], macAddress);
 
-          omlc_process(oml_mp, v);
+          omlc_inject(oml_mp, v);
           //stop=0;
           for(j = 0; j < 9; j++) {
             scanf ("%s",command);
