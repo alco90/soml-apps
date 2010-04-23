@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------- 
  * Copyright (c) 1999,2000,2001,2002,2003                              
  * The Board of Trustees of the University of Illinois            
@@ -45,90 +44,35 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * List.cpp
- * by Kevin Gibbs <kgibbs@ncsa.uiuc.edu> 
- * ------------------------------------------------------------------- 
- */
+ * PerfSocket.hpp
+ * by Mark Gates <mgates@nlanr.net>
+ *  &  Ajay Tirumala <tirumala@ncsa.uiuc.edu>   
+ * -------------------------------------------------------------------
+ * Changes in version 1.6
+ *   Incorporates class declarations for fetching data from files 
+ * ------------------------------------------------------------------- */
 
-#include "List.h"
+
+#ifndef PERFSOCKET_H
+#define PERFSOCKET_H
+
 #include "Mutex.h"
-#include "SocketAddr.h"
+#include "Settings.hpp"
 
-/*
- * Global List and Mutex variables
- */
-Iperf_ListEntry *clients = NULL;
-Mutex clients_mutex; 
+    void SetSocketOptions( thread_Settings *inSettings );
 
-/*
- * Add Entry add to the List
- */
-void Iperf_pushback ( Iperf_ListEntry *add, Iperf_ListEntry **root ) {
-    add->next = *root;
-    *root = add;
-}
+    // handle interupts
+    void Sig_Interupt( int inSigno );
 
-/*
- * Delete Entry del from the List
- */
-void Iperf_delete ( iperf_sockaddr *del, Iperf_ListEntry **root ) {
-    Iperf_ListEntry *temp = Iperf_present( del, *root );
-    if ( temp != NULL ) {
-        if ( temp == *root ) {
-            *root = (*root)->next;
-        } else {
-            Iperf_ListEntry *itr = *root;
-            while ( itr->next != NULL ) {
-                if ( itr->next == temp ) {
-                    itr->next = itr->next->next;
-                    break;
-                }
-                itr = itr->next;
-            }
-        }
-        delete temp;
-    }
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
+    extern int sInterupted;
+    extern int groupID;
+    extern Mutex groupCond;
 
-/*
- * Destroy the List (cleanup function)
- */
-void Iperf_destroy ( Iperf_ListEntry **root ) {
-    Iperf_ListEntry *itr1 = *root, *itr2;
-    while ( itr1 != NULL ) {
-        itr2 = itr1->next;
-        delete itr1;
-        itr1 = itr2;
-    }
-    *root = NULL;
-}
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
 
-/*
- * Check if the exact Entry find is present
- */
-Iperf_ListEntry* Iperf_present ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_are_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
-
-/*
- * Check if a Entry find is in the List or if any
- * Entry exists that has the same host as the 
- * Entry find
- */
-Iperf_ListEntry* Iperf_hostpresent ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_Hostare_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+#endif // PERFSOCKET_H

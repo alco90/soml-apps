@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------- 
  * Copyright (c) 1999,2000,2001,2002,2003                              
  * The Board of Trustees of the University of Illinois            
@@ -45,90 +44,80 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * List.cpp
- * by Kevin Gibbs <kgibbs@ncsa.uiuc.edu> 
- * ------------------------------------------------------------------- 
- */
+ * Extractor.h
+ * by Ajay Tirumala (tirumala@ncsa.uiuc.edu)
+ * -------------------------------------------------------------------
+ * Extract data from a file, used to measure the transfer rates
+ * for various stream formats. 
+ *
+ * E.g. Use a gzipped file to measure the transfer rates for 
+ * compressed data
+ * Use an MPEG file to measure the transfer rates of 
+ * Multimedia data formats
+ * Use a plain BMP file to measure the transfer rates of 
+ * Uncompressed data
+ *
+ * This is beneficial especially in measuring bandwidth across WAN
+ * links where data compression takes place before data transmission 
+ * ------------------------------------------------------------------- */
 
-#include "List.h"
-#include "Mutex.h"
-#include "SocketAddr.h"
+#ifndef _EXTRACTOR_H
+#define _EXTRACTOR_H
 
-/*
- * Global List and Mutex variables
- */
-Iperf_ListEntry *clients = NULL;
-Mutex clients_mutex; 
+#include <stdlib.h>
+#include <stdio.h>
+#include "Settings.hpp"
 
-/*
- * Add Entry add to the List
- */
-void Iperf_pushback ( Iperf_ListEntry *add, Iperf_ListEntry **root ) {
-    add->next = *root;
-    *root = add;
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/*
- * Delete Entry del from the List
- */
-void Iperf_delete ( iperf_sockaddr *del, Iperf_ListEntry **root ) {
-    Iperf_ListEntry *temp = Iperf_present( del, *root );
-    if ( temp != NULL ) {
-        if ( temp == *root ) {
-            *root = (*root)->next;
-        } else {
-            Iperf_ListEntry *itr = *root;
-            while ( itr->next != NULL ) {
-                if ( itr->next == temp ) {
-                    itr->next = itr->next->next;
-                    break;
-                }
-                itr = itr->next;
-            }
-        }
-        delete temp;
-    }
-}
+    /**
+     * Constructor
+     * @arg fileName   Name of the file 
+     * @arg size       Block size for reading
+     */
+    void Extractor_Initialize( char *fileName, int size, thread_Settings *mSettings );
 
-/*
- * Destroy the List (cleanup function)
- */
-void Iperf_destroy ( Iperf_ListEntry **root ) {
-    Iperf_ListEntry *itr1 = *root, *itr2;
-    while ( itr1 != NULL ) {
-        itr2 = itr1->next;
-        delete itr1;
-        itr1 = itr2;
-    }
-    *root = NULL;
-}
+    /**
+     * Constructor
+     * @arg fp         File Pointer 
+     * @arg size       Block size for reading
+     */
+    void Extractor_InitializeFile( FILE *fp, int size, thread_Settings *mSettings );
 
-/*
- * Check if the exact Entry find is present
- */
-Iperf_ListEntry* Iperf_present ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_are_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
 
-/*
- * Check if a Entry find is in the List or if any
- * Entry exists that has the same host as the 
- * Entry find
- */
-Iperf_ListEntry* Iperf_hostpresent ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_Hostare_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+    /*
+     * Fetches the next data block from 
+     * the file
+     * @arg block     Pointer to the data read
+     * @return        Number of bytes read
+     */
+    int Extractor_getNextDataBlock( char *block, thread_Settings *mSettings );
+
+
+    /**
+     * Function which determines whether
+     * the file stream is still readable
+     * @return true, if readable; false, if not
+     */
+    int Extractor_canRead( thread_Settings *mSettings );
+
+    /**
+     * This is used to reduce the read size
+     * Used in UDP transfer to accomodate the
+     * the header (timestamp)
+     * @arg delta         Size to reduce
+     */
+    void Extractor_reduceReadSize( int delta, thread_Settings *mSettings );
+
+    /**
+     * Destructor
+     */
+    void Extractor_Destroy( thread_Settings *mSettings ); 
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
+
+#endif
+

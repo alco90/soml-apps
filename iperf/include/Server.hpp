@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------- 
  * Copyright (c) 1999,2000,2001,2002,2003                              
  * The Board of Trustees of the University of Illinois            
@@ -45,90 +44,42 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * List.cpp
- * by Kevin Gibbs <kgibbs@ncsa.uiuc.edu> 
- * ------------------------------------------------------------------- 
- */
+ * Server.hpp
+ * by Mark Gates <mgates@nlanr.net>
+ * -------------------------------------------------------------------
+ * A server thread is initiated for each connection accept() returns.
+ * Handles sending and receiving data, and then closes socket.
+ * ------------------------------------------------------------------- */
 
-#include "List.h"
-#include "Mutex.h"
-#include "SocketAddr.h"
+#ifndef SERVER_H
+#define SERVER_H
 
-/*
- * Global List and Mutex variables
- */
-Iperf_ListEntry *clients = NULL;
-Mutex clients_mutex; 
 
-/*
- * Add Entry add to the List
- */
-void Iperf_pushback ( Iperf_ListEntry *add, Iperf_ListEntry **root ) {
-    add->next = *root;
-    *root = add;
-}
+#include "Settings.hpp"
+#include "util.h"
+#include "Timestamp.hpp"
 
-/*
- * Delete Entry del from the List
- */
-void Iperf_delete ( iperf_sockaddr *del, Iperf_ListEntry **root ) {
-    Iperf_ListEntry *temp = Iperf_present( del, *root );
-    if ( temp != NULL ) {
-        if ( temp == *root ) {
-            *root = (*root)->next;
-        } else {
-            Iperf_ListEntry *itr = *root;
-            while ( itr->next != NULL ) {
-                if ( itr->next == temp ) {
-                    itr->next = itr->next->next;
-                    break;
-                }
-                itr = itr->next;
-            }
-        }
-        delete temp;
-    }
-}
+/* ------------------------------------------------------------------- */
+class Server {
+public:
+    // stores server socket, port and TCP/UDP mode
+    Server( thread_Settings *inSettings );
 
-/*
- * Destroy the List (cleanup function)
- */
-void Iperf_destroy ( Iperf_ListEntry **root ) {
-    Iperf_ListEntry *itr1 = *root, *itr2;
-    while ( itr1 != NULL ) {
-        itr2 = itr1->next;
-        delete itr1;
-        itr1 = itr2;
-    }
-    *root = NULL;
-}
+    // destroy the server object
+    ~Server();
 
-/*
- * Check if the exact Entry find is present
- */
-Iperf_ListEntry* Iperf_present ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_are_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+    // accepts connection and receives data
+    void Run( void );
 
-/*
- * Check if a Entry find is in the List or if any
- * Entry exists that has the same host as the 
- * Entry find
- */
-Iperf_ListEntry* Iperf_hostpresent ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_Hostare_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+    void write_UDP_AckFIN( );
+
+    static void Sig_Int( int inSigno );
+
+private:
+    thread_Settings *mSettings;
+    char* mBuf;
+    Timestamp mEndTime;
+
+}; // end class Server
+
+#endif // SERVER_H

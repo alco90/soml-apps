@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------- 
  * Copyright (c) 1999,2000,2001,2002,2003                              
  * The Board of Trustees of the University of Illinois            
@@ -45,90 +44,69 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * List.cpp
- * by Kevin Gibbs <kgibbs@ncsa.uiuc.edu> 
- * ------------------------------------------------------------------- 
- */
+ * Mutex.h
+ * by Mark Gates <mgates@nlanr.net>
+ * -------------------------------------------------------------------
+ * An abstract class for locking a mutex (mutual exclusion). If
+ * threads are not available, this does nothing.
+ * ------------------------------------------------------------------- */
+#ifndef MUTEX_H
+#define MUTEX_H
 
-#include "List.h"
-#include "Mutex.h"
-#include "SocketAddr.h"
+#include "headers.h"
 
-/*
- * Global List and Mutex variables
- */
-Iperf_ListEntry *clients = NULL;
-Mutex clients_mutex; 
+#if   defined( HAVE_POSIX_THREAD )
+    typedef pthread_mutex_t Mutex;
+#elif defined( HAVE_WIN32_THREAD )
+    typedef HANDLE Mutex;
+#else
+    typedef int Mutex;
+#endif
 
-/*
- * Add Entry add to the List
- */
-void Iperf_pushback ( Iperf_ListEntry *add, Iperf_ListEntry **root ) {
-    add->next = *root;
-    *root = add;
-}
+/* ------------------------------------------------------------------- *
+class Mutex {
+public:*/
+    
+    // initialize mutex
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Initialize( MutexPtr ) pthread_mutex_init( MutexPtr, NULL )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Initialize( MutexPtr ) *MutexPtr = CreateMutex( NULL, false, NULL )
+#else
+    #define Mutex_Initialize( MutexPtr )
+#endif
+    
+    // lock the mutex variable
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Lock( MutexPtr ) pthread_mutex_lock( MutexPtr )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Lock( MutexPtr ) WaitForSingleObject( *MutexPtr, INFINITE )
+#else
+    #define Mutex_Lock( MutexPtr )
+#endif
 
-/*
- * Delete Entry del from the List
- */
-void Iperf_delete ( iperf_sockaddr *del, Iperf_ListEntry **root ) {
-    Iperf_ListEntry *temp = Iperf_present( del, *root );
-    if ( temp != NULL ) {
-        if ( temp == *root ) {
-            *root = (*root)->next;
-        } else {
-            Iperf_ListEntry *itr = *root;
-            while ( itr->next != NULL ) {
-                if ( itr->next == temp ) {
-                    itr->next = itr->next->next;
-                    break;
-                }
-                itr = itr->next;
-            }
-        }
-        delete temp;
-    }
-}
+    // unlock the mutex variable
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Unlock( MutexPtr ) pthread_mutex_unlock( MutexPtr )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Unlock( MutexPtr ) ReleaseMutex( *MutexPtr )
+#else
+    #define Mutex_Unlock( MutexPtr )
+#endif
 
-/*
- * Destroy the List (cleanup function)
- */
-void Iperf_destroy ( Iperf_ListEntry **root ) {
-    Iperf_ListEntry *itr1 = *root, *itr2;
-    while ( itr1 != NULL ) {
-        itr2 = itr1->next;
-        delete itr1;
-        itr1 = itr2;
-    }
-    *root = NULL;
-}
+    // destroy, making sure mutex is unlocked
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Destroy( MutexPtr )  do {         \
+        int rc = pthread_mutex_destroy( MutexPtr ); \
+        if ( rc == EBUSY ) {                        \
+            Mutex_Unlock( MutexPtr );               \
+            pthread_mutex_destroy( MutexPtr );      \
+        }                                           \
+    } while ( 0 )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Destroy( MutexPtr ) CloseHandle( *MutexPtr )
+#else
+    #define Mutex_Destroy( MutexPtr )
+#endif
 
-/*
- * Check if the exact Entry find is present
- */
-Iperf_ListEntry* Iperf_present ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_are_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
-
-/*
- * Check if a Entry find is in the List or if any
- * Entry exists that has the same host as the 
- * Entry find
- */
-Iperf_ListEntry* Iperf_hostpresent ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_Hostare_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+#endif // MUTEX_H

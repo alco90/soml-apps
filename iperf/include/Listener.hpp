@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------- 
  * Copyright (c) 1999,2000,2001,2002,2003                              
  * The Board of Trustees of the University of Illinois            
@@ -45,90 +44,52 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * List.cpp
- * by Kevin Gibbs <kgibbs@ncsa.uiuc.edu> 
- * ------------------------------------------------------------------- 
- */
+ * Listener.hpp
+ * by Mark Gates <mgates@nlanr.net>
+ * -------------------------------------------------------------------
+ * Listener sets up a socket listening on the server host. For each
+ * connected socket that accept() returns, this creates a Server
+ * socket and spawns a thread for it.
+ * ------------------------------------------------------------------- */
 
-#include "List.h"
-#include "Mutex.h"
-#include "SocketAddr.h"
+#ifndef LISTENER_H
+#define LISTENER_H
 
-/*
- * Global List and Mutex variables
- */
-Iperf_ListEntry *clients = NULL;
-Mutex clients_mutex; 
+#include "Thread.h"
+#include "Settings.hpp"
 
-/*
- * Add Entry add to the List
- */
-void Iperf_pushback ( Iperf_ListEntry *add, Iperf_ListEntry **root ) {
-    add->next = *root;
-    *root = add;
-}
+class Listener;
 
-/*
- * Delete Entry del from the List
- */
-void Iperf_delete ( iperf_sockaddr *del, Iperf_ListEntry **root ) {
-    Iperf_ListEntry *temp = Iperf_present( del, *root );
-    if ( temp != NULL ) {
-        if ( temp == *root ) {
-            *root = (*root)->next;
-        } else {
-            Iperf_ListEntry *itr = *root;
-            while ( itr->next != NULL ) {
-                if ( itr->next == temp ) {
-                    itr->next = itr->next->next;
-                    break;
-                }
-                itr = itr->next;
-            }
-        }
-        delete temp;
-    }
-}
+class Listener {
+public:
+    // stores server port and TCP/UDP mode
+    Listener( thread_Settings *inSettings );
 
-/*
- * Destroy the List (cleanup function)
- */
-void Iperf_destroy ( Iperf_ListEntry **root ) {
-    Iperf_ListEntry *itr1 = *root, *itr2;
-    while ( itr1 != NULL ) {
-        itr2 = itr1->next;
-        delete itr1;
-        itr1 = itr2;
-    }
-    *root = NULL;
-}
+    // destroy the server object
+    ~Listener();
 
-/*
- * Check if the exact Entry find is present
- */
-Iperf_ListEntry* Iperf_present ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_are_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+    // accepts connections and starts Servers
+    void Run( void );
 
-/*
- * Check if a Entry find is in the List or if any
- * Entry exists that has the same host as the 
- * Entry find
- */
-Iperf_ListEntry* Iperf_hostpresent ( iperf_sockaddr *find, Iperf_ListEntry *root ) {
-    Iperf_ListEntry *itr = root;
-    while ( itr != NULL ) {
-        if ( SockAddr_Hostare_Equal( (sockaddr*)itr, (sockaddr*)find ) ) {
-            return itr;
-        }
-        itr = itr->next;
-    }
-    return NULL;
-}
+    // Starts the Servers as a daemon 
+    void runAsDaemon( const char *, int );
+
+    void Listen( );
+
+    void McastJoin( );
+
+    void McastSetTTL( int val );
+
+    void Accept( thread_Settings *server );
+
+    void UDPSingleServer ();
+
+protected:
+    int mClients;
+    char* mBuf;
+    thread_Settings *mSettings;
+    thread_Settings *server;
+
+}; // end class Listener
+
+#endif // LISTENER_H
