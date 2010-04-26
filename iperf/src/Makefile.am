@@ -13,7 +13,6 @@ AM_CXXFLAGS = -Wall
 AM_CFLAGS = -Wall
 
 iperf_LDFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ @WEB100_CFLAGS@ @DEFS@
-
 iperf_SOURCES = \
 		Client.cpp \
 		Extractor.c \
@@ -35,5 +34,9 @@ iperf_SOURCES = \
 		sockets.c \
 		stdio.c \
 		tcp_window_size.c
+if LIBOML
+iperf_SOURCES += ReportOML.c
+endif
+
 
 iperf_LDADD = $(LIBCOMPAT_LDADDS)

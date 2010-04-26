@@ -78,6 +78,9 @@ void serverstatistics_notimpl( Connection_Info *nused1, Transfer_Info *nused2 ) 
 // To add a reporting style include its header here.
 #include "report_default.h"
 #include "report_CSV.h"
+#ifdef HAVE_LIBOML
+#include "report_OML.h"
+#endif
 
 // The following array of report structs contains the
 // pointers required for reporting in different reporting
@@ -85,27 +88,42 @@ void serverstatistics_notimpl( Connection_Info *nused1, Transfer_Info *nused2 ) 
 // below.
 report_connection connection_reports[kReport_MAXIMUM] = {
     reporter_reportpeer,
-    CSV_peer
+    CSV_peer,
+#ifdef HAVE_LIBOML
+    OML_peer,
+#endif
 };
 
 report_settings settings_reports[kReport_MAXIMUM] = {
     reporter_reportsettings,
-    settings_notimpl
+    settings_notimpl,
+#ifdef HAVE_LIBOML
+    reporter_reportsettings, /* Give the OML user some feedback*/
+#endif
 };
 
 report_statistics statistics_reports[kReport_MAXIMUM] = {
     reporter_printstats,
-    CSV_stats
+    CSV_stats,
+#ifdef HAVE_LIBOML
+    OML_stats,
+#endif
 };
 
 report_serverstatistics serverstatistics_reports[kReport_MAXIMUM] = {
     reporter_serverstats,
-    CSV_serverstats
+    CSV_serverstats,
+#ifdef HAVE_LIBOML
+    OML_serverstats,
+#endif
 };
 
 report_statistics multiple_reports[kReport_MAXIMUM] = {
     reporter_multistats,
-    CSV_stats
+    CSV_stats,
+#ifdef HAVE_LIBOML
+    OML_stats,
+#endif
 };
 
 char buffer[64]; // Buffer for printing

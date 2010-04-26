@@ -30,6 +30,9 @@ AC_ARG_ENABLE(debuginfo, AC_HELP_STRING([--enable-debuginfo],
 	enable_debuginfo=$enableval,
 	enable_debuginfo=no)
 
+AC_ARG_ENABLE(liboml, AC_HELP_STRING([--disable-liboml],
+	    [disable OML support (default is autodetect)]))
+
 AC_ARG_ENABLE(web100, AC_HELP_STRING([--disable-web100],
 	    [disable web100 support (default is autodetect)]))
 
@@ -232,6 +235,19 @@ if test "$enable_debuginfo" = yes; then
 AC_DEFINE([DBG_MJZ], 1, [Define if debugging info is desired])
 fi
 
+if test "$enable_liboml" != no; then
+	AC_CHECK_LIB(oml2, omlc_init,
+		[
+		 ac_cv_have_liboml=yes
+		 AC_DEFINE([HAVE_LIBOML], 1, [Define if OML support is desired and available])
+		 LIBOML_CFLAGS=""
+		 LIBOML_LIBS="-loml2"
+		 CFLAGS="$CFLAGS $LIBOML_CFLAGS"
+		 LIBS="$LIBS $LIBOML_LIBS"
+                ]
+	)
+fi
+
 if test "$enable_web100" != no; then
 if test -e "/proc/web100"; then
 if test -d "/proc/web100"; then
@@ -262,6 +278,10 @@ STRIP_DUMMY=
 AC_SUBST(STRIP_DUMMY)
 AC_SUBST(STRIP_BEGIN)
 AC_SUBST(STRIP_END)
+AC_SUBST(LIBOML_CFLAGS)
+AC_SUBST(LIBOML_LIBS)
+
+AM_CONDITIONAL([LIBOML], [test x$ac_cv_have_liboml = xyes])
 
 AC_CONFIG_FILES([Makefile
 		compat/Makefile

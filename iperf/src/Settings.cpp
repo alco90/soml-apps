@@ -71,6 +71,10 @@
 
 #include "gnu_getopt.h"
 
+#ifdef HAVE_LIBOML
+#include "report_OML.h"
+#endif
+
 void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtSettings );
 
 /* -------------------------------------------------------------------
@@ -121,6 +125,14 @@ const struct option long_options[] =
 {"ipv6_domain",      no_argument, NULL, 'V'},
 {"suggest_win_size", no_argument, NULL, 'W'},
 {"linux-congestion", required_argument, NULL, 'Z'},
+
+#ifdef HAVE_LIBOML
+// prevent iperf from complainig about oml parameters
+{"oml-id", required_argument, NULL, NULL},
+{"oml-exp-id", required_argument, NULL, NULL},
+{"oml-server", required_argument, NULL, NULL},
+#endif
+
 {0, 0, 0, 0}
 };
 
@@ -293,6 +305,7 @@ void Settings_ParseEnvironment( thread_Settings *mSettings ) {
 
 void Settings_ParseCommandLine( int argc, char **argv, thread_Settings *mSettings ) {
     int option;
+
     while ( (option =
              gnu_getopt_long( argc, argv, short_options,
                               long_options, NULL )) != EOF ) {
@@ -302,6 +315,13 @@ void Settings_ParseCommandLine( int argc, char **argv, thread_Settings *mSetting
     for ( int i = gnu_optind; i < argc; i++ ) {
         fprintf( stderr, "%s: ignoring extra argument -- %s\n", argv[0], argv[i] );
     }
+
+#ifdef HAVE_LIBOML
+    if (mSettings->mReportMode == kReport_OML) {
+	    OML_init (&argc, (const char**) argv);
+	    OML_set_measurepoints(mSettings);
+    }
+#endif
 } // end ParseCommandLine
 
 /* -------------------------------------------------------------------
@@ -531,6 +551,12 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
                 case 'C':
                     mExtSettings->mReportMode = kReport_CSV;
                     break;
+#ifdef HAVE_LIBOML
+                case 'o':
+                case 'O':
+                    mExtSettings->mReportMode = kReport_OML;
+                    break;
+#endif
                 default:
                     fprintf( stderr, warn_invalid_report_style, optarg );
             }

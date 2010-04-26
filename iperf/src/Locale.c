@@ -118,8 +118,12 @@ Client specific:\n\
 \n\
 Miscellaneous:\n\
   -x, --reportexclude [CDMSV]   exclude C(connection) D(data) M(multicast) S(settings) V(server) reports\n\
-  -y, --reportstyle C      report as a Comma-Separated Values\n\
-  -h, --help               print this message and quit\n\
+  -y, --reportstyle <style> choose the format of the report from the options below\n\
+  		      C,c  report as a Comma-Separated Values\n"
+#ifdef HAVE_LIBOML
+"		      O,o  report using OML functions\n"
+#endif
+"  -h, --help               print this message and quit\n\
   -v, --version            print version information and quit\n\
 \n\
 [KM] Indicates options that support a K or M suffix for kilo- or mega-\n\

@@ -83,6 +83,9 @@ typedef enum ReportMode {
     kReport_Default = 0,
     kReport_CSV,
     //kReport_XML,
+#ifdef HAVE_LIBOML
+    kReport_OML,
+#endif
     kReport_MAXIMUM
 } ReportMode;
 
