@@ -6,7 +6,7 @@ bin_PROGRAMS = trace_oml2
 
 trace_oml2_SOURCES = src/c/omf_trace.c
 
-trace_oml2_LDADD = -loml2	-ltrace -lpopt
+trace_oml2_LDADD = -loml2 -ltrace -lpopt
 
 BUILT_SOURCES = \
 	$(progname)_popt.h \
