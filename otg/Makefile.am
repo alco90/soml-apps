@@ -6,7 +6,7 @@ AM_CPPFLAGS = \
 	-I $(srcdir) \
 	-DWITH_OML
 
-otgrlibs = -lpopt -lpthread -loml2 -locomm \
+otgrlibs = -lpthread \
 	libotg2.la
 
 bin_PROGRAMS = otg2 otr2
@@ -45,6 +45,4 @@ libotg2_la_LIBADD = -locomm \
 	$(builddir)/core/libotg2core.la \
 	$(builddir)/port/libotg2port.la \
 	$(builddir)/generator/libotg2generator.la
-
-
-
+    -lpopt -lpthread -loml2
