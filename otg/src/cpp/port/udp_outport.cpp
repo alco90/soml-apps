@@ -17,11 +17,11 @@ extern "C" {
 }
 static OmlMPDef oml_def[] = {
    {"ts", OML_DOUBLE_VALUE},
-   {"flow_id", OML_LONG_VALUE},
-   {"seq_no", OML_LONG_VALUE},
-   {"pkt_length", OML_LONG_VALUE},
+   {"flow_id", OML_INT32_VALUE},
+   {"seq_no", OML_UINT32_VALUE},
+   {"pkt_length", OML_UINT32_VALUE},
    {"dst_host",OML_STRING_VALUE},
-   {"dst_port", OML_LONG_VALUE},
+   {"dst_port", OML_UINT32_VALUE},
    {NULL, (OmlValueT)0},
 };
 static OmlMP* oml_mp = NULL;
@@ -104,43 +104,43 @@ UDPOutPort::initSocket()
 }
 
 /** The main send function of UDP Socket Port.
- * 
- * Stamp a stream id and sequence number. 
+ *
+ * Stamp a stream id and sequence number.
  * Then, use sendto()
  */
-Packet* 
+Packet*
 UDPOutPort::sendPacket(Packet* pkt)
-{  
+{
   struct timeval tv;
   gettimeofday(&tv, NULL);
   double now = tv.tv_sec - timestamp + 0.000001 * tv.tv_usec;
-  
+
  // cout << timestamp << endl;
   pkt->stampPacket(0x01);
   pkt->stampShortVal(pkt->getFlowId());
   pkt->stampLongVal(pkt->getSequenceNum());
-  
+
   struct sockaddr* dest = (struct sockaddr*)&dstSockAddress_;
-  int  destLength = sizeof(struct sockaddr_in); 
+  int  destLength = sizeof(struct sockaddr_in);
   int pktLength = pkt->getPayloadSize();
-   
+
   o_log(O_LOG_DEBUG2, "Sending UDP packet of size '%d' to '%s:%d'\n", pktLength, dsthost_, dstport_);
-  int len = sendto(sockfd_, pkt->getPayload(), pktLength, 0, dest, destLength); 
-  if (len == -1) { 
+  int len = sendto(sockfd_, pkt->getPayload(), pktLength, 0, dest, destLength);
+  if (len == -1) {
     perror("send");
     throw "Sending Error.";
   }
-  
+
 #ifdef WITH_OML
   OmlValueU v[6];
-  v[0].doubleValue = now;
-  v[1].longValue = pkt->getFlowId();
-  v[2].longValue = pkt->getSequenceNum();
-  v[3].longValue = pktLength;
+  omlc_set_double(v[0], now);
+  omlc_set_int32(v[1], pkt->getFlowId());
+  omlc_set_uint32(v[2], pkt->getSequenceNum());
+  omlc_set_uint32(v[3], pktLength);
   omlc_set_string(v[4], dsthost_);
-  v[5].longValue = dstport_;
-  omlc_inject(oml_mp, v);   
-#endif   
+  omlc_set_uint32(v[5], dstport_);
+  omlc_inject(oml_mp, v);
+#endif
   return pkt;
 }
 

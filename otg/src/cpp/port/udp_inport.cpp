@@ -16,11 +16,11 @@ extern "C" {
 }
 static OmlMPDef oml_def[] = {
    {"ts", OML_DOUBLE_VALUE},
-   {"flow_id", OML_LONG_VALUE},
-   {"seq_no", OML_LONG_VALUE},
-   {"pkt_length", OML_LONG_VALUE},
+   {"flow_id", OML_INT32_VALUE},
+   {"seq_no", OML_UINT32_VALUE},
+   {"pkt_length", OML_UINT32_VALUE},
    {"src_host", OML_STRING_VALUE},
-   {"src_port", OML_LONG_VALUE},
+   {"src_port", OML_UINT32_VALUE},
    {NULL, (OmlValueT)0},
 };
 static OmlMP* oml_mp = NULL;
@@ -110,18 +110,18 @@ UDPInPort::nextPacket(
     pkt->setSequenceNum(pkt->extractLongVal());
   }
   pkt->setTimeStamp(-1); // mark with current time
-  
+
 #ifdef WITH_OML
   OmlValueU v[6];
-  v[0].doubleValue = now;
-  v[1].longValue = pkt->getFlowId();
-  v[2].longValue = pkt->getSequenceNum();
-  v[3].longValue = len;
+  omlc_set_double(v[0], now);
+  omlc_set_int32 (v[1], pkt->getFlowId());
+  omlc_set_uint32(v[2], pkt->getSequenceNum());
+  omlc_set_uint32(v[3], len);
   omlc_set_const_string(v[4], senderHost);
-  v[5].longValue = senderPort;
+  omlc_set_uint32(v[5], senderPort);
   omlc_inject(oml_mp, v);
-#endif   
-  
+#endif
+
   return pkt;
 }
 
