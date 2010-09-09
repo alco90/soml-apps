@@ -237,7 +237,7 @@ per_packet(
     return;
   case 6:{
     libtrace_tcp_t* tcp = trace_get_tcp(packet);
-    payload = trace_get_payload_from_tcp(tcp,  &remaining);
+    payload = trace_get_payload_from_tcp(tcp, &remaining);
     omlc_inject_tcp(tcp, packet, payload, now);
     if (!payload)
       return;
@@ -245,8 +245,7 @@ per_packet(
   }
   case 17:{
     libtrace_udp_t* udp = trace_get_udp(packet);
-    payload = trace_get_payload_from_udp(udp,
-                                         &remaining);
+    payload = trace_get_payload_from_udp(udp, &remaining);
     omlc_inject_udp(udp, packet, payload, now);
     if (!payload)
       return;
@@ -349,7 +348,8 @@ main(int argc, const char *argv[])
 
     radio_dev_type = fopen(radiotap_dev,"rb");
     if(radio_dev_type == NULL){
-      printf("WARNING:  You need to enable radiotap in %s, by putting the value 803.\n Radiotap measurements are disabled for this run.\n", radiotap_dev);
+      printf("WARNING:  You need to enable radiotap in %s, by putting the value 803.\n"
+             "          Radiotap measurements are disabled for this run.\n", radiotap_dev);
       g_opts->radiotap = 0;
     }
   }
