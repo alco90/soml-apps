@@ -31,7 +31,7 @@ struct poptOption options[] = {
 
 static OmlMPDef d_lin[] = {
     {"label", OML_STRING_VALUE},
-    {"seq_no", OML_LONG_VALUE},
+    {"seq_no", OML_UINT32_VALUE},
     {NULL, 0}
 };
 static OmlMP* m_lin;
@@ -53,7 +53,7 @@ run()
 
   // this loop should never end if samples = -1
   int i = samples;
-  int count = 1;
+  unsigned int count = 1;
   for (; i != 0; i--, count++) {
     char label[64];
     sprintf(label, "sample-%d", count);
@@ -61,7 +61,7 @@ run()
       // "lin" measurement point
       OmlValueU v[2];
       omlc_set_const_string(v[0], label);
-      omlc_set_long(v[1], count);
+      omlc_set_uint32(v[1], count);
       omlc_inject(m_lin, v);
     }
 
@@ -71,7 +71,7 @@ run()
       OmlValueU v[3];
       omlc_set_const_string(v[0], label);
       omlc_set_double(v[1], angle);
-	  omlc_set_double(v[2], value);
+      omlc_set_double(v[2], value);
       omlc_inject(m_sin, v);
     }
 
