@@ -9,70 +9,64 @@ is doing and useful for.
 }
 
   a.defProperty('filter', 'Filter expression BPFEXP', ?f,
-		:type => :string)
+        :type => :string)
   a.defProperty('snaplen', '???', ?s,
-		:type => :int, :unit => 'bytes')
+        :type => :int, :unit => 'bytes')
   a.defProperty('promisc', '???', ?p,
-		:type => :flag)
+        :type => :flag)
   a.defProperty('interface', 'Interface to trace', ?i,
-		:type => :string)
+        :type => :string)
   a.defProperty('radiotap', 'Enable radiotap', ?r,
-		:type => :flag)
+        :type => :flag)
 
   a.defMeasurement("radiotap") do |m|
-      m.defMetric('tsft', 'long', ' wireless Timer Syncronisation Function')
-      m.defMetric('rate', 'long', ' Wireless Rate')
-      m.defMetric('freq', 'long', ' Wireless Channel Frequency')
-      m.defMetric('sig_strength_dBm', 'long', ' Wireless Signal Strength in dB')
-      m.defMetric('noise_strength_dBm', 'long', ' Wireless Noise Strength in dBm')
-      m.defMetric('sig_strength', 'long', ' Wireless Signal Strength in dB')
-      m.defMetric('noise_strength', 'long', ' Wireless Noise Strength in dB')
-      m.defMetric('attenuation', 'long', ' Transmit Attenuation')
-      m.defMetric('attenuation_dB', 'long', ' Transmit Attenuation in dB')
-      m.defMetric('power', 'long', ' Transmit Power in dBm')
-      m.defMetric('antenna', 'long', ' Wireless Antenna')
-      m.defMetric('sourceMAC', 'string', ' Source MAC Address')
-      m.defMetric('dstMAC', 'string', ' Destination MAC Address')
+      m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
+      m.defMetric('rate',              :uint32, ' Wireless Rate')
+      m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
+      m.defMetric('sig_strength_dBm',  :int32, ' Wireless Signal Strength in dB')
+      m.defMetric('noise_strength_dBm',:int32, ' Wireless Noise Strength in dBm')
+      m.defMetric('sig_strength',      :uint32, ' Wireless Signal Strength in dB')
+      m.defMetric('noise_strength',    :uint32, ' Wireless Noise Strength in dB')
+      m.defMetric('attenuation',       :uint32, ' Transmit Attenuation')
+      m.defMetric('attenuation_dB',    :uint32, ' Transmit Attenuation in dB')
+      m.defMetric('power',             :int32, ' Transmit Power in dBm')
+      m.defMetric('antenna',           :uint32, ' Wireless Antenna')
+      m.defMetric('sourceMAC', :string, ' Source MAC Address')
+      m.defMetric('dstMAC',    :string, ' Destination MAC Address')
  end
 
   a.defMeasurement("ip") do |m|
-    m.defMetric('ip_tos', 'long', ' Type of Service')
-    m.defMetric('ip_len', 'long', ' Total Length')
-    m.defMetric('ip_id', 'long', ' Identification')
-    m.defMetric('ip_off', 'long', ' IP Fragment offset (and flags)')
-    m.defMetric('ip_ttl', 'long', ' Time to Live')
-    m.defMetric('ip_proto', 'long', 'Protocol')
-    m.defMetric('ip_sum', 'long', 'Checksum')
-    m.defMetric('ip_src', 'string', ' Source Address')
-    m.defMetric('ip_dst', 'string', ' Destination Address')
-	m.defMetric('ip_sizeofpacket', 'long', ' Size of the Packet')
-	m.defMetric('ip_ts', 'double', ' timestamp of the measurement')
+    m.defMetric('ip_tos',   :uint32, ' Type of Service')
+    m.defMetric('ip_len',   :uint32, ' Total Length')
+    m.defMetric('ip_id',    :int32,  ' Identification')
+    m.defMetric('ip_off',   :uint32, ' IP Fragment offset (and flags)')
+    m.defMetric('ip_ttl',   :uint32, ' Time to Live')
+    m.defMetric('ip_proto', :uint32, ' Protocol')
+    m.defMetric('ip_sum',   :uint32, ' Checksum')
+    m.defMetric('ip_src',   :string, ' Source Address')
+    m.defMetric('ip_dst',   :string, ' Destination Address')
+    m.defMetric('ip_sizeofpacket', :uint32, ' Size of the Packet')
+    m.defMetric('ip_ts',    :double, ' timestamp of the measurement')
   end
 
   a.defMeasurement("tcp") do |m|
-    m.defMetric('tcp_source', 'long', ' Source Port')
-    m.defMetric('tcp_dest', 'long', ' Destination Port')
-    m.defMetric('tcp_seq', 'long', ' TCP sequence Number')
-    m.defMetric('tcp_ack_seq', 'long', ' Acknowledgment Number')
-    m.defMetric('tcp_window', 'long', ' Window Size')
-    m.defMetric('tcp_checksum', 'long', ' Checksum')
-    m.defMetric('tcp_urgptr', 'long', ' Urgent Pointer')
-	m.defMetric('tcp_packet_size', 'long', ' Size of the Packet')
-	m.defMetric('tcp_ts', 'double', ' timestamp of the measurement')
+    m.defMetric('tcp_source',   :uint32, ' Source Port')
+    m.defMetric('tcp_dest',     :uint32, ' Destination Port')
+    m.defMetric('tcp_seq',      :uint32, ' TCP sequence Number')
+    m.defMetric('tcp_ack_seq',  :uint32, ' Acknowledgment Number')
+    m.defMetric('tcp_window',   :uint32, ' Window Size')
+    m.defMetric('tcp_checksum', :uint32, ' Checksum')
+    m.defMetric('tcp_urgptr',   :uint32, ' Urgent Pointer')
+    m.defMetric('tcp_packet_size', :uint32, ' Size of the Packet')
+    m.defMetric('tcp_ts',       :double, ' timestamp of the measurement')
   end
 
   a.defMeasurement("udp") do |m|
-    m.defMetric('udp_source', 'long', ' Source Port')
-    m.defMetric('udp_dest', 'long', ' Destination Port')
-    m.defMetric('udp_len', 'long', ' Length of Datagram')
-    m.defMetric('udp_checksum', 'long', ' Checksum')
-    m.defMetric('udp_ts', 'double', ' timestamp of the measurement')
-  end
-
-  a.defMeasurement("sensor") do |m|
-    m.defMetric('val', 'long')
-    m.defMetric('inverse', 'double')
-    m.defMetric('name', 'string')
+    m.defMetric('udp_source',   :uint32, ' Source Port')
+    m.defMetric('udp_dest',     :uint32, ' Destination Port')
+    m.defMetric('udp_len',      :uint32, ' Length of Datagram')
+    m.defMetric('udp_checksum', :uint32, ' Checksum')
+    m.defMetric('udp_ts',       :double, ' timestamp of the measurement')
   end
 
   a.path = "/usr/local/bin/omf_trace"

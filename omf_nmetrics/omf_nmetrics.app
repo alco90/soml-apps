@@ -6,22 +6,22 @@ defApplication('omf:app:nmetrics', 'omf_nmetrics') do |a|
   a.shortDescription = 'Monitoring node statistcs'
   a.description = %{
 'nmetrics' is monitoring various node specific statistics,
-such as CPU, memory and network usage and reports them through 
+such as CPU, memory and network usage and reports them through
 OML. }
 
-  a.defProperty('cpu', 'Report cpu usage', ?c, 
-		:type => :flag, :impl => { :var_name => 'report_cpu' })
-  a.defProperty('interface', 
-		'Report usage for the specified network interface (can \
-be used multiple times)', ?i, 
-		:type => :string, 
-		:impl => { :var_name => 'if_name', :popt_val => 'i' })
-  a.defProperty('memory', 'Report memory usage', ?m, 
-		:type => :flag, :impl => { :var_name => 'report_memory' })
-  a.defProperty('sample-interval', 
-		'Time between consecutive measurements [sec]', ?s, 
-		:type => :int, :unit => 'seconds', :default => 1,
-		:impl => { :var_name => 'sample_interval' })
+  a.defProperty('cpu', 'Report cpu usage', ?c,
+        :type => :flag, :impl => { :var_name => 'report_cpu' })
+  a.defProperty('interface',
+        'Report usage for the specified network interface (can \
+be used multiple times)', ?i,
+        :type => :string,
+        :impl => { :var_name => 'if_name', :popt_val => 'i' })
+  a.defProperty('memory', 'Report memory usage', ?m,
+        :type => :flag, :impl => { :var_name => 'report_memory' })
+  a.defProperty('sample-interval',
+        'Time between consecutive measurements [sec]', ?s,
+        :type => :int, :unit => 'seconds', :default => 1,
+        :impl => { :var_name => 'sample_interval' })
 
   a.defMeasurement("memory") do |m|
     m.defMetric('ram', 'uint64')
