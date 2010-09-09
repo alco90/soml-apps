@@ -40,8 +40,8 @@
 
 static OmlMPDef oml_def[] = {
   {"macAddress", OML_STRING_VALUE},
-  {"RSSI", OML_LONG_VALUE},
-  {"DBM", OML_LONG_VALUE},
+  {"RSSI", OML_INT32_VALUE},
+  {"DBM", OML_INT32_VALUE},
   {"myMacAddress", OML_STRING_VALUE},
   {NULL, (OmlValueT)0},
 };
@@ -140,10 +140,10 @@ main(int argc, const char *argv[])
           scanf ("%s",command);
           scanf ("%s",command);
 
-          v[1].longValue = atol(command);
+          omlc_set_int32(v[1], atol(command));
           scanf ("%s",command);
 
-          v[2].longValue = atol(command);
+          omlc_set_int32(v[2], atol(command));
           omlc_set_const_string(v[3], macAddress);
 
           omlc_inject(oml_mp, v);
