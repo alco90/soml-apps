@@ -70,9 +70,9 @@ AC_CONFIG_FILES([Makefile
 		omf_nmetrics/Makefile
 		omf_trace/Makefile
 		otg/Makefile
-		otg/src/cpp/core/Makefile
-		otg/src/cpp/generator/Makefile
-		otg/src/cpp/port/Makefile
+		otg/core/Makefile
+		otg/generator/Makefile
+		otg/port/Makefile
 		simple/Makefile
 		wlanconfig/Makefile
 		])
