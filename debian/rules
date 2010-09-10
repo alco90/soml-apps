@@ -49,16 +49,11 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/oml.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/oml-client install
+	# Add here commands to install the package into debian/tmp.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 
 	# Separate OTG2 into its own package
-	mkdir -p $(CURDIR)/debian/otg/usr/bin
-	mkdir -p $(CURDIR)/debian/otg/usr/lib
-	mv $(CURDIR)/debian/oml-client/usr/bin/otg2 $(CURDIR)/debian/otg/usr/bin/
-	mv $(CURDIR)/debian/oml-client/usr/bin/otr2 $(CURDIR)/debian/otg/usr/bin/
-	mv $(CURDIR)/debian/oml-client/usr/lib/libotg* $(CURDIR)/debian/otg/usr/lib/
-	rm -f $(CURDIR)/debian/otg/usr/lib/libotg2.so
+	CURDIR=$(CURDIR) debian/build-package-contents.rb
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -90,7 +85,7 @@ binary-arch: build install
 #	dh_perl
 	dh_makeshlibs
 	dh_installdeb
-#	dh_shlibdeps
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

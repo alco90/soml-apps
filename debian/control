@@ -1,26 +1,88 @@
-Source: oml-client
+Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: debhelper (>= 5), autoconf, automake, libtool, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml-dev (>= 2.3.4)
+Build-Depends: debhelper (>= 5), autoconf, automake, libtool, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev
 Standards-Version: 3.7.2
 
-Package: oml-client
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsigar, libpopt0, liboml (>= 2.3.4), libtrace3, libc6
-Description: OML Client Applications
- A collection of applications that use the OML client library to
- collect measurements generated from a variety of different sources.
- iperf_oml2 is a version of the popular iperf tool modified to send
- measurements using OML; wlanconfig_oml2 provides WLAN information
- taken from the wlanconfig program; gps_oml2 records GPS position
- information from an external GPS device; trace_oml2 provides packet
- capture analysis from libtrace; and nmetrics_oml2 provides
- measurements of node statistics derived from libsigar.
 
-Package: otg
+Package: oml2-apps-all
+Section: net
+Priority: optional
+Architecture: all
+Depends: oml2-gps, oml2-iperf, oml2-wlanconfig, oml2-trace, oml2-nmetrics, oml2-otg2
+Replaces: oml-client
+Conflicts: oml-client
+Description: A meta-package that installs all the bundled OML2 Applications
+ This package installs all the OML2 Application packages:
+  - oml2-gps -- measure GPS data from gpds;
+  - oml2-iperf -- measure network performance;
+  - oml2-wlanconfig -- record wireless lan information from wlanconfig;
+  - oml2-trace -- wrapper around libtrace with OML2 measurement recording
+  - oml2-nmetrics -- node metrics using libsigar;
+  - oml2-otg2 -- the otg2/otr2 programs for generating background traffic.
+
+
+Package: oml2-gps
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml (>= 2.3.4), libc6
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Replaces: oml-client
+Conflicts: oml-client
+Description: Record and store GPS measurements using OML
+ oml2-gps records a stream of GPS position measurements from an external GPS
+ device and stores it using the OML measurement library and server.
+
+
+Package: oml2-iperf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Replaces: oml-client
+Conflicts: oml-client
+Description: Network performance monitoring with OML measurement collection
+ oml2-iperf is a version of the popular iperf tool modified to send
+ measurements using OML.
+
+
+Package: oml2-wlanconfig
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Replaces: oml-client
+Conflicts: oml-client
+Description: Record WLAN information from wlanconfig using OML
+ oml2-wlanconfig provides WLAN information taken from the wlanconfig
+ program;
+
+
+Package: oml2-trace
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libtrace3
+Replaces: oml-client
+Conflicts: oml-client
+Description: Measure and record libtrace data using OML
+ oml2-trace provides packet capture analysis from libtrace; the
+ resulting measurements are recorded using the OML measurement
+ library.  Currently implemented measurement points include radiotap
+ information, IP, TCP, and UDP protocol data.
+
+
+Package: oml2-nmetrics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libsigar
+Replaces: oml-client
+Conflicts: oml-client
+Description: Measure and record system information from libsigar using OML
+ oml2-nmetrics provides measurements of node statistics derived from
+ libsigar.  The measurements are recorded using the OML measurement
+ library.  Currently implemented measurement points include CPU data,
+ network inteface summary statistics, system process statistics, and
+ process uptime statistics.
+
+
+Package: oml2-otg2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Replaces: otg
+Conflicts: otg
 Description: Orbit Traffic Generator
  OTG provides an instrumented traffic source/sink pair, with
  measurement collection on the transmitted and received traffic
