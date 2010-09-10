@@ -1,3 +1,43 @@
+2010-09-10  Jolyon White  <jolyon.white@nicta.com.au>
+
+	* oml2-apps: Renamed all application binaries to start with
+	'oml2-', based on email discussions with Max & Christoph.  Added
+	install-exec-hook targets to all Makefile.am's to install symlinks
+	from the old names to the new binaries to avoid breaking existing
+	scripts.
+
+	* oml2-apps: All apps are now separately buildable with their own
+	Autotools build system.  They can be built in one fell swoop using
+	as well from the top level (implemented with Autoconf submodules,
+	i.e. AC_CONFIG_SUBDIRS.
+
+	* oml2-apps: Converted all the apps so that they no longer use
+	OML_LONG_VALUE, which is deprecated in OML 2.4.  Also make use of
+	wider integer types and unsigned integer types like
+	OML_UINT64_VALUE where appropriate.
+
+	* oml2-apps: Cleaned up the build system to do better library
+	autodetection and header inclusion.
+
+	* oml2-apps: Various bug fixes and cleanups across all apps, but
+	particularly in trace_oml2.
+
+	* iperf/src/main.cpp (main): Changed the names of measurement
+	points "TCP_received" and "UDP_received" to "TCP_Info" and
+	"UDP_Rich_Info", respectively, when run as a server.  When run as
+	the client, iperf now offers MP's "UDP_Rich_Info" (same as server)
+	and "UDP_Periodic_Info".
+
+	* otg/port/udp_inport.cpp (UDPInPort): In the "udp_in" measurement
+	point, changed the names of "dst_host" and "dst_port" to
+	"src_host" and "src_port", respectively.
+
+	* trace_oml2: Extended to support measurement of TCP and UDP
+	traffic properties.
+
+	* gps_oml2: Replaced the gps_oml2 program with a version that uses
+	gpsd instead of reading directly from the GPS device file.
+
 2010-04-12    <jolyon.white@nicta.com.au>
 
 	* oml2-apps: Fix bugs in wlanconfig_oml2.
