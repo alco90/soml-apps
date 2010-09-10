@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I ../../m4 -Wnone
+ACLOCAL_AMFLAGS = -I m4 -Wnone
 
 progname = gps
 
