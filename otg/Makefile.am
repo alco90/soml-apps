@@ -44,5 +44,5 @@ libotg2_la_SOURCES = \
 libotg2_la_LIBADD = -locomm \
 	$(builddir)/core/libotg2core.la \
 	$(builddir)/port/libotg2port.la \
-	$(builddir)/generator/libotg2generator.la
+	$(builddir)/generator/libotg2generator.la \
     -lpopt -lpthread -loml2
