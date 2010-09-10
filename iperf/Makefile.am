@@ -4,11 +4,11 @@ AM_CPPFLAGS = \
 	-I $(srcdir)/lib \
 	-I $(srcdir)/cfg
 
-progname = iperf_oml2
+progname = iperf
 
-bin_PROGRAMS = $(progname)
+bin_PROGRAMS = oml2-iperf
 
-iperf_oml2_SOURCES = lib/config.h \
+oml2_iperf_SOURCES = lib/config.h \
     lib/Condition.hpp         \
 	lib/Mutex.hpp             \
 	lib/Socket.cpp            \
@@ -66,6 +66,11 @@ iperf_oml2_SOURCES = lib/config.h \
 	src/main.cpp              \
 	src/version.h
 
-iperf_oml2_LDADD = -loml2 -ltrace -lpopt 
+oml2_iperf_LDADD = -loml2 -ltrace -lpopt 
 
 
+installed_name = $(DESTDIR)$(bindir)/oml2-$(progname)$(EXEEXT)
+installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
+install-exec-hook:
+	rm -f $(installed_link_name)
+	$(LN_S) $(installed_name) $(installed_link_name)

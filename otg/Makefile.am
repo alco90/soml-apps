@@ -1,7 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4 -Wnone
 
-PACKAGE=otg2
-
 SUBDIRS = lib/core lib/port lib/generator
 
 AM_CPPFLAGS = \
@@ -11,16 +9,16 @@ AM_CPPFLAGS = \
 
 otgrlibs = -lpthread libotg2.la
 
-bin_PROGRAMS = otg2 otr2
+bin_PROGRAMS = oml2-otg2 oml2-otr2
 
-otg2_SOURCES = \
+oml2_otg2_SOURCES = \
 	version.h \
 	otg2.cpp
 
-otr2_SOURCES = otr2.cpp
+oml2_otr2_SOURCES = otr2.cpp
 
-otg2_LDADD = $(otgrlibs)
-otr2_LDADD = $(otgrlibs)
+oml2_otg2_LDADD = $(otgrlibs)
+oml2_otr2_LDADD = $(otgrlibs)
 
 pkglib_LTLIBRARIES = libotg2.la 
 
@@ -46,3 +44,13 @@ libotg2_la_LIBADD = -locomm \
 	$(builddir)/lib/port/libotg2port.la \
 	$(builddir)/lib/generator/libotg2generator.la \
     -lpopt -lpthread -loml2
+
+installed_otg = $(DESTDIR)$(bindir)/oml2-otg2$(EXEEXT)
+installed_link_otg = $(DESTDIR)$(bindir)/otg2$(EXEEXT)
+installed_otr = $(DESTDIR)$(bindir)/oml2-otr2$(EXEEXT)
+installed_link_otr = $(DESTDIR)$(bindir)/otr2$(EXEEXT)
+
+install-exec-hook:
+	rm -f $(installed_link_otg) $(installed_link_otr)
+	$(LN_S) $(installed_otg) $(installed_link_otg)
+	$(LN_S) $(installed_otr) $(installed_link_otr)

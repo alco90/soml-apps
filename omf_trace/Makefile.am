@@ -1,25 +1,33 @@
 ACLOCAL_AMFLAGS = -I m4 -Wnone
 
-progname = omf_trace
+progname = trace
+appname = omf_trace
 
-bin_PROGRAMS = trace_oml2
+bin_PROGRAMS = oml2-trace
 
-trace_oml2_SOURCES = omf_trace.c
+oml2_trace_SOURCES = omf_trace.c
 
-trace_oml2_LDADD = -loml2 -ltrace -lpopt
+oml2_trace_LDADD = -loml2 -ltrace -lpopt
 
 BUILT_SOURCES = \
-	$(progname)_popt.h \
-	$(progname)_oml.h
+	$(appname)_popt.h \
+	$(appname)_oml.h
 
 CLEANFILES = \
-	$(progname)_popt.h \
-	$(progname)_oml.h
+	$(appname)_popt.h \
+	$(appname)_oml.h
 
-EXTRA_DIST=$(progname).app
+EXTRA_DIST=$(appname).app
 
-$(progname)_popt.h:	$(progname).app Makefile
+$(appname)_popt.h:	$(appname).app Makefile
 	oml2_scaffold --opts $<
 
-$(progname)_oml.h:	$(progname).app Makefile
+$(appname)_oml.h:	$(appname).app Makefile
 	oml2_scaffold --oml $<
+
+
+installed_name = $(DESTDIR)$(bindir)/oml2-$(progname)$(EXEEXT)
+installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
+install-exec-hook:
+	rm -f $(installed_link_name)
+	$(LN_S) $(installed_name) $(installed_link_name)

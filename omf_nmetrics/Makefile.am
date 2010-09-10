@@ -1,24 +1,31 @@
 ACLOCAL_AMFLAGS = -I m4 -Wnone
 
-progname = omf_nmetrics
+progname = nmetrics
+appname = omf_nmetrics
 
-bin_PROGRAMS = nmetrics_oml2
-nmetrics_oml2_SOURCES = omf_nmetrics.c
-nmetrics_oml2_LDADD = -loml2 -locomm -lsigar -lpopt
-nmetrics_oml2_CPPFLAGS = $(LIBSIGAR_CFLAGS)
+bin_PROGRAMS = oml2-nmetrics
+oml2_nmetrics_SOURCES = omf_nmetrics.c
+oml2_nmetrics_LDADD = -loml2 -locomm -lsigar -lpopt
+oml2_nmetrics_CPPFLAGS = $(LIBSIGAR_CFLAGS)
 
 BUILT_SOURCES = \
-	$(progname)_popt.h \
-	$(progname)_oml.h
+	$(appname)_popt.h \
+	$(appname)_oml.h
 
 CLEANFILES = \
-	$(progname)_popt.h \
-	$(progname)_oml.h
+	$(appname)_popt.h \
+	$(appname)_oml.h
 
-EXTRA_DIST=$(progname).app
+EXTRA_DIST=$(appname).app
 
-$(progname)_popt.h:	$(progname).app Makefile
+$(appname)_popt.h:	$(appname).app Makefile
 	oml2_scaffold --opts $<
 
-$(progname)_oml.h:	$(progname).app Makefile
+$(appname)_oml.h:	$(appname).app Makefile
 	oml2_scaffold --oml $<
+
+installed_name = $(DESTDIR)$(bindir)/oml2-$(progname)$(EXEEXT)
+installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
+install-exec-hook:
+	rm -f $(installed_link_name)
+	$(LN_S) $(installed_name) $(installed_link_name)
