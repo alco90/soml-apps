@@ -27,7 +27,7 @@ $(progname)_popt.h:	$(progname).app Makefile
 $(progname)_oml.h:	$(progname).app Makefile
 	$(OML2_SCAFFOLD) --oml $<
 
-installed_name = $(DESTDIR)$(bindir)/oml2-$(progname)$(EXEEXT)
+installed_name = oml2-$(progname)$(EXEEXT)
 installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
 install-exec-hook:
 	rm -f $(installed_link_name)

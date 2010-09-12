@@ -45,12 +45,12 @@ libotg2_la_LIBADD = -locomm \
 	$(builddir)/lib/generator/libotg2generator.la \
     -lpopt -lpthread -loml2
 
-installed_otg = $(DESTDIR)$(bindir)/oml2-otg2$(EXEEXT)
+target_otg = oml2-otg2$(EXEEXT)
+target_otr = oml2-otr2$(EXEEXT)
 installed_link_otg = $(DESTDIR)$(bindir)/otg2$(EXEEXT)
-installed_otr = $(DESTDIR)$(bindir)/oml2-otr2$(EXEEXT)
 installed_link_otr = $(DESTDIR)$(bindir)/otr2$(EXEEXT)
 
 install-exec-hook:
 	rm -f $(installed_link_otg) $(installed_link_otr)
-	$(LN_S) $(installed_otg) $(installed_link_otg)
-	$(LN_S) $(installed_otr) $(installed_link_otr)
+	$(LN_S) $(target_otg) $(installed_link_otg)
+	$(LN_S) $(target_otr) $(installed_link_otr)

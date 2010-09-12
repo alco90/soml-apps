@@ -69,7 +69,7 @@ oml2_iperf_SOURCES = lib/config.h \
 oml2_iperf_LDADD = -loml2 -ltrace -lpopt 
 
 
-installed_name = $(DESTDIR)$(bindir)/oml2-$(progname)$(EXEEXT)
+installed_name = oml2-$(progname)$(EXEEXT)
 installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
 install-exec-hook:
 	rm -f $(installed_link_name)
