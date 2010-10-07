@@ -69,7 +69,7 @@ AC_CONFIG_FILES([Makefile
 		simple/Makefile
 		])
 
-AC_CONFIG_SUBDIRS([gps iperf omf_nmetrics omf_trace otg wlanconfig])
+AC_CONFIG_SUBDIRS([gps iperf omf_nmetrics omf_trace otg ripwave_monitor wlanconfig])
 
 # Let the user know we're missing required libraries, and don't generate the build system.
 if test "x$missing_libs" != "x"; then
