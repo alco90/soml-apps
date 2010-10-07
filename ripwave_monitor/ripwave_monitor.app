@@ -1,0 +1,35 @@
+
+defApplication('app:ripwave_monitor', 'ripwave_monitor') do |a|
+
+  a.version(0, 1, 0)
+  a.shortDescription = 'Report statistics from a Navini RipWave modem'
+  a.description = %{
+This application parses periodic UDP status messages from a Navini RipWave
+modem (Unwired, Exetel, nTelos).
+}
+
+  a.defMeasurement("navini_stats") do |m|
+    # Measurements are in the same order as the report packet
+    m.defMetric('modemid', 'uint32', 'Modem identifier (32 bits)')
+    m.defMetric('month', 'uint32', 'Month as reported by the modem')
+    m.defMetric('day', 'uint32', 'Day as reported by the modem')
+    m.defMetric('year', 'uint32', 'Year as reported by the modem')
+    m.defMetric('hour', 'uint32', 'Hour as reported by the modem')
+    m.defMetric('minute', 'uint32', 'Minute as reported by the modem')
+    m.defMetric('second', 'uint32', 'Second as reported by the modem')
+    m.defMetric('syncstrength1', 'int32', 'Absolute Signal Strength 1 (dB)') # the report has absolute values
+    m.defMetric('btsid', 'uint32', 'Base Tranceiver Station ID (8 bits)')
+    m.defMetric('networkid', 'uint32', 'Network identifier (16 bits)')
+    m.defMetric('antenna', 'uint32', 'Antenna in use (8 bits: 0x00=upright, 0x20=patch 1, 0x40=patch 2])')
+    m.defMetric('syncstrength2', 'int32', 'Absolute Signal Strength 2 (dB)') # ditto
+    m.defMetric('snr', 'uint32', 'Signal to noise ratio (dB)')
+    m.defMetric('temperature', 'uint32', 'Temperature [deg. Celcius]')
+ end
+
+  a.path = "/usr/bin/ripwave-monitor"
+end
+
+# Local Variables:
+# mode:ruby
+# vim: ft=ruby:sw=2
+# End:
