@@ -76,13 +76,14 @@ Application::Application(int argc, const char * argv[], const char* defLogFile)
 
 {
 #ifdef WITH_OML
- /* const char* name = argv[0];
-  const char* p = name + strlen(argv[0]);
-  while (! (p == name || *p == '/')) p--;
-  if (*p == '/') p++;
-  name = p;*/
-  
-  omlc_init(argv[0], &argc, argv, o_log); 
+  char *appname = strdup (argv[0]);
+  char *s = appname;
+  do {
+      if (*s == '-')
+          *s = '_';
+  } while (*s++);
+  omlc_init(appname, &argc, argv, o_log);
+  free (appname);
 #endif
 
   argc_ = argc;
