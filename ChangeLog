@@ -1,3 +1,14 @@
+2010-10-13  Jolyon White  <jolyon.white@nicta.com.au>
+
+	* otg/lib/app/application.cpp (Application): Change OML
+	application name string handling to change hyphens '-' to
+	underscores '_' to keep the OML library happy.  OML names must be
+	like C identifiers.
+
+	* ripwave_monitor/ripwave-monitor.c: Add application to monitor
+	the status output from a Ripwave pre-WiMAX modem (author Olivier
+	Mehani).
+
 2010-09-10  Jolyon White  <jolyon.white@nicta.com.au>
 
 	* oml2-apps: Renamed all application binaries to start with
