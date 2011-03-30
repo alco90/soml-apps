@@ -1,3 +1,7 @@
+# The pktid field in all MPs can be used to link information about the multiple
+# protocols encapsulated in the same packet, even in cases where multiple
+# packets have been received at the same time, which renders the timestamp field
+# useless as an identifier. 
 
 defApplication('max:app:omf_trace', 'omf_trace') do |a|
 
@@ -20,6 +24,7 @@ is doing and useful for.
         :type => :flag)
 
   a.defMeasurement("radiotap") do |m|
+      m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
       m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
       m.defMetric('rate',              :uint32, ' Wireless Rate')
       m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
@@ -36,6 +41,7 @@ is doing and useful for.
  end
 
   a.defMeasurement("ip") do |m|
+    m.defMetric('pktid',    :uint64, ' internal packet ID to link MPs')
     m.defMetric('ip_tos',   :uint32, ' Type of Service')
     m.defMetric('ip_len',   :uint32, ' Total Length')
     m.defMetric('ip_id',    :int32,  ' Identification')
@@ -50,6 +56,7 @@ is doing and useful for.
   end
 
   a.defMeasurement("tcp") do |m|
+    m.defMetric('pktid',    	:uint64, ' internal packet ID to link MPs')
     m.defMetric('tcp_source',   :uint32, ' Source Port')
     m.defMetric('tcp_dest',     :uint32, ' Destination Port')
     m.defMetric('tcp_seq',      :uint32, ' TCP sequence Number')
@@ -62,6 +69,7 @@ is doing and useful for.
   end
 
   a.defMeasurement("udp") do |m|
+    m.defMetric('pktid', 	:uint64, ' internal packet ID to link MPs')
     m.defMetric('udp_source',   :uint32, ' Source Port')
     m.defMetric('udp_dest',     :uint32, ' Destination Port')
     m.defMetric('udp_len',      :uint32, ' Length of Datagram')
