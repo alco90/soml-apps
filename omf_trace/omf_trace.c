@@ -29,12 +29,13 @@ omlc_inject_ip(oml_mps_t* oml_mps, libtrace_ip_t* ip, libtrace_packet_t *packet,
 
     omlc_set_uint64(v[0], pktid);
     omlc_set_uint32(v[1], ip->ip_tos);
-    omlc_set_uint32(v[2], ip->ip_len);
-    omlc_set_int32(v[3], ip->ip_id);
-    omlc_set_uint32(v[4], ip->ip_off);
+    omlc_set_uint32(v[2], ntohs(ip->ip_len));
+    omlc_set_int32(v[3], ntohs(ip->ip_id));
+    /* XXX: fragmentation flags are trimmed */
+    omlc_set_uint32(v[4], ntohs(ip->ip_off & ~(7<<13)));
     omlc_set_uint32(v[5], ip->ip_ttl);
     omlc_set_uint32(v[6], ip->ip_p);
-    omlc_set_uint32(v[7], ip->ip_sum);
+    omlc_set_uint32(v[7], ntohs(ip->ip_sum));
     omlc_set_const_string(v[8], addr_src );
     omlc_set_const_string(v[9], addr_dst);
     omlc_set_uint32(v[10], trace_get_capture_length(packet));
@@ -52,11 +53,11 @@ omlc_inject_tcp(oml_mps_t* oml_mps, libtrace_tcp_t* tcp, libtrace_packet_t *pack
     omlc_set_uint64(v[0], pktid);
     omlc_set_uint32(v[1], trace_get_source_port(packet));
     omlc_set_uint32(v[2], trace_get_destination_port(packet));
-    omlc_set_uint32(v[3], tcp->seq);
-    omlc_set_uint32(v[4], tcp->ack_seq);
-    omlc_set_uint32(v[5], tcp->window);
-    omlc_set_uint32(v[6], tcp->check);
-    omlc_set_uint32(v[7], tcp->urg_ptr);
+    omlc_set_uint32(v[3], ntohs(tcp->seq));
+    omlc_set_uint32(v[4], ntohs(tcp->ack_seq));
+    omlc_set_uint32(v[5], ntohs(tcp->window));
+    omlc_set_uint32(v[6], ntohs(tcp->check));
+    omlc_set_uint32(v[7], ntohs(tcp->urg_ptr));
     omlc_set_uint32(v[8], trace_get_capture_length(packet));
     omlc_set_double(v[9], time_now);
     omlc_inject(oml_mps->tcp, v);
@@ -73,8 +74,8 @@ omlc_inject_udp(oml_mps_t* oml_mps, libtrace_udp_t* udp, libtrace_packet_t *pack
     omlc_set_uint64(v[0], pktid);
     omlc_set_uint32(v[1], trace_get_source_port(packet));
     omlc_set_uint32(v[2], trace_get_destination_port(packet));
-    omlc_set_uint32(v[3], udp->len);
-    omlc_set_uint32(v[4], udp->check);
+    omlc_set_uint32(v[3], ntohs(udp->len));
+    omlc_set_uint32(v[4], ntohs(udp->check));
     omlc_set_double(v[5], time_now);
     omlc_inject(oml_mps->udp, v);
 }
