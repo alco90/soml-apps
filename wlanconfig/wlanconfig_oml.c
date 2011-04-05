@@ -59,12 +59,11 @@ main(int argc, const char *argv[])
   char command[256];
   char command2[256] = "256";
   char macAddress[256] = "e";
-  int* argc_;
-  const char** argv_;
   char* ifwifi;
-  omlc_init(argv[ 0 ], &argc, argv, o_log);
-  argc_ = &argc;
-  argv_ = argv;
+  char *progname = strdup(argv[0]), *p = progname;
+  do *p = (*p == '-') ? '_' : *p; while (*p++);
+
+  omlc_init(progname, &argc, argv, o_log);
 
   ifwifi = "ath0";
   if (pipe (mypipe)) {
