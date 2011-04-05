@@ -72,15 +72,15 @@ typedef struct _if_monitor_t {
 static void  run(if_monitor_t* first_if);
 
 int
-main(
-  int argc,
-  const char *argv[]
-) {
+main(int argc, const char **argv)
+{
   char c;
   if_monitor_t* first = NULL;
   if_monitor_t* if_p;
+  char *progname = strdup(argv[0]), *p = progname;
+  do *p = (*p == '-') ? '_' : *p; while (*p++);
 
-  omlc_init(argv[0], &argc, argv, NULL);
+  omlc_init(progname, &argc, argv, NULL);
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);

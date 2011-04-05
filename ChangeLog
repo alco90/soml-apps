@@ -1,3 +1,13 @@
+2011-04-05  Jolyon White  <jolyon.white@nicta.com.au>
+
+	* omf_nmetrics/omf_nmetrics.c (main):
+	* omf_trace/omf_trace.c (main):
+	* gps/gps.c (main):
+	* wlanconfig/wlanconfig_oml.c (main): Fix omlc_init() call in
+	omf_trace, omf_nmetrics, gps, and wlanconfig to use a modified
+	appname with all hyphens changed to underscores.  liboml2 rejects
+	names with hyphens in them.
+
 2010-09-10  Jolyon White  <jolyon.white@nicta.com.au>
 
 	* oml2-apps: Renamed all application binaries to start with

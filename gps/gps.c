@@ -87,7 +87,9 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 int
 main(int argc, const char *argv[])
 {
-  omlc_init(argv[0], &argc, argv, NULL);
+  char *progname = strdup(argv[0]), *p = progname;
+  do *p = (*p == '-') ? '_' : *p; while (*p++);
+  omlc_init(progname, &argc, argv, NULL);
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
