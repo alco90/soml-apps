@@ -1,5 +1,5 @@
 AC_PREREQ([2.6])
-AC_INIT([oml2-iperf], [2.4.0], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
+AC_INIT([oml2-iperf], [2.4.1], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
