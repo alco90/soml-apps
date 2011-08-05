@@ -10,37 +10,26 @@ Package: oml2-apps-all
 Section: net
 Priority: optional
 Architecture: all
-Depends: oml2-gps, oml2-iperf, oml2-wlanconfig, oml2-trace, oml2-nmetrics, oml2-otg2
+Depends: oml2-gpslogger, oml2-wlanconfig, oml2-trace, oml2-nmetrics, oml2-otg2
 Replaces: oml-client
 Conflicts: oml-client
 Description: A meta-package that installs all the bundled OML2 Applications
  This package installs all the OML2 Application packages:
-  - oml2-gps -- measure GPS data from gpds;
-  - oml2-iperf -- measure network performance;
+  - oml2-gpslogger -- measure GPS data from gpds;
   - oml2-wlanconfig -- record wireless lan information from wlanconfig;
   - oml2-trace -- wrapper around libtrace with OML2 measurement recording
   - oml2-nmetrics -- node metrics using libsigar;
   - oml2-otg2 -- the otg2/otr2 programs for generating background traffic.
 
 
-Package: oml2-gps
+Package: oml2-gpslogger
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, gpsd, liboml2-0
 Replaces: oml-client
 Conflicts: oml-client
 Description: Record and store GPS measurements using OML
- oml2-gps records a stream of GPS position measurements from an external GPS
+ oml2-gpslogger records a stream of GPS position measurements from an external GPS
  device and stores it using the OML measurement library and server.
-
-
-Package: oml2-iperf
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
-Replaces: oml-client
-Conflicts: oml-client
-Description: Network performance monitoring with OML measurement collection
- oml2-iperf is a version of the popular iperf tool modified to send
- measurements using OML.
 
 
 Package: oml2-wlanconfig

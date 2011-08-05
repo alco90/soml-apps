@@ -81,8 +81,7 @@ def defApplication(name, link = nil, lib = nil)
   Package.new(name).defApplication(name, link, lib)
 end
 
-defApplication("gps")
-defApplication("iperf")
+defApplication("gpslogger")
 defApplication("nmetrics")
 defApplication("trace")
 defApplication("wlanconfig")
