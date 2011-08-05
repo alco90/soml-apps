@@ -31,7 +31,7 @@ struct fixsource_t
 static void log_fix(struct gps_fix_t *fix, struct tm *time)
 {
 	char time_string [20];
-	char mode [4];
+	char mode [5];
 	
 	(void)sprintf(time_string, "%04d-%02d-%02dT%02d:%02d:%02dZ",
 		time->tm_year+1900, time->tm_mon+1, time->tm_mday,
@@ -39,7 +39,7 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
 		
 	if (fix->mode==MODE_NO_FIX)
 		(void)sprintf (mode, "none");
-    else
+    	else
 		(void)sprintf (mode, "%dd", fix->mode);
 	
 	if (verbose) {
