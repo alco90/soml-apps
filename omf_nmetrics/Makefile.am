@@ -5,7 +5,7 @@ appname = omf_nmetrics
 
 bin_PROGRAMS = oml2-nmetrics
 oml2_nmetrics_SOURCES = omf_nmetrics.c
-oml2_nmetrics_LDADD = -loml2 -locomm -lsigar -lpopt
+oml2_nmetrics_LDADD = -loml2 -lsigar -lpopt
 oml2_nmetrics_CPPFLAGS = $(LIBSIGAR_CFLAGS)
 
 BUILT_SOURCES = \
@@ -19,10 +19,10 @@ CLEANFILES = \
 EXTRA_DIST=$(appname).app
 
 $(appname)_popt.h:	$(appname).app Makefile
-	oml2_scaffold --opts $<
+	oml2-scaffold --opts $<
 
 $(appname)_oml.h:	$(appname).app Makefile
-	oml2_scaffold --oml $<
+	oml2-scaffold --oml $<
 
 installed_name = oml2-$(progname)$(EXEEXT)
 installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
