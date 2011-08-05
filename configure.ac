@@ -16,7 +16,7 @@ AC_CONFIG_FILES([Makefile
 		simple/Makefile
 		])
 
-AC_CONFIG_SUBDIRS([omf_nmetrics omf_trace otg ripwave_monitor wlanconfig])
+AC_CONFIG_SUBDIRS([gpslogger omf_nmetrics omf_trace otg ripwave_monitor wlanconfig])
 
 # Generate output files
 AC_OUTPUT
