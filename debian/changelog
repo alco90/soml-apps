@@ -1,3 +1,9 @@
+oml2-apps (2.5.0-ubuntu2) oneiric; urgency=low
+
+  * oneiric build 
+
+ -- Christoph Dwertmann <christoph.dwertmann@nicta.com.au>  Tue, 13 Dec 2011 15:22:40 +1100
+
 oml2-apps (2.5.0-ubuntu1) natty; urgency=low
 
   * moving to natty, new upstream release
