@@ -6,7 +6,7 @@ bin_PROGRAMS = oml2-gpslogger
 
 oml2_gpslogger_SOURCES = gpslogger.c
 
-oml2_gpslogger_LDADD = -loml2 -lgps
+oml2_gpslogger_LDADD = -loml2 -lgps -lm
 
 installed_name = oml2-$(progname)$(EXEEXT)
 installed_link_name = $(DESTDIR)$(bindir)/$(progname)_oml2$(EXEEXT)
