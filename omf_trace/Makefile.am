@@ -20,10 +20,10 @@ CLEANFILES = \
 EXTRA_DIST=$(appname).app
 
 $(appname)_popt.h:	$(appname).app Makefile
-	oml2_scaffold --opts $<
+	oml2-scaffold --opts $<
 
 $(appname)_oml.h:	$(appname).app Makefile
-	oml2_scaffold --oml $<
+	oml2-scaffold --oml $<
 
 
 installed_name = oml2-$(progname)$(EXEEXT)

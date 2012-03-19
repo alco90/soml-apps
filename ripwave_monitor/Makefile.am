@@ -6,7 +6,7 @@ BUILT_SOURCES = ripwave_monitor_oml.h
 EXTRA_DIST = navini-protocol.txt ripwave_monitor.app
 
 %_oml.h: %.app
-	oml2_scaffold --oml $^
+	oml2-scaffold --oml $^
 
 clean-local:
 	rm -f ripwave_monitor_oml.h
