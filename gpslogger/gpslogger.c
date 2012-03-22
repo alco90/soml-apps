@@ -44,18 +44,21 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
 	
 	if (verbose) {
 		// print fix data
-		(void)printf("lat=\"%f\" lon=\"%f\" ele=\"%f\" fix=\"%s\" ts=\"%s\"\n", 
-			 fix->latitude, fix->longitude, fix->altitude, mode, time_string);
+		(void)printf("lat=\"%f\" lon=\"%f\" ele=\"%f\" track=\"%f\" speed=\"%f\" climb=\"%f\" fix=\"%s\" ts=\"%s\"\n", 
+			 fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode, time_string);
 		(void)fflush (stdout);
 	}
 	
 	// log fix data to OML
-	OmlValueU values[5];
+	OmlValueU values[8];
 	omlc_set_double (values[0], fix->latitude);
 	omlc_set_double (values[1], fix->longitude);
 	omlc_set_double (values[2], fix->altitude);
-	omlc_set_string (values[3], mode);
-	omlc_set_string (values[4], time_string);
+	omlc_set_double (values[3], fix->track);
+	omlc_set_double (values[4], fix->speed);
+	omlc_set_double (values[5], fix->climb);
+	omlc_set_string (values[6], mode);
+	omlc_set_string (values[7], time_string);
 	omlc_inject (mp, values);
 }
 
@@ -154,6 +157,9 @@ int main (int argc, char *argv[])
 	  { "lat", OML_DOUBLE_VALUE },
 	  { "lon", OML_DOUBLE_VALUE },
 	  { "ele", OML_DOUBLE_VALUE },
+	  { "track", OML_DOUBLE_VALUE },
+	  { "speed", OML_DOUBLE_VALUE },
+	  { "climb", OML_DOUBLE_VALUE },
 	  { "fix", OML_STRING_VALUE },
 	  { "time", OML_STRING_VALUE },
 	  { NULL, (OmlValueT)0 }
