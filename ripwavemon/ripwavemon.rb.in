@@ -1,7 +1,7 @@
 
-defApplication('app:ripwave_monitor', 'ripwave_monitor') do |a|
+defApplication('oml:app:ripwavemon', 'ripwavemon') do |a|
 
-  a.version(0, 1, 0)
+  a.version(2, 7)
   a.shortDescription = 'Report statistics from a Navini RipWave modem'
   a.description = %{
 This application parses periodic UDP status messages from a Navini RipWave
@@ -26,7 +26,7 @@ modem (Unwired, Exetel, nTelos).
     m.defMetric('temperature', 'uint32', 'Temperature [deg. Celcius]')
  end
 
-  a.path = "/usr/bin/ripwave-monitor"
+  a.path = "@bindir@/ripwavemon"
 end
 
 # Local Variables:

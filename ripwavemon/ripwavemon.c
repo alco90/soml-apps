@@ -3,8 +3,9 @@
  * Navini (now Cisco) Ripwave pre-WiMAX modem used by, e.g. Unwired, Exetel or
  * nTelos.
  *
- * Copyright (c) 2010, Nicta, Olivier Mehani <olivier.mehani@nicta.com.au>
- * All rights reserved.
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2012
+ *
+ * Copyright (c) 2010-2012 National ICT Australia (NICTA)
  *
  * This program is based on documentation available at [0], which is dumped
  * in file navini-protocol.txt for convenience.
@@ -42,7 +43,7 @@
 #include <sys/types.h>
 #include <netinet/ip.h>
 #define OML_FROM_MAIN
-#include "ripwave_monitor_oml.h"
+#include "ripwavemon_oml.h"
 //#include "EPEventDef.h"
 
 #define NAVINI_REPORT_PORT  3859
@@ -103,13 +104,13 @@ int prepare_socket(void)
 
 prepare_oml(int argc, const char **argv)
 {
-    if (omlc_init("ripwave_monitor", &argc, argv, NULL) != 0) {
-        fprintf(stderr, "error: omlc_init()\n");
+    if (omlc_init("ripwavemon", &argc, argv, NULL) != 0) {
+        fprintf(stderr, "error: could not initialise OML\n");
         return -1;
     }
     oml_register_mps();
     if (omlc_start() != 0) {
-        fprintf(stderr, "error: omlc_start()\n");
+        fprintf(stderr, "error: could not start OML\n");
         return -1;
     }
 
@@ -188,3 +189,12 @@ int main(int argc, const char **argv)
 
     return 0;
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

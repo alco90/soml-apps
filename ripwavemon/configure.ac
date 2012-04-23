@@ -1,8 +1,7 @@
 AC_PREREQ([2.6])
-AC_INIT([ripwave-monitor], [0.1], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
+AC_INIT([ripwavemon-oml2], [2.7.0], [oml-user@lists.nicta.com.au])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
@@ -10,11 +9,11 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_PROG_LN_S
 
 #Checks for libraries.
 missing_libs=""
 
-# Create a Makefile variable for checking Mac OS X
 AC_CHECK_LIB([oml2], [omlc_init], [AC_DEFINE([HAVE_LIBOML2], [1], [Define if liboml2 is installed.])], [missing_libs+=" liboml2"])
 
 # Checks for header files.
@@ -22,10 +21,6 @@ AC_CHECK_HEADERS([stdio.h stdlib.h stdint.h string.h sys/socket.h sys/types.h ne
 AC_CHECK_HEADER([oml2/omlc.h],  [AC_DEFINE([HAVE_OMLC_H], [1], [Define if omlc.h is installed.])], [missing_headers+="omlc.h"])
 
 AC_CHECK_FUNCS([memset socket ntohs nothl])
-
-AC_C_BIGENDIAN
-
-AC_CONFIG_FILES([Makefile])
 
 # Let the user know we're missing required libraries, and don't generate the build system.
 if test "x$missing_libs" != "x"; then
@@ -53,4 +48,5 @@ $missing_headers])
 fi
 
 # Generate output files
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
