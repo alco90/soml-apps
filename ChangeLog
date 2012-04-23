@@ -1,3 +1,19 @@
+2012-04-23  Olivier Mehani <olivier.mehani@nicta.com.au>
+	* oml2-app: re-canonalised all names to APPNAME-oml2 symlinks
+	omf_APPNAME, APPNAME_oml2 and oml2-APPNAME are still provided
+	for convenience, but will be removed in the future (2.9.0).
+	* otg2: name `otg' without number is now deprecated; symlink
+	name otg2 and otr2 will remain in the future for ease of use,
+	though the canonical names are ot{g,r}2-oml2.
+	* gpslogger: support for gpsd API version 5
+	* ripwave-monitor: app renamed to ripwavemon (binary:
+	ripwavemon-oml2)
+	* simple: removed simple generator; see the example/ directory
+	of oml-2.7.0's source tree (or PREFIX/usr/share/oml2) for an
+	up-to-date version.
+	* iperf: removed elderly 1.7 fork from this distribution; see instead
+	the standalone iperf-oml2, also maintained at mytestbed.net
+
 2011-04-05  Jolyon White  <jolyon.white@nicta.com.au>
 
 	* omf_nmetrics/omf_nmetrics.c (main):

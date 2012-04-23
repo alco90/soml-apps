@@ -1,3 +1,3 @@
-ACLOCAL_AMFLAGS = -I m4 -Wnone
+ACLOCAL_AMFLAGS = -Wall
 
 SUBDIRS = gpslogger nmetrics otg2 ripwavemon trace wlanconfig 
