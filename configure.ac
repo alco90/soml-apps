@@ -12,9 +12,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
-AC_CONFIG_FILES([Makefile
-		simple/Makefile
-		])
+AC_CONFIG_FILES([Makefile])
 
 AC_CONFIG_SUBDIRS([gpslogger omf_nmetrics omf_trace otg ripwave_monitor wlanconfig])
 
