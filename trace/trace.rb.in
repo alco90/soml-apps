@@ -1,16 +1,17 @@
-# The pktid field in all MPs can be used to link information about the multiple
-# protocols encapsulated in the same packet, even in cases where multiple
-# packets have been received at the same time, which renders the timestamp field
-# useless as an identifier. 
+defApplication('oml:app:trace', 'trace') do |a|
 
-defApplication('max:app:omf_trace', 'omf_trace') do |a|
-
-  a.version(1, 0, 0)
-  a.shortDescription = 'A short description'
+  a.version(2, 7)
+  a.shortDescription = 'Packet capture'
   a.description = %{
-A longer description describing in more detail what this application
-is doing and useful for.
-}
+'trace' uses libtrace to capture packets matching the
+BPFilter, and report various header (IP, TCP, UDP,
+Radiotap,...) fields through OML.
+
+Note The pktid field in all MPs can be used to link
+information about the multiple protocols encapsulated
+in the same packet, even in cases where multiple
+packets have been received at the same time, which
+renders the timestamp field useless as an identifier. }
 
   a.defProperty('filter', 'Filter expression BPFEXP', ?f,
         :type => :string)
@@ -77,7 +78,7 @@ is doing and useful for.
     m.defMetric('udp_ts',       :double, ' timestamp of the measurement')
   end
 
-  a.path = "/usr/local/bin/omf_trace"
+  a.path = "@bindir@/omf_trace"
 end
 
 # Local Variables:

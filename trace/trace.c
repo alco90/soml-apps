@@ -1,4 +1,34 @@
-
+/*
+ * OML application reporting various captured packets' characteristics
+ *
+ * This application is using the libtrace library to capture packets matching a
+ * given filter and report selected header files through OML
+ *
+ * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2009
+ * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2009
+ * Author: Jolyon White  <jolyon.white@nicta.com.au>, (C) 2010
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2012
+ *
+ * Copyright (c) 2007-2012 National ICT Australia (NICTA)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 #include <libtrace.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,10 +37,12 @@
 #include <arpa/inet.h>
 
 #define USE_OPTS
-#include "omf_trace_popt.h"
+#include "trace_popt.h"
 #include <netinet/in.h>
 #define OML_FROM_MAIN
-#include "omf_trace_oml.h"
+#include "trace_oml.h"
+
+#define MIN(x,y) ((x)<(y)?(x):(y))
 
 static void
 omlc_inject_ip(oml_mps_t* oml_mps, libtrace_ip_t* ip, libtrace_packet_t *packet,
@@ -230,7 +262,7 @@ void iferr(libtrace_t *trace)
   libtrace_err_t err = trace_get_err(trace);
   if (err.err_num==0)
     return;
-  printf("Error: %s\n",err.problem);
+  printf("error: %s\n",err.problem);
   exit(1);
 }
 
@@ -247,28 +279,28 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 
   trace = trace_create(opts->interface);
   if (trace_is_err(trace)) {
-    trace_perror(trace,"Opening trace file");
+    trace_perror(trace,"error opening trace file ");
     return 1;
   }
 
   if (opts->snaplen > 0) {
     if (trace_config(trace, TRACE_OPTION_SNAPLEN, &opts->snaplen)) {
-      trace_perror(trace, "ignoring: ");
+      trace_perror(trace, "ignoring ");
     }
   }
 
   if (opts->filter) {
     filter = trace_create_filter(opts->filter);
-    printf("FILTER %s \n", opts->filter);
+    printf("info: filter is `%s' \n", opts->filter);
     if (trace_config(trace, TRACE_OPTION_FILTER, filter)) {
-      trace_perror(trace, "ignoring: ");
+      trace_perror(trace, "ignoring ");
     }
     iferr(trace);
   }
 
   if (opts->promisc) {
     if (trace_config(trace, TRACE_OPTION_PROMISC, &opts->promisc)) {
-      trace_perror(trace, "ignoring: ");
+      trace_perror(trace, "ignoring ");
     }
   }
   if (trace_start(trace)==-1) {
@@ -282,7 +314,7 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 
   trace_destroy_packet(packet);
   if (trace_is_err(trace)) {
-    trace_perror(trace, "Reading packets");
+    trace_perror(trace, "error reading packets ");
   }
   trace_destroy(trace);
 
@@ -295,10 +327,29 @@ main(int argc, const char *argv[])
   char str[50] = "int:";
   char radiotap_dev[68] = "/proc/sys/net/";
   FILE *radio_dev_type;
-  char *progname = strdup(argv[0]), *p = progname;
-  do *p = (*p == '-') ? '_' : *p; while (*p++);
+  char *progname = strdup(argv[0]), *p=progname, *p2;
+  int result, l;
 
-  omlc_init(progname, &argc, argv, NULL);
+  /* Get basename */
+  p2 = strtok(p, "/");
+  while(p2) {
+    p = p2;
+    p2 = strtok(NULL, "/");
+  }
+  p2 = p;
+  /* The canonical name is `trace-oml2', so it clearly does not start with `om' */
+  l = strlen(p);
+  if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "trace_oml2", MIN(l,13))) {
+	  fprintf(stderr,
+              "warning: binary name `%s' is deprecated and will disappear with OML 2.9.0, please use `trace-oml2' instead\n", p);
+  }
+  free(progname);
+
+  omlc_init("trace", &argc, argv, NULL);
+  if (result == -1) {
+    fprintf (stderr, "error: could not initialise OML\n");
+    exit (1);
+  }
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
@@ -306,7 +357,7 @@ main(int argc, const char *argv[])
   while ((c = poptGetNextOpt(optCon)) > 0) {}
 
   if (g_opts->interface == NULL) {
-    fprintf(stderr, "Missing interface\n");
+    fprintf(stderr, "error: missing interface\n");
     return 1;
   }
 
@@ -316,13 +367,14 @@ main(int argc, const char *argv[])
 
     radio_dev_type = fopen(radiotap_dev,"rb");
     if(radio_dev_type == NULL){
-      printf("WARNING:  You need to enable radiotap in %s, by putting the value 803.\n"
-             "          Radiotap measurements are disabled for this run.\n", radiotap_dev);
+      fprintf(stderr, "warning: You need to enable radiotap by setting value `803' in `%s'. "
+             "Radiotap measurements are disabled for this run.\n", radiotap_dev);
       g_opts->radiotap = 0;
     }
   }
+
   strcat(str,g_opts->interface);
-  strcpy(g_opts->interface, str);
+  g_opts->interface=str;
   // Initialize measurment points
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
@@ -332,3 +384,12 @@ main(int argc, const char *argv[])
 
   return(0);
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/
