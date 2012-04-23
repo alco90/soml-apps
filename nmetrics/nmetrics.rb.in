@@ -1,7 +1,7 @@
 
-defApplication('omf:app:nmetrics', 'omf_nmetrics') do |a|
+defApplication('oml:app:nmetrics', 'nmetrics') do |a|
 
-  a.version(1, 0)
+  a.version(2, 7)
 #  a.revision = 1
   a.shortDescription = 'Monitoring node statistcs'
   a.description = %{
@@ -81,7 +81,7 @@ be used multiple times)', ?i,
     m.defMetric('total', 'uint64')
   end
 
-  a.path = "/usr/bin/nmetrics"
+  a.path = "@bindir@/nmetrics-oml2"
 end
 
 # Local Variables:

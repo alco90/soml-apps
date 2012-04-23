@@ -1,14 +1,15 @@
 /*
- *  OML application reporting various node metrics, such as cpu, memory, ...
+ * OML application reporting various node metrics, such as cpu, memory, ...
  *
- * Description:  This application is using the libsigar library to report regularily
- *    through the OML framework on various node metrics, such as cpu load, memory
- *    and network usage.
+ * This application is using the libsigar library to report regularily through
+ * the OML framework on various node metrics, such as cpu load, memory and
+ * network usage.
  *
  * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2008
  * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2009
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
  *
- * Copyright (c) 2007-2009 National ICT Australia (NICTA)
+ * Copyright (c) 2007-2012 National ICT Australia (NICTA)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +36,18 @@
 #include <unistd.h>
 
 #define USE_OPTS
-#include "omf_nmetrics_popt.h"
+#include "nmetrics_popt.h"
 
 #define OML_FROM_MAIN
-#include "omf_nmetrics_oml.h"
+#include "nmetrics_oml.h"
 
 OmlMP*   cpu_mp;
 OmlMP*   memory_mp;
 OmlMP*   net_mp;
 
 #include <sigar.h>
+
+#define MIN(x,y) ((x)<(y)?(x):(y))
 
 typedef struct _if_monitor_t {
   char           if_name[64];
@@ -75,10 +78,29 @@ main(int argc, const char **argv)
   char c;
   if_monitor_t* first = NULL;
   if_monitor_t* if_p;
-  char *progname = strdup(argv[0]), *p = progname;
-  do *p = (*p == '-') ? '_' : *p; while (*p++);
+  char *progname = strdup(argv[0]), *p=progname, *p2;
+  int result, l;
 
-  omlc_init(progname, &argc, argv, NULL);
+  /* Get basename */
+  p2 = strtok(p, "/");
+  while(p2) {
+    p = p2;
+    p2 = strtok(NULL, "/");
+  }
+  p2 = p;
+  /* The canonical name is `nmetrics-oml2', so it clearly does not start with `om' */
+  l = strlen(p);
+  if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "nmetrics_oml2", MIN(l,13))) {
+	  fprintf(stderr,
+              "warning: binary name `%s' is deprecated and will disappear with OML 2.9.0, please use `nmetrics-oml2' instead\n", p);
+  }
+  free(progname);
+
+  omlc_init("nmetrics", &argc, argv, NULL);
+  if (result == -1) {
+    fprintf (stderr, "error: could not initialise OML\n");
+    exit (1);
+  }
 
   // parsing command line arguments
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
@@ -231,3 +253,12 @@ run(
     sleep(g_opts->sample_interval);
   }
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

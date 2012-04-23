@@ -1,10 +1,8 @@
 AC_PREREQ([2.6])
-AC_INIT([oml2-nmetrics], [2.4.1], [http://omf.mytestbed.net/wiki/OML/FAQ_and_Support])
+AC_INIT([nmetrics-oml2], [2.7.0], [oml-user@lists.nicta.com.au])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
-AC_PROG_LIBTOOL([1.4])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -12,34 +10,6 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
-
-# Make a shell variable for checking Mac OS X
-if test x`uname` = xDarwin; then
-   DARWIN=yes
-fi
-
-#Checks for libraries.
-missing_libs=""
-
-# Create a Makefile variable for checking Mac OS X
-AM_CONDITIONAL([DARWIN], [test x`uname` = xDarwin])
-AC_CHECK_LIB([popt], [poptGetContext], [AC_DEFINE([HAVE_LIBPOPT], [1], [Define if libpopt is installed.])], [missing_libs+=" libpopt"])
-AC_CHECK_LIB([oml2], [omlc_init], [AC_DEFINE([HAVE_LIBOML2], [1], [Define if liboml2 is installed.])], [missing_libs+=" liboml2"])
-AC_CHECK_LIB([sigar], [sigar_open], [AC_DEFINE([HAVE_LIBSIGAR], [1], [Define if libsigar is installed.])], [missing_libs+=" libsigar"])
-
-# Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
-AC_CHECK_HEADER([oml2/omlc.h],  [AC_DEFINE([HAVE_OMLC_H], [1], [Define if omlc.h is installed.])], [missing_headers+="omlc.h"])
-AC_CHECK_HEADER([popt.h], [AC_DEFINE([HAVE_POPT_H], [1], [Define if popt.h is installed.])], [missing_headers+="popt.h"])
-AC_CHECK_HEADER([sigar.h])
-AC_CHECK_HEADER([libsigar/sigar.h])
-
-if test $ac_cv_header_libsigar_sigar_h = no -a $ac_cv_header_sigar_h = no; then
-   missing_headers+="sigar.h"
-elif test $ac_cv_header_libsigar_sigar_h = yes; then
-   AC_SUBST([LIBSIGAR_CFLAGS], [-I/usr/include/libsigar])
-fi
-
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -56,11 +26,25 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([gethostbyname gettimeofday inet_ntoa memmove memset socket sqrt strerror])
 
-AC_C_BIGENDIAN
+#Checks for libraries.
+missing_libs=""
 
-AC_CONFIG_FILES([Makefile])
+AC_CHECK_LIB([popt], [poptGetContext], [AC_DEFINE([HAVE_LIBPOPT], [1], [Define if libpopt is installed.])], [missing_libs+=" libpopt"])
+AC_CHECK_LIB([oml2], [omlc_init], [AC_DEFINE([HAVE_LIBOML2], [1], [Define if liboml2 is installed.])], [missing_libs+=" liboml2"])
+AC_CHECK_LIB([dl], [dlopen])
+AC_CHECK_LIB([sigar], [sigar_open], [AC_DEFINE([HAVE_LIBSIGAR], [1], [Define if libsigar is installed.])], [missing_libs+=" libsigar"])
 
-
+# Checks for header files.
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
+AC_CHECK_HEADER([oml2/omlc.h],  [AC_DEFINE([HAVE_OMLC_H], [1], [Define if omlc.h is installed.])], [missing_headers+="omlc.h"])
+AC_CHECK_HEADER([popt.h], [AC_DEFINE([HAVE_POPT_H], [1], [Define if popt.h is installed.])], [missing_headers+="popt.h"])
+AC_CHECK_HEADER([sigar.h])
+AC_CHECK_HEADER([libsigar/sigar.h])
+if test $ac_cv_header_libsigar_sigar_h = no -a $ac_cv_header_sigar_h = no; then
+   missing_headers+="sigar.h"
+elif test $ac_cv_header_libsigar_sigar_h = yes; then
+   AC_SUBST([LIBSIGAR_CFLAGS], [-I/usr/include/libsigar])
+fi
 
 # Let the user know we're missing required libraries, and don't generate the build system.
 if test "x$missing_libs" != "x"; then
@@ -88,4 +72,5 @@ $missing_headers])
 fi
 
 # Generate output files
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
