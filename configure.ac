@@ -14,7 +14,7 @@ AC_PROG_MAKE_SET
 
 AC_CONFIG_FILES([Makefile])
 
-AC_CONFIG_SUBDIRS([gpslogger nmetrics otg ripwavemon trace wlanconfig])
+AC_CONFIG_SUBDIRS([gpslogger nmetrics otg2 ripwavemon trace wlanconfig])
 
 # Generate output files
 AC_OUTPUT
