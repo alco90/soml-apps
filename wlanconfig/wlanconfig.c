@@ -1,12 +1,11 @@
 /*
- *  C Implementation: wlanconfig_oml2
+ * OML application reporting wireless characteristics from wlanconfig.
  *
- * Description:  An application to take measurements from wlanconfig using
- *               OML.
+ * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2008--2009
+ * Author: Jolyon White  <jolyon.white@nicta.com.au>, (C) 2010--2011
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
  *
- * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2008
- *
- * Copyright (c) 2007-2009 National ICT Australia (NICTA)
+ * Copyright (c) 2008-2012 National ICT Australia (NICTA)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +37,8 @@
 #include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
+#define MIN(x,y) ((x)<(y)?(x):(y))
+
 static OmlMPDef oml_def[] = {
   {"macAddress", OML_STRING_VALUE},
   {"RSSI", OML_INT32_VALUE},
@@ -60,10 +61,23 @@ main(int argc, const char *argv[])
   char command2[256] = "256";
   char macAddress[256] = "e";
   char* ifwifi;
-  char *progname = strdup(argv[0]), *p = progname;
-  do *p = (*p == '-') ? '_' : *p; while (*p++);
+  char *progname = strdup(argv[0]), *p=progname, *p2;
+  int result, l;
 
-  omlc_init(progname, &argc, argv, o_log);
+  /* Get basename */
+  p2 = strtok(p, "/");
+  while(p2) {
+    p = p2;
+    p2 = strtok(NULL, "/");
+  }
+  p2 = p;
+  /* The canonical name is `wlanconfig-oml2', so it clearly does not start with `om' */
+  l = strlen(p);
+  if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "wlanconfig_oml2", MIN(l,13))) {
+	  fprintf(stderr,
+              "warning: binary name `%s' is deprecated and will disappear in later versions, please use `wlanconfig-oml2' instead\n", p);
+  }
+  free(progname);
 
   ifwifi = "ath0";
   if (pipe (mypipe)) {
@@ -172,3 +186,12 @@ main(int argc, const char *argv[])
 
   return 0;
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/
