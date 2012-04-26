@@ -167,7 +167,7 @@ void receive_reports (int sockfd)
         omlc_set_int32(values[11], -report.syncstrength2);
         omlc_set_uint32(values[12], report.snr);
         omlc_set_uint32(values[13], report.temperature);
-        omlc_inject(g_oml_mps->navini_stats, values);
+        omlc_inject(g_oml_mps->ripwave_stats, values);
 
     }
 }

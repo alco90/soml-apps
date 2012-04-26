@@ -8,7 +8,7 @@ This application parses periodic UDP status messages from a Navini RipWave
 modem (Unwired, Exetel, nTelos).
 }
 
-  a.defMeasurement("navini_stats") do |m|
+  a.defMeasurement("ripwave_stats") do |m|
     # Measurements are in the same order as the report packet
     m.defMetric('modemid', 'uint32', 'Modem identifier (32 bits)')
     m.defMetric('month', 'uint32', 'Month as reported by the modem')
