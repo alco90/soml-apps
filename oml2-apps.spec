@@ -1,5 +1,5 @@
 %define name            oml2-apps
-%define version         2.5.0
+%define version         2.7.0
 
 BuildRoot:              %{_tmppath}/%{name}-%{version}-build
 Summary:                OML application collection
@@ -8,7 +8,7 @@ URL:                    http://oml.mytestbed.net/projects/omlapp
 Name:                   %{name}
 Version:                %{version}
 Release:                1
-Source:                 http://oml.mytestbed.net/attachments/download/645/oml2-apps-2.5.0.tar.gz
+Source:                 http://oml.mytestbed.net/attachments/download/645/oml2-apps-2.7.0.tar.gz
 Packager:               Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
 Prefix:                 /usr
 Group:                  Applications/Internet
@@ -39,4 +39,4 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_bindir}/*
 /usr/lib/*
-
+/usr/share/*
