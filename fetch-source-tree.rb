@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 
 def redhat_spec_version()
-  f = File.new("oml2.spec")
+  f = File.new("oml2-apps.spec")
   begin
     while line = f.readline do
       if (line =~ /^%define +version +([0-9]+\.[0-9]+\..*)/ ) then
 	return $1
       end
     end
-    $stderr.print "ERROR:  oml2.spec does not appear to have any version number in it.\n"
+    $stderr.print "ERROR:  oml2-apps.spec does not appear to have any version number in it.\n"
     Kernel.exit 1
   ensure
     f.close
@@ -48,10 +48,10 @@ end
 #
 def check_source_version(version)
   File.open("configure.ac").each do |line|
-    if (line =~ /^AC_INIT\(\[oml2\], \[(.*)\],.*/) then
+    if (line =~ /^AC_INIT\(\[oml2-apps\], \[(.*)\],.*/) then
       source_version = $1
       if (source_version != version) then
-        $stderr.print "ERROR:  Package version from configure.ac (#{source_version}) does not match oml2.spec version (#{version})\n"
+        $stderr.print "ERROR:  Package version from configure.ac (#{source_version}) does not match oml2-apps.spec version (#{version})\n"
         Kernel.exit 1
       else
         puts "Package version check OK"
@@ -67,7 +67,7 @@ def run
   spec_version = redhat_spec_version
   treeish = treeish_from_version(spec_version)
 
-  puts "OML version #{spec_version}\n"
+  puts "OML apps version #{spec_version}\n"
   puts "Building package from tree at '#{treeish}'\n"
 
   fetch_result = system("git archive #{treeish} | tar xf -")
@@ -77,7 +77,7 @@ def run
   end
 
   #
-  # Check that the version number in configure.ac matches the version from oml2.spec.
+  # Check that the version number in configure.ac matches the version from oml2-apps.spec.
   #
   check_source_version(spec_version)
 end
