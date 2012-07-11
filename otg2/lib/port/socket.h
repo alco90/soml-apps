@@ -30,7 +30,7 @@ protected:
   struct sockaddr* 
   setSockAddress(Address *addr, struct sockaddr_in *address);
   struct sockaddr*
-  setSockAddress(char* hostname, int   port, struct sockaddr_in *address);
+  setSockAddress(const char* hostname, int   port, struct sockaddr_in *address);
   
   void 
   decodeSockAddress(Address *addr, struct sockaddr_in *address);
@@ -43,7 +43,7 @@ protected:
   
   int nblockflag_;
   
-  char* localhost_;
+  const char* localhost_;
   int   localport_;
   char* dsthost_;
   int   dstport_;

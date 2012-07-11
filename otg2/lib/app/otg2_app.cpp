@@ -19,8 +19,8 @@ using namespace std;
 OTG::OTG(
   int argc, 
   const char* argv[],
-  char*       senderName,
-  char*       sourceName,
+  const char* senderName,
+  const char* sourceName,
   const char* appName,
   const char* copyright
 ): Application(argc, argv)
@@ -60,14 +60,14 @@ OTG::getComponentOptions(
 
 Sender*
 OTG::createSender(
-  char* name
+  const char* name
 ) {
   return Port::createOutPort(name);
 }
 
 ISource*
 OTG::createSource(
-  char* name
+  const char* name
 ) {
   return Generator::create(name);
 }

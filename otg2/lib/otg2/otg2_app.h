@@ -26,8 +26,8 @@ public:
   OTG(
     int argc, 
     const char* argv[],
-    char* senderName = NULL,
-    char* sourceName = NULL,
+    const char* senderName = NULL,
+    const char* sourceName = NULL,
     const char* appName = NULL,
     const char* copyright = NULL
   );
@@ -41,12 +41,12 @@ protected:
   
   Sender*
   createSender(
-    char* senderName
+    const char* senderName
   );
 
   ISource*
   createSource(
-    char* sourceName
+   const  char* sourceName
   );
   
 };

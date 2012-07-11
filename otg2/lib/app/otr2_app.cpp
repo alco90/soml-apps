@@ -19,8 +19,8 @@ using namespace std;
 OTR::OTR(
   int argc, 
   const char* argv[],
-  char*       senderName,
-  char*       sourceName,
+  const char* senderName,
+  const char* sourceName,
   const char* appName,
   const char* copyright
 ): Application(argc, argv)
@@ -58,14 +58,14 @@ OTR::getComponentOptions(
 
 Sender*
 OTR::createSender(
-  char* name
+  const char* name
 ) {
   return Port::createOutPort(name);
 }
 
 ISource*
 OTR::createSource(
-  char* name
+  const char* name
 ) {
   return Port::createInPort(name);
 }

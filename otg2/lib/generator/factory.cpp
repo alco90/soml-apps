@@ -8,7 +8,7 @@
 
 Generator*
 Generator::create(
-  char* name
+  const char* name
 ) {
   if (strcmp(name, "cbr") == 0) {
     return new CBR_Generator();
@@ -18,7 +18,7 @@ Generator::create(
   return NULL;
 }
 
-char* 
+const char* 
 Generator::listGenerators()
 
 {
@@ -26,7 +26,7 @@ Generator::listGenerators()
 }
 
 
-char* 
+const char* 
 Generator::getDefGeneratorName()
 
 {

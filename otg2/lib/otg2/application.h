@@ -26,12 +26,12 @@ protected:
   
   virtual Sender*
   createSender(
-    char* senderName
+    const char* senderName
   ) = 0;
 
   virtual ISource*
   createSource(
-    char* sourceName
+    const char* sourceName
   ) = 0;
 
   void 
@@ -59,16 +59,16 @@ protected:
   setSenderInfo(
     const char* longName,
     char        shortName,        /* may be ’\0’ */
-    char*       descrip,        /* description for autohelp -- may be NULL */
-    char*       argDescrip
+    const char*       descrip,        /* description for autohelp -- may be NULL */
+    const char*       argDescrip
   );
 
   void
   setSourceInfo(
     const char* longName,
     char        shortName,        /* may be ’\0’ */
-    char*       descrip,        /* description for autohelp -- may be NULL */
-    char*       argDescrip
+    const char* descrip,        /* description for autohelp -- may be NULL */
+    const char* argDescrip
   );
 
   struct poptOption* phase1_;
@@ -77,8 +77,8 @@ protected:
   int argc_;
   const char** argv_;
 
-  char* sender_name_;
-  char* source_name_;
+  const char* sender_name_;
+  const char* source_name_;
   int   clockref_; 
   char* component_name_;
   

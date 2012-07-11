@@ -318,8 +318,8 @@ void
 Application::setSenderInfo(
   const char* longName,
   char        shortName,        /* may be ’\0’ */
-  char*       descrip,        /* description for autohelp -- may be NULL */
-  char*       argDescrip   
+  const char*       descrip,        /* description for autohelp -- may be NULL */
+  const char*       argDescrip   
 ) {
   struct poptOption& p1 = phase1_[2];
   struct poptOption& p2 = phase2_[3];  
@@ -334,8 +334,8 @@ void
 Application::setSourceInfo(
   const char* longName,
   char        shortName,        /* may be ’\0’ */
-  char*       descrip,        /* description for autohelp -- may be NULL */
-  char*       argDescrip   
+  const char* descrip,        /* description for autohelp -- may be NULL */
+  const char* argDescrip   
 ) {
   struct poptOption& p1 = phase1_[3];
   struct poptOption& p2 = phase2_[4];  

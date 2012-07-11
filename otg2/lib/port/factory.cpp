@@ -7,7 +7,7 @@
 
 Sender*
 Port::createOutPort(
-  char* name
+  const char* name
 ) {
   if (strcmp(name, "udp") == 0) {
     return new UDPOutPort();
@@ -17,14 +17,14 @@ Port::createOutPort(
   return NULL;
 }
 
-char*
+const char*
 Port::listOutPorts()
 
 {
   return "udp|null";
 }
 
-char*
+const char*
 Port::getDefOutPortName()
 
 {
@@ -34,7 +34,7 @@ Port::getDefOutPortName()
 
 ISource*
 Port::createInPort(
-  char* name
+  const char* name
 ) {
   if (strcmp(name, "udp") == 0) {
     return new UDPInPort();
@@ -42,14 +42,14 @@ Port::createInPort(
   return NULL;
 }
 
-char*
+const char*
 Port::listInPorts()
 
 {
   return "udp";
 }
 
-char*
+const char*
 Port::getDefInPortName()
 
 {

@@ -24,13 +24,13 @@ class Port
 
 {
 public:
-  static Sender* createOutPort(char* name);
-  static char* getDefOutPortName();
-  static char* listOutPorts();
+  static Sender* createOutPort(const char* name);
+  static const char* getDefOutPortName();
+  static const char* listOutPorts();
   
-  static ISource* createInPort(char* name);  
-  static char* getDefInPortName();
-  static char* listInPorts();
+  static ISource* createInPort(const char* name);  
+  static const char* getDefInPortName();
+  static const char* listInPorts();
 };
 
 #endif

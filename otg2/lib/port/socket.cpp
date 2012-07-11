@@ -99,7 +99,7 @@ Socket::setSockAddress(
   */
 struct sockaddr * 
 Socket::setSockAddress(
-  char* hostname,
+  const char* hostname,
   int   port,
   struct sockaddr_in *address
 ) {

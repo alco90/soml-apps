@@ -12,9 +12,9 @@ class Generator: public ISource
 
 {     
 public:
-  static Generator* create(char* name);  
-  static char* getDefGeneratorName();
-  static char* listGenerators();
+  static Generator* create(const char* name);  
+  static const char* getDefGeneratorName();
+  static const char* listGenerators();
   
 };
 
