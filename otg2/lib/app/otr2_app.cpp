@@ -1,6 +1,5 @@
 
 #define APP_NAME "OTG2 Traffic Sink"
-#define COPYRIGHT "Copyright (c) 2005-07 WINLAB, 2007-08 NICTA"
 
 
 #include <fstream>
@@ -8,7 +7,8 @@
 #include <iostream>
 using namespace std;
 
-#include "otg2/otr2_app.h"
+#include <otg2/otr2_app.h>
+#include <version.h>
 
 
 #define STDIN 0

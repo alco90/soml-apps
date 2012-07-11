@@ -38,7 +38,7 @@ To send UDP packets to the local interface
 
 $ build/otg2/bin/otg2 -d 5 --udp:dst_host localhost
 # OTG2 Traffic Generator V2.0
-# Copyright (c) 2005-07 WINLAB, 2007-08 NICTA
+# Copyright (c) 2005-2007 WINLAB, 2007-2012 NICTA
 # .. Binding port to '(null):0'
 # .... Sending UDP packet of size '512' to 'localhost:3000'
 # .... Sending UDP packet of size '512' to 'localhost:3000'
@@ -52,7 +52,7 @@ To receive this flow, start 'otr2'
 
 $ build/otg2/bin/otr2 -d 5 --udp:local_port 3000
 # OTG2 Traffic Sink V2.0
-# Copyright (c) 2005-07 WINLAB, 2007-08 NICTA
+# Copyright (c) 2005-2007 WINLAB, 2007-2012 NICTA
 # .. Binding port to 'localhost:3000'
 # .... Receiving UDP packet of size '512' from '127.0.0.1:32770'
 # .... Consuming  packet of size '512'
