@@ -232,7 +232,12 @@ int main (int argc, const char **argv)
 
   int ch;
 
-  while ((ch = getopt(argc, argv, "hv")) != -1) {
+  /* getopt(3) expects arg 2 to be char * const (i.e., pointer to an array of
+   * immutable strings), however, omlc_init(3) needs argv to be mutable, so our
+   * main() cannot declare it as such we cast it here to make the C compiler
+   * happy by letting it know wo know what we are doing 
+   */
+  while ((ch = getopt(argc, (char* const*)argv, "hv")) != -1) {
     switch (ch) {
     case 'v':
       verbose = true;
