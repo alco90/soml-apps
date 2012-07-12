@@ -3,6 +3,8 @@
 
 #include <otg2/application.h>
 
+#define APP_NAME "OTG2 Traffic Generator"
+
 /**
 *  Main funciton of the OTG
 *
@@ -28,7 +30,7 @@ public:
     const char* argv[],
     const char* senderName = NULL,
     const char* sourceName = NULL,
-    const char* appName = NULL,
+    const char* appName = APP_NAME,
     const char* copyright = NULL
   );
 

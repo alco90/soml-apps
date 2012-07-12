@@ -71,19 +71,20 @@ phase2[] = {
 * 
 */
 
-
 Application::Application(int argc, const char * argv[], const char* defLogFile)
-
 {
+  throw("Application::Application(argc, argv,...) is deprecated; use Application::Application(\"appname\", argc, argv,...) instead");
+}
+
+Application::Application(const char *appname, int argc, const char * argv[], const char* defLogFile,
+		const char* applongname, const char* copyright)
+{
+  app_name_ = appname;
+  app_long_name_ = applongname == NULL ? appname : applongname;
+  copyright_ = copyright == NULL ? COPYRIGHT : copyright;
+
 #ifdef WITH_OML
-  char *appname = strdup (argv[0]);
-  char *s = appname;
-  do {
-      if (*s == '-')
-          *s = '_';
-  } while (*s++);
-  omlc_init(appname, &argc, argv, o_log);
-  free (appname);
+  omlc_init(app_name_, &argc, argv, NULL);
 #endif
 
   argc_ = argc;
@@ -116,6 +117,13 @@ Application::Application(int argc, const char * argv[], const char* defLogFile)
   phase2_[8].argDescrip = "FIXED";
   //cout << "initialisation of the application end of phase 2 \n " <<endl;
   
+}
+
+Application::~Application()
+{
+#ifdef WITH_OML
+  omlc_close();
+#endif
 }
 
 
@@ -151,7 +159,7 @@ Application::parseOptionsPhase1()
   o_set_log_file((char*)logfile_name_);
   o_set_log_level(log_level_);
   
-  o_log(O_LOG_INFO, "%s V%s\n", app_name_, OTG2_VERSION);
+  o_log(O_LOG_INFO, "%s V%s\n", app_long_name_, OTG2_VERSION);
   o_log(O_LOG_INFO, "%s\n", copyright_);
   
 }
@@ -310,7 +318,7 @@ void
 Application::printVersion()
 
 {  
-  cout << app_name_ << " V" << OTG2_VERSION << endl;
+  cout << app_long_name_ << " V" << OTG2_VERSION << endl;
   cout << copyright_ << endl;
 }
 

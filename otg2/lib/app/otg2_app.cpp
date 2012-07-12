@@ -1,6 +1,3 @@
-
-#define APP_NAME "OTG2 Traffic Generator"
-
 #include <fstream>
 #include <iostream>
 using namespace std;
@@ -11,7 +8,6 @@ using namespace std;
 
 #include <otg2/port.h>
 #include <otg2/otg2_app.h>
-#include <version.h>
 
 #define STDIN 0
 #define MAX_INPUT_SIZE 256
@@ -23,15 +19,12 @@ OTG::OTG(
   const char* sourceName,
   const char* appName,
   const char* copyright
-): Application(argc, argv)
+): Application("otg2", argc, argv, "-", appName, copyright)
 
 {
   sender_name_ = senderName == NULL ? Port::getDefOutPortName() : senderName;
   source_name_ = sourceName == NULL ? Generator::getDefGeneratorName() : sourceName;
   
-  app_name_ = appName == NULL ? APP_NAME : appName;
-  copyright_ = copyright == NULL ? COPYRIGHT : copyright;
-
   setSenderInfo("protocol", 'p', "Protocol to use to send packet", Port::listOutPorts());
   setSourceInfo("generator", 'g', "Generator producing packets", Generator::listGenerators());
 

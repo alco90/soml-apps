@@ -16,8 +16,10 @@ class Application
 {
 public:
   
-  Application(int argc, const char * argv[], const char* defLogFile = "-");
-  virtual ~Application() {};
+  Application(int argc, const char * argv[], const char* defLogFile = "-"); /* Deprecated, throws an exception */
+  Application(const char *appname, int argc, const char * argv[],
+		  const char* defLogFile, const char* applongname = NULL, const char* copyright = NULL);
+  ~Application();
   
   virtual void
   run();
@@ -90,6 +92,7 @@ protected:
   const char* logfile_name_;
   
   const char* app_name_;
+  const char* app_long_name_;
   const char* copyright_;
   
 };

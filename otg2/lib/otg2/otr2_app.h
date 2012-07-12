@@ -2,6 +2,7 @@
 #define OTR2_APP_H_
 
 #include <otg2/application.h>
+#define APP_NAME "OTG2 Traffic Sink"
 
 /**
 *  Main funciton of the OTR
@@ -28,7 +29,7 @@ public:
     const char* argv[],
     const char* senderName = NULL,
     const char* sourceName = NULL,
-    const char* appName = NULL,
+    const char* appName = APP_NAME,
     const char* copyright = NULL
   );
 

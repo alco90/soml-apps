@@ -1,20 +1,16 @@
-
-#define APP_NAME "OTG2 Traffic Sink"
-
-
 #include <fstream>
+#include <iostream>
+using namespace std;
+
 #include <sys/time.h>
 #include <iostream>
 using namespace std;
 
+#include <otg2/port.h>
 #include <otg2/otr2_app.h>
-#include <version.h>
-
 
 #define STDIN 0
 #define MAX_INPUT_SIZE 256
-
-
 
 OTR::OTR(
   int argc, 
@@ -23,13 +19,10 @@ OTR::OTR(
   const char* sourceName,
   const char* appName,
   const char* copyright
-): Application(argc, argv)
+): Application("otr2", argc, argv, "-", appName, copyright)
 {
   sender_name_ = senderName == NULL ? (char*)"null" : senderName;
   source_name_ = sourceName == NULL ? Port::getDefInPortName() : sourceName;
-  
-  app_name_ = appName == NULL ? APP_NAME : appName;
-  copyright_ = copyright == NULL ? COPYRIGHT : copyright;
   
   setSenderInfo("protocol", 'p', "Protocol to use to send packet", Port::listInPorts());
   setSourceInfo("sink", 'g', "What to do with received packets", Port::listOutPorts());
