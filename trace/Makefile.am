@@ -1,11 +1,9 @@
 ACLOCAL_AMFLAGS = -Wall
 
 appname = trace
-progname = $(appname)-oml2
-prefixedname = $(shell echo $(PACKAGE) | sed '$(transform)')
-pkgdatadir = $(datadir)/$(prefixedname)
+installed_name = `echo -n '$(PACKAGE)' | sed '$(transform)'`
+pkgdatadir = $(datadir)/$(installed_name)
 
-# Cannot use progname here
 bin_PROGRAMS = trace-oml2
 trace_oml2_SOURCES = trace.c
 trace_oml2_LDADD = -loml2 -ltrace -lpopt
@@ -18,7 +16,7 @@ BUILT_SOURCES = \
 	$(appname)_oml.h
 
 CLEANFILES = \
-	$(pkgdata_DATA)
+	$(pkgdata_DATA) \
 	$(appname)_popt.h \
 	$(appname)_oml.h
 
@@ -31,12 +29,18 @@ $(appname)_oml.h: $(appname).rb Makefile
 	oml2-scaffold --oml $<
 
 $(appname).rb: $(appname).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e '/a\.path/s/$(PACKAGE)/$(prefixedname)/' $< > $@
+	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@
 
-installed_link_names = $(DESTDIR)$(bindir)/$(shell echo $(appname)_oml2 | sed '$(transform)')$(EXEEXT) $(DESTDIR)$(bindir)/$(shell echo oml2-$(appname) | sed '$(transform)')$(EXEEXT) $(DESTDIR)$(bindir)/$(shell echo omf_$(appname) | sed '$(transform)')$(EXEEXT)
+installed_link_names = \
+		       $(DESTDIR)$(bindir)/`echo -n "$(appname)_oml2" | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo -n "oml2-$(appname)" | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo -n "omf_$(appname)" | sed '$(transform)'`$(EXEEXT)
 
 install-exec-hook:
-	rm -f $(installed_link_names)
 	for OLDNAME in $(installed_link_names); do \
-		$(LN_S) $(prefixedname) $${OLDNAME}; \
+		$(LN_S) $(installed_name) $${OLDNAME}; \
 	done
+
+uninstall-hook:
+	rm -f $(installed_link_names)
+	rm -f $(DESTDIR)/$(pkgdatadir)/$(appname).rb

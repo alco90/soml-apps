@@ -1,4 +1,4 @@
-AC_PREREQ([2.6])
+AC_PREREQ([2.69])
 AC_INIT([gpslogger-oml2], [2.7.0], [oml-user@lists.nicta.com.au])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])

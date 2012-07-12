@@ -2,13 +2,13 @@ ACLOCAL_AMFLAGS = -I m4 -Wall
 
 appotg2 = otg2
 progotg2 = $(appotg2)-oml2
-prefixedotg2 = $(shell echo $(progotg2) | sed '$(transform)')
+installed_otg2 = `echo -n '$(progotg2)' | sed '$(transform)'`
 
 appotr2 = otr2
 progotr2 = $(appotr2)-oml2
-prefixedotr2 = $(shell echo $(progotr2) | sed '$(transform)')
+installed_otr2 = `echo -n '$(progotr2)' | sed '$(transform)'`
 
-pkgdatadir = $(datadir)/$(prefixedotg2)
+pkgdatadir = $(datadir)/$(installed_otg2)
 
 SUBDIRS = lib/core lib/port lib/generator
 
@@ -36,9 +36,9 @@ EXTRA_DIST = $(appotg2).rb.in $(appotr2).rb.in
 CLEANFILES = $(appotg2).rb $(appotr2).rb
 
 $(appotg2).rb: $(appotg2).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e '/a\.path/s/$(appotg2)/$(prefixedotg2)/' $< > $@
+	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotg2)/$(installed_otg2)/" $< > $@
 $(appotr2).rb: $(appotr2).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e '/a\.path/s/$(appotr2)/$(prefixedotr2)/' $< > $@
+	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotr2)/$(installed_otr2)/" $< > $@
 
 libotg2_la_SOURCES = \
 	lib/app/application.cpp \
@@ -63,17 +63,22 @@ libotg2_la_LIBADD = -locomm \
 	$(builddir)/lib/generator/libotg2generator.la \
 	-lpopt -lpthread -loml2
 
-target_otg2 = $(prefixedotg2)$(EXEEXT)
-target_otr2 = $(prefixedotr2)$(EXEEXT)
-installed_links_otg2 = $(DESTDIR)$(bindir)/$(shell echo $(appotg2) | sed '$(transform)')$(EXEEXT) $(DESTDIR)$(bindir)/$(shell echo oml2-$(appotg2) | sed '$(transform)')$(EXEEXT)
-installed_links_otr2 = $(DESTDIR)$(bindir)/$(shell echo $(appotr2) | sed '$(transform)')$(EXEEXT) $(DESTDIR)$(bindir)/$(shell echo oml2-$(appotr2) | sed '$(transform)')$(EXEEXT)
+target_otg2 = $(installed_otg2)$(EXEEXT)
+target_otr2 = $(installed_otr2)$(EXEEXT)
+installed_links_otg2 = $(DESTDIR)$(bindir)/`echo -n $(appotg2) | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo -n oml2-$(appotg2) | sed '$(transform)'`$(EXEEXT)
+installed_links_otr2 = $(DESTDIR)$(bindir)/`echo -n $(appotr2) | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo -n oml2-$(appotr2) | sed '$(transform)'`$(EXEEXT)
 
 install-exec-hook:
-	rm -f $(installed_link_otg2)
-	for OLDNAME in $(installed_links_otg2); do \
+	for OLDNAME in $(installed_links_otg2); do  \
 		$(LN_S) $(target_otg2) $${OLDNAME}; \
 	done
-	rm -f $(installed_link_otr2)
-	for OLDNAME in $(installed_links_otr2); do \
+	for OLDNAME in $(installed_links_otr2); do  \
 		$(LN_S) $(target_otr2) $${OLDNAME}; \
 	done
+
+uninstall-hook:
+	rm -f $(installed_link_names)
+	rm -f $(DESTDIR)/$(pkgdatadir)/$(appotg2).rb
+	rm -f $(DESTDIR)/$(pkgdatadir)/$(appotr2).rb

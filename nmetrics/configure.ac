@@ -1,4 +1,4 @@
-AC_PREREQ([2.6])
+AC_PREREQ([2.69])
 AC_INIT([nmetrics-oml2], [2.7.0], [oml-user@lists.nicta.com.au])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
