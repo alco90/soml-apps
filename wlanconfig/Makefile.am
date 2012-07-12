@@ -2,10 +2,19 @@ ACLOCAL_AMFLAGS = -Wall
 
 appname = wlanconfig
 installed_name = `echo -n '$(PACKAGE)' | sed '$(transform)'`
+pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = wlanconfig-oml2
 wlanconfig_oml2_SOURCES = wlanconfig.c
 wlanconfig_oml2_LDADD = -loml2 -locomm
+
+pkgdata_DATA = $(appname).rb
+
+EXTRA_DIST = $(appname).rb.in
+CLEANFILES = $(appname).rb
+
+$(appname).rb: $(appname).rb.in
+	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@
 
 installed_link_names = \
 		       $(DESTDIR)$(bindir)/`echo -n "$(appname)_oml2" | sed '$(transform)'`$(EXEEXT) \
