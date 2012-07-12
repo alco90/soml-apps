@@ -78,7 +78,7 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('udp_ts',       :double, ' timestamp of the measurement')
   end
 
-  a.path = "@bindir@/omf_trace"
+  a.path = "@bindir@/trace-oml2"
 end
 
 # Local Variables:
