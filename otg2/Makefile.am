@@ -8,6 +8,8 @@ appotr2 = otr2
 progotr2 = $(appotr2)-oml2
 prefixedotr2 = $(shell echo $(progotr2) | sed '$(transform)')
 
+pkgdatadir = $(datadir)/$(prefixedotg2)
+
 SUBDIRS = lib/core lib/port lib/generator
 
 AM_CPPFLAGS = \
@@ -27,7 +29,16 @@ otg2_oml2_LDADD = $(otgrlibs)
 otr2_oml2_SOURCES = otr2.cpp
 otr2_oml2_LDADD = $(otgrlibs)
 
-pkglib_LTLIBRARIES = libotg2.la 
+pkglib_LTLIBRARIES = libotg2.la
+pkgdata_DATA = $(appotg2).rb $(appotr2).rb
+
+EXTRA_DIST = $(appotg2).rb.in $(appotr2).rb.in
+CLEANFILES = $(appotg2).rb $(appotr2).rb
+
+$(appotg2).rb: $(appotg2).rb.in
+	sed -e 's|@bindir[@]|$(bindir)|g' -e '/a\.path/s/$(appotg2)/$(prefixedotg2)/' $< > $@
+$(appotr2).rb: $(appotr2).rb.in
+	sed -e 's|@bindir[@]|$(bindir)|g' -e '/a\.path/s/$(appotr2)/$(prefixedotr2)/' $< > $@
 
 libotg2_la_SOURCES = \
 	lib/app/application.cpp \
@@ -50,7 +61,7 @@ libotg2_la_LIBADD = -locomm \
 	$(builddir)/lib/core/libotg2core.la \
 	$(builddir)/lib/port/libotg2port.la \
 	$(builddir)/lib/generator/libotg2generator.la \
-    -lpopt -lpthread -loml2
+	-lpopt -lpthread -loml2
 
 target_otg2 = $(prefixedotg2)$(EXEEXT)
 target_otr2 = $(prefixedotr2)$(EXEEXT)
