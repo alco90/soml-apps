@@ -29,7 +29,7 @@
 defApplication('oml:app:otg2', 'otg2') do |a|
 
   a.path = "@bindir@/otg2"
-  a.version(2, 7, 0)
+  a.version(2, 8, 0)
   a.shortDescription = "Programmable traffic generator v2"
   a.description = <<TEXT
 OTG is a configurable traffic generator. It contains generators

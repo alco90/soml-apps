@@ -1,6 +1,6 @@
 defApplication('oml:app:trace', 'trace') do |a|
 
-  a.version(2, 7)
+  a.version(2, 8, 0)
   a.shortDescription = 'Packet capture'
   a.description = %{
 'trace' uses libtrace to capture packets matching the

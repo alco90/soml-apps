@@ -1,6 +1,6 @@
 defApplication('oml:app:gpslogger', 'gpslogger') do |a|
 
-  a.version(1, 0, 0)
+  a.version(2, 8, 0)
   a.shortDescription = 'A client for GPSd to obtain geolocation information'
   a.description = %{
 This application connects to a local or remote GPSd and reports GPS fixes

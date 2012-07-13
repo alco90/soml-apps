@@ -28,7 +28,7 @@
 defApplication('oml:app:otr2', 'otr2') do |a|
 
   a.path = "@bindir@/otr2"
-  a.version(2, 7, 0)
+  a.version(2, 8, 0)
   a.shortDescription = "Programmable traffic sink"
   a.description = <<TEXT
 otr is a configurable traffic sink. It contains port to receive

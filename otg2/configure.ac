@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([otg2], [2.7.0], [oml-user@lists.nicta.com.au])
+AC_INIT([otg2], [2.8.0], [oml-user@lists.nicta.com.au])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
