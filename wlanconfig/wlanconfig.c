@@ -79,9 +79,11 @@ main(int argc, const char *argv[])
   }
   free(progname);
 
+  omlc_init("wlanconfig", &argc, argv, NULL);
+
   ifwifi = "ath0";
   if (pipe (mypipe)) {
-    fprintf (stderr, "Pipe failed.\n");
+    fprintf (stderr, "error: pipe failed.\n");
     return EXIT_FAILURE;
   }
   pid = fork ();
@@ -90,39 +92,38 @@ main(int argc, const char *argv[])
     close(1);
     dup(mypipe[1]);
     if (execl("/sbin/ifconfig", "ifconfig", "ath0", NULL) < 0) {
-      printf("execl failed\n");
+      fprintf(stderr,"error: execl failed\n");
       exit(1);
     }
   } else if (pid < (pid_t) 0) {
-    fprintf (stderr, "Fork failed.\n");
+    fprintf (stderr, "error: fork failed\n");
     return EXIT_FAILURE;
   } else {
     close(mypipe[1]);
     close(0);
     dup(mypipe[0]);
-    scanf ("%s",command);
-    scanf ("%s",command);
-    scanf ("%s",command);
-    scanf ("%s",command);
-    scanf ("%s",command);
+    scanf ("%s", command);
+    scanf ("%s", command);
+    scanf ("%s", command);
+    scanf ("%s", command);
+    scanf ("%s", command);
     strcpy(macAddress, command);
     close(mypipe[0]);
-    while(strcmp(command,command2) != 0) {
+    while(strcmp(command, command2) != 0) {
       strcpy(command2, command);
-      scanf ("%s",command);
+      scanf ("%s", command);
     }
   }
 
   oml_mp = omlc_add_mp("wifi_info", oml_def);
 
   omlc_start();
-  printf("mac address %s \n",macAddress);
 
   while(1) {
     i = 0;
     stop = 1;
     if (pipe (mypipe)) {
-      fprintf (stderr, "Pipe failed.\n");
+      fprintf (stderr, "error: pipe failed\n");
       return EXIT_FAILURE;
     }
     pid = fork ();
@@ -131,58 +132,57 @@ main(int argc, const char *argv[])
       close(1);
       dup(mypipe[1]);
       if (execl("/sbin/wlanconfig", "wlanconfig", "ath0", "list", NULL) < 0) {
-        printf("execl failed\n");
+        fprintf(stderr, "error: execl failed\n");
         exit(1);
       }
     } else if (pid < (pid_t) 0) {
-      fprintf (stderr, "Fork failed.\n");
+      fprintf (stderr, "error: fork failed\n");
       return EXIT_FAILURE;
     } else {
       close(mypipe[1]);
       close(0);
       dup(mypipe[0]);
-      scanf ("%s",command);
+      scanf ("%s", command);
 
       while(stop) {
-        strcpy(command2, command);
 
-        if(strcmp(command,"ADDR") != 0) {
-          omlc_set_const_string(v[0], command2);
-          scanf ("%s",command);
-          scanf ("%s",command);
-          scanf ("%s",command);
-          scanf ("%s",command);
+	if(strcmp(command,"ADDR") != 0) {
+	  /* ADDR; copy it so it is nit overwritten by susequent calls to scanf */
+          strcpy(command2, command);
+	  omlc_set_const_string(v[0], command2);
 
-          omlc_set_int32(v[1], atol(command));
-          scanf ("%s",command);
+	  /* Skip columns */
+	  scanf ("%s", command); /* AID */
+	  scanf ("%s", command); /* CHAN */
+	  scanf ("%s", command); /* RATE */
 
-          omlc_set_int32(v[2], atol(command));
-          omlc_set_const_string(v[3], macAddress);
+	  scanf ("%s", command); /* RSSI */
+	  omlc_set_int32(v[1], atol(command));
 
-          omlc_inject(oml_mp, v);
-          //stop=0;
-          for(j = 0; j < 9; j++) {
-            scanf ("%s",command);
-            strcpy(command2, command);
-          }
-          while(command[0] != '0' && command[2] != ':') {
-            printf("result wlanconfig 11: %s \n ", command);
-            scanf ("%s",command);
-            if(strcmp(command,command2) == 0) {
+	  scanf ("%s", command); /* DBM */
+	  omlc_set_int32(v[2], atol(command));
+
+	  omlc_set_const_string(v[3], macAddress);
+
+	  omlc_inject(oml_mp, v);
+	}
+	  /* Does command contain something MAC address-ish? */
+          while(!(command[0] >= '0' && command[0] <= '9'
+				  && command[2] == ':')) {
+            scanf ("%s", command);
+            if(strcmp(command, command2) == 0) {
               stop = 0;
               break;
             }
-            strcpy(command2, command);
-          }
-        } else {
-          for(i = 0; i < 16; i++) {
-            scanf ("%s",command);
-          }
+	    /* Keep the previous value to make sure we are not finished */
+	    strcpy(command2, command);
         }
       }
     }
     sleep(1);
   }
+
+  omlc_close();
 
   return 0;
 }
