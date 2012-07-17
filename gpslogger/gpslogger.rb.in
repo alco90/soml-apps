@@ -1,0 +1,27 @@
+defApplication('oml:app:gpslogger', 'gpslogger') do |a|
+
+  a.version(1, 0, 0)
+  a.shortDescription = 'A client for GPSd to obtain geolocation information'
+  a.description = %{
+This application connects to a local or remote GPSd and reports GPS fixes
+information, as well as the current GPS time.
+  }
+
+  a.defMeasurement("gps_data") do |m|
+    m.defMetric('lat', :double)
+    m.defMetric('lon', :double)
+    m.defMetric('ele', :double)
+    m.defMetric('track', :double)
+    m.defMetric('speed', :double)
+    m.defMetric('climb', :double)
+    m.defMetric('fix', :string)
+    m.defMetric('time', :string)
+  end
+
+  a.path = "@bindir@/gpslogger-oml2"
+end
+
+# Local Variables:
+# mode:ruby
+# End:
+# vim: ft=ruby:sw=2
