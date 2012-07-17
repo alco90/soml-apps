@@ -12,6 +12,7 @@ pkgdata_DATA = $(appname).rb
 
 BUILT_SOURCES = \
 	$(appname).rb \
+	$(appname)_popt.h \
 	$(appname)_oml.h
 
 CLEANFILES = \

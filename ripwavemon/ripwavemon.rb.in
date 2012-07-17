@@ -26,7 +26,7 @@ modem (Unwired, Exetel, nTelos).
     m.defMetric('temperature', 'uint32', 'Temperature [deg. Celcius]')
  end
 
-  a.path = "@bindir@/ripwavemon"
+  a.path = "@bindir@/ripwavemon-oml2"
 end
 
 # Local Variables:
