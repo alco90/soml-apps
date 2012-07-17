@@ -2,78 +2,107 @@ Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: debhelper (>= 5), autoconf, automake, libtool, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev,liboml2-dev, libgps-dev
-Standards-Version: 3.7.2
+Build-Depends: cdbs, debhelper (>= 7),  autotools-dev, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev,liboml2-dev, libgps-dev, dh-autoreconf, tree
+Standards-Version: 3.9.1
+Homepage: http://omlapp.mytestbed.net/
 
 
-Package: oml2-apps-all
+Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
 Depends: oml2-gpslogger, oml2-wlanconfig, oml2-trace, oml2-nmetrics, oml2-otg2
-Replaces: oml-client
-Conflicts: oml-client
+Replaces: oml-client, oml2-apps-all
+Suggests: oml2-apps-omfdef
+Conflicts: oml-client, oml2-apps-all
 Description: A meta-package that installs all the bundled OML2 Applications
  This package installs all the OML2 Application packages:
-  - oml2-gpslogger -- measure GPS data from gpds;
-  - oml2-wlanconfig -- record wireless lan information from wlanconfig;
-  - oml2-trace -- wrapper around libtrace with OML2 measurement recording
-  - oml2-nmetrics -- node metrics using libsigar;
-  - oml2-otg2 -- the otg2/otr2 programs for generating background traffic.
+  - gpslogger-oml2 -- measure GPS data from gpds;
+  - iperf-oml2 --
+  - nmetrics-oml2 -- node metrics using libsigar;
+  - otg2-oml2 -- the otg2/otr2 programs for generating background traffic;
+  - ripwavemon-oml2 --
+  - trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
+  - wlanconfig-oml2 -- record wireless lan information from wlanconfig.
 
+Package: oml2-apps-omfdef
+Section: net
+Priority: optional
+Architecture: all
+Depends: oml2-apps, omf-expctl-5.4
+Description: A meta-package that installs OML2 Applications and their OMF-5.4 definition
+ This package installs all the OML2 Application packages, as well as the
+ Application definition need by the OMF 5.4 experiment controller to use them.
 
-Package: oml2-gpslogger
+Package: gpslogger-oml2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gpsd, liboml2-0
-Replaces: oml-client
-Conflicts: oml-client
+Replaces: oml-client, oml2-gpslogger
+Conflicts: oml-client, oml2-gpslogger
 Description: Record and store GPS measurements using OML
- oml2-gpslogger records a stream of GPS position measurements from an external GPS
+ gpslogger-oml2 records a stream of GPS position measurements from an external GPS
  device and stores it using the OML measurement library and server.
 
 
-Package: oml2-wlanconfig
+Package: iperf-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
-Replaces: oml-client
-Conflicts: oml-client
-Description: Record WLAN information from wlanconfig using OML
- oml2-wlanconfig provides WLAN information taken from the wlanconfig
- program;
+Depends: ${shlibs:Depends}, ${misc:Depends}, liboml2-0
+Replaces: oml2-iperf
+Conflicts: oml2-iperf
+Description: Iperf with OML support
+ This project is meant to implement OML support following Iperf development. 
+ It is based on iperf 2.0.5.
 
 
-Package: oml2-trace
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libtrace3
-Replaces: oml-client
-Conflicts: oml-client
-Description: Measure and record libtrace data using OML
- oml2-trace provides packet capture analysis from libtrace; the
- resulting measurements are recorded using the OML measurement
- library.  Currently implemented measurement points include radiotap
- information, IP, TCP, and UDP protocol data.
-
-
-Package: oml2-nmetrics
+Package: nmetrics-oml2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libsigar
-Replaces: oml-client
-Conflicts: oml-client
+Replaces: oml-client, oml2-nmetrics
+Conflicts: oml-client, oml2-nmetrics
 Description: Measure and record system information from libsigar using OML
- oml2-nmetrics provides measurements of node statistics derived from
+ nmetrics-oml2 provides measurements of node statistics derived from
  libsigar.  The measurements are recorded using the OML measurement
  library.  Currently implemented measurement points include CPU data,
  network inteface summary statistics, system process statistics, and
  process uptime statistics.
 
 
-Package: oml2-otg2
+Package: otg2-oml2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
-Replaces: otg
-Conflicts: otg
+Replaces: otg, otg2
+Conflicts: otg, otg2
 Description: Orbit Traffic Generator
  OTG provides an instrumented traffic source/sink pair, with
  measurement collection on the transmitted and received traffic
  streams using OML.
 
+
+Package: ripwavemon-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Description: Report statistics from a Navini RipWave modem
+ This application parses periodic UDP status messages from a Navini RipWave
+ modem (Unwired, Exetel, nTelos).
+
+
+Package: trace-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libtrace3
+Replaces: oml-client, oml2-trace
+Conflicts: oml-client, oml2-trace
+Description: Measure and record libtrace data using OML
+ trace-oml2 provides packet capture analysis from libtrace; the
+ resulting measurements are recorded using the OML measurement
+ library.  Currently implemented measurement points include radiotap
+ information, IP, TCP, and UDP protocol data.
+
+
+Package: wlanconfig-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Replaces: oml-client, oml2-wlanconfig
+Conflicts: oml-client, oml2-wlanconfig
+Description: Record WLAN information from wlanconfig using OML
+ wlanconfig-oml2 provides WLAN information taken from the wlanconfig
+ program.
