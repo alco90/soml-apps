@@ -23,6 +23,7 @@ To enable building these new components, their name has to be added to
 PRODUCT_PACKAGES in build/target/product/core.mk:
 
   PRODUCT_PACKAGES += \
+		      libtrace \
 		      trace-oml2
 
 Building the source

@@ -1,0 +1,12 @@
+Libtrace Packaging for Android
+==============================
+
+This directory contains the source code for libtrace 3.0.14 [0], packaged for
+Android by François Hoguet at Nicta [1,2]. It is shipped alongside the  OML2
+applications [3] as this is one of their dependencies, and is not currently part
+of the Android distribution.
+
+[0] http://research.wand.net.nz/software/libtrace.php
+[1] http://ext.npc.nicta.com.au/projects/fhoguet
+[2] http://www.nicta.com.au
+[3] http://oml.mytestbed.net
