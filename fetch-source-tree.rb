@@ -48,10 +48,10 @@ end
 #
 def check_source_version(version)
   File.open("configure.ac").each do |line|
-    if (line =~ /^AC_INIT\(\[oml2-apps\], \[(.*)\],.*/) then
+    if (line =~ /^AC_INIT\(\[.*\], \[(.*)\],.*/) then
       source_version = $1
       if (source_version != version) then
-        $stderr.print "ERROR:  Package version from configure.ac (#{source_version}) does not match oml2-apps.spec version (#{version})\n"
+        $stderr.print "ERROR:  Package version from configure.ac (#{source_version}) does not match debian/changelog version (#{version})\n"
         Kernel.exit 1
       else
         puts "Package version check OK"
@@ -66,11 +66,13 @@ end
 def run
   spec_version = redhat_spec_version
   treeish = treeish_from_version(spec_version)
+  iperf_treeish = "v2.0.5+oml#{spec_version}"
 
   puts "OML apps version #{spec_version}\n"
-  puts "Building package from tree at '#{treeish}'\n"
+  puts "Building package from tree at '#{treeish} (iperf: #{iperf_treeish})'\n"
 
-  fetch_result = system("git archive #{treeish} | tar xf -")
+  fetch_result = system("git archive #{treeish} | tar x && \
+			 git archive --remote git://mytestbed.net/iperf.git #{iperf_treeish} --prefix=iperf/ | tar x")
   if not fetch_result or $? != 0 then
     $stderr.print "ERROR:  could not fetch tree from #{treeish}:  command failed (#{$?})\n"
     Kernel.exit 1

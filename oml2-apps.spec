@@ -1,26 +1,28 @@
 %define name            oml2-apps
-%define version         2.7.0
+%define version         2.8.0
 
 BuildRoot:              %{_tmppath}/%{name}-%{version}-build
-Summary:                OML application collection
+Summary:                OML applications collection
 License:                MIT
 URL:                    http://oml.mytestbed.net/projects/omlapp
 Name:                   %{name}
 Version:                %{version}
 Release:                1
-Source:                 http://oml.mytestbed.net/attachments/download/645/oml2-apps-2.7.0.tar.gz
+Source:                 http://oml.mytestbed.net/attachments/download/724/oml2-apps-%{version}.tar.gz
 Packager:               Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
 Prefix:                 /usr
 Group:                  Applications/Internet
 BuildRequires:		autoconf make automake libtool gcc gcc-c++ oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby
 
 %description
-This package provides some OML2 applications:
-- oml2-gpslogger -- measure GPS data from gpds;
-- oml2-wlanconfig -- record wireless lan information from wlanconfig;
-- oml2-trace -- wrapper around libtrace with OML2 measurement recording
-- oml2-nmetrics -- node metrics using libsigar;
-- oml2-otg2 -- the otg2/otr2 programs for generating background traffic.
+This package provides some OML2 Applications:
+ - gpslogger-oml2 -- measure GPS data from gpds;
+ - iperf-oml2 -- actively probe the network path;
+ - nmetrics-oml2 -- node metrics using libsigar;
+ - otg2-oml2 -- the otg2/otr2 programs for generating background traffic;
+ - ripwavemon-oml2 -- get status information from Navini RipWave modems;
+ - trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
+ - wlanconfig-oml2 -- record wireless lan information from wlanconfig.
 
 %prep
 %setup -q
