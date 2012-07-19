@@ -17,9 +17,17 @@ for i in $conffiles; do
 done
 
 appdeffiles=$(find . -name *.rb.in)
+verruby=$ver
+if echo $verruby | grep -q "[^0-9.]"; then
+	# Strip any character, replace them by a minus sign
+	verruby=`echo $verruby | sed "s/[^.0-9]\+/-/g"`
+fi
 for i in $appdeffiles; do
 	echo -n " $i"
-	sed -i "s/a\.version([^)]*)/a.version(${ver//./, })/" $i
+	sed -i "s/a\.version([^)]*)/a.version(${verruby//./, })/" $i
 done
 
 echo .
+
+echo Do not forget to commit changes in iperf too:
+echo " (cd iperf; git commit -a -s -m 'Bump to oml2-apps-${ver}'); git add iperf"

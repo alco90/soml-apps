@@ -1,7 +1,7 @@
 
 defApplication('oml:app:nmetrics', 'nmetrics') do |a|
 
-  a.version(2, 8, 0)
+  a.version(2, 9, -0)
 #  a.revision = 1
   a.shortDescription = 'Monitoring node statistcs'
   a.description = %{

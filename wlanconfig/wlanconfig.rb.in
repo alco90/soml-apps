@@ -22,11 +22,9 @@
 # THE SOFTWARE.
 #
 #
-require 'handler/application/appDefinition'
-
 defApplication('oml:app:wlanconfig', 'wlanconfig') { |a|
 
-  a.version(2, 8, 0)
+  a.version(2, 9, -0)
   a.shortDescription = "Get information about the wireless network"
   a.description = <<TEXT
 This application get information about the neighbours of the node using the wlanconfig command
