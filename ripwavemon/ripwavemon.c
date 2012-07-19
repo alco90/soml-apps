@@ -41,6 +41,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include <netinet/ip.h>
 #define OML_FROM_MAIN
 #include "ripwavemon_oml.h"
@@ -121,6 +122,7 @@ void receive_reports (int sockfd)
 {
     navini_report_t report;
     ssize_t len;
+    unsigned int *p;
     OmlValueU values[14];
 
     printf("# Modem ID\tMM/DD/YY HH:MM:SS\tSyncStr\tBTS ID\tNet ID\tAntenna\tSyncStr\tSNR\tTemperature\n");
@@ -129,9 +131,12 @@ void receive_reports (int sockfd)
         len = recv(sockfd, (void*) &report, sizeof(report), MSG_WAITALL);
         if (len != sizeof(report)) {
             fprintf(stderr, "warning: received packet of unexpected size (%d instead of %d)\n",
-                    len, sizeof(report));
-            fprintf(stderr, "info: first 32 bytes are %08x %08x %08x %08x %08x %08x %08x %08x\n",
-                     report);
+                    (int)len, (int)sizeof(report));
+            fprintf(stderr, "info: first 32 bytes are");
+            for(p=(unsigned int *)&report; p++;
+                (p-(unsigned int *)&report)<4)
+              fprintf(stderr, " %08x", *p);
+            fprintf(stderr, "\n");
             continue;
         }
 
