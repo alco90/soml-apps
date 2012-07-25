@@ -1,7 +1,7 @@
 CLOCAL_AMFLAGS = -Wall
 
 appname = ripwavemon
-installed_name = `echo -n '$(PACKAGE)' | sed '$(transform)'`
+installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
 pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = ripwavemon-oml2
@@ -32,10 +32,11 @@ $(appname)_oml.h: $(appname).rb Makefile
 $(appname).rb: $(appname).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@
 
-installed_link_names = $(DESTDIR)$(bindir)/`echo -n "ripwave_monitor" | sed '$(transform)'`$(EXEEXT)
+installed_link_names = $(DESTDIR)$(bindir)/`echo "ripwave_monitor" | sed '$(transform)'`$(EXEEXT)
 
 install-exec-hook:
 	for OLDNAME in $(installed_link_names); do \
+		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
 		$(LN_S) $(installed_name) $${OLDNAME}; \
 	done
 

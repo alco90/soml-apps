@@ -2,11 +2,11 @@ ACLOCAL_AMFLAGS = -I m4 -Wall
 
 appotg2 = otg2
 progotg2 = $(appotg2)-oml2
-installed_otg2 = `echo -n '$(progotg2)' | sed '$(transform)'`
+installed_otg2 = `echo '$(progotg2)' | sed '$(transform)'`
 
 appotr2 = otr2
 progotr2 = $(appotr2)-oml2
-installed_otr2 = `echo -n '$(progotr2)' | sed '$(transform)'`
+installed_otr2 = `echo '$(progotr2)' | sed '$(transform)'`
 
 pkgdatadir = $(datadir)/$(installed_otg2)
 
@@ -65,16 +65,18 @@ libotg2_la_LIBADD = -locomm \
 
 target_otg2 = $(installed_otg2)$(EXEEXT)
 target_otr2 = $(installed_otr2)$(EXEEXT)
-installed_links_otg2 = $(DESTDIR)$(bindir)/`echo -n $(appotg2) | sed '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo -n oml2-$(appotg2) | sed '$(transform)'`$(EXEEXT)
-installed_links_otr2 = $(DESTDIR)$(bindir)/`echo -n $(appotr2) | sed '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo -n oml2-$(appotr2) | sed '$(transform)'`$(EXEEXT)
+installed_links_otg2 = $(DESTDIR)$(bindir)/`echo $(appotg2) | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo oml2-$(appotg2) | sed '$(transform)'`$(EXEEXT)
+installed_links_otr2 = $(DESTDIR)$(bindir)/`echo $(appotr2) | sed '$(transform)'`$(EXEEXT) \
+		       $(DESTDIR)$(bindir)/`echo oml2-$(appotr2) | sed '$(transform)'`$(EXEEXT)
 
 install-exec-hook:
 	for OLDNAME in $(installed_links_otg2); do  \
+		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
 		$(LN_S) $(target_otg2) $${OLDNAME}; \
 	done
 	for OLDNAME in $(installed_links_otr2); do  \
+		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
 		$(LN_S) $(target_otr2) $${OLDNAME}; \
 	done
 
