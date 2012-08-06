@@ -152,12 +152,8 @@ create_mpoint(
     // first one created
     mp->next = mp;
   } else {
-    // insert mp into circular chain
-    MPoint* last = pmp;
-    while (last->next != pmp)
-      last = last->next;
-    pmp->next = mp;
     mp->next = pmp;
+    pmp = mp;
   }
   session.mpoint = mp;
   configure_mpoint(mp, ds, vl);
