@@ -1,3 +1,3 @@
 ACLOCAL_AMFLAGS = -Wall
 
-SUBDIRS = gpslogger nmetrics iperf otg2 ripwavemon trace wlanconfig 
+SUBDIRS = collectd gpslogger nmetrics iperf otg2 ripwavemon trace wlanconfig 
