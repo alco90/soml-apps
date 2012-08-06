@@ -65,7 +65,7 @@ AC_SUBST([collectd_incdir], [$collectd_incdir])
 AC_ARG_WITH([collectd-lib],[AS_HELP_STRING([--with-collectd-lib],
 	                  [path to Collectd plugin directory @<:@default=/usr/lib/collectd@:>@])],
 			  [collectd_libdir=$withval],
-			  [collectd_libdir=/usr/lib/collectd])
+			  [collectd_libdir=$libdir/collectd])
 AC_SUBST([collectd_libdir], [$collectd_libdir])
 
 AC_CONFIG_FILES([Makefile
