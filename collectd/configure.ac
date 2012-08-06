@@ -49,7 +49,7 @@ AS_IF([test x$collectd_incdir=xno], [
 	     AC_MSG_NOTICE([downloading collectd-${collectdver} source...])
 	     $getter http://collectd.org/files/collectd-${collectdver}.tar.bz2 | tar xj
 	     ])
-       AS_IF([test -d collectd-${collectdver}/src/config.h],
+       AS_IF([test ! -r collectd-${collectdver}/src/config.h],
 	     [AC_MSG_NOTICE([configuring collectd-${collectdver} source (see collectd_config.log for details)...])
 	     cd collectd-${collectdver}; ./configure ${configure_debug} > ../collectd_config.log
 	     AS_IF([test $? = 0],
