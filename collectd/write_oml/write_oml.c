@@ -21,17 +21,16 @@
  * THE SOFTWARE.
  *
  */
-#include "time.h"
-#include "pthread.h"
+#include <time.h>
+#include <pthread.h>
+
+#include <oml2/omlc.h>
 
 #include "collectd.h"
 #include "plugin.h"
 #include "common.h"
 #include "utils_cache.h"
 #include "utils_parse_option.h"
-
-#include "oml2/omlc.h"
-
 
 static const char *config_keys[] =
 {
