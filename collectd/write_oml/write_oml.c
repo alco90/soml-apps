@@ -115,7 +115,7 @@ configure_mpoint(
     data_source_t* d = &ds->ds[i];
     OmlMPDef* md = &mp->mp_defs[i + offset];
     char* s = (char*)malloc(sizeof(d->name) + 1);
-    strcpy(s, d->name);
+    strncpy(s, d->name, sizeof(d->name));
     md->name = s;
     assert(d->type <= 3);
     switch(d->type) {
@@ -250,13 +250,13 @@ oml_config(
 ) {
   if (strcasecmp ("ServerURL", key) == 0) {
     session.server_url = (char*)malloc(strlen(value) + 1);
-    strcpy(session.server_url, value);
+    strncpy(session.server_url, value, strlen(value));
   } else if (strcasecmp ("ContextName", key) == 0) {
     session.context_name = (char*)malloc(strlen(value) + 1);
-    strcpy(session.context_name, value);
+    strncpy(session.context_name, value, strlen(value));
   } else if (strcasecmp ("NodeName", key) == 0) {
     session.node_id = (char*)malloc(strlen(value) + 1);
-    strcpy(session.node_id, value);
+    strncpy(session.node_id, value, strlen(value));
   } else if (strcasecmp ("StartupDelay", key) == 0) {
     session.startup_delay = atoi(value);
   } else {
