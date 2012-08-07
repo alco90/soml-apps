@@ -51,9 +51,21 @@ install: build
 
 	# Add here commands to install the package into debian/tmp.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
-
-	# Separate OTG2 into its own package
-	CURDIR=$(CURDIR) debian/build-package-contents.rb
+	for APP in `find $(CURDIR) -mindepth 1 -maxdepth 1 -type d -not -name .git`; do \
+		export APP=`echo $${APP} | sed s-.*/--`; \
+		install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/bin; \
+		install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/share/$${APP}-oml2; \
+		test $${APP} = otg2 && install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/lib/otg2; \
+		test $${APP} = iperf && install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/share/man/man1; \
+		cd $(CURDIR)/debian/tmp; find . -name "*$${APP}*" -not -type d -exec mv {} $(CURDIR)/debian/$${APP}-oml2/{} \; ;\
+	done
+	cd $(CURDIR)/debian/tmp; find . -name "*otr2*" -not -type d -exec mv {} $(CURDIR)/debian/otg2-oml2/{} \;
+	mv $(CURDIR)/debian/tmp/usr/bin/ripwave_monitor $(CURDIR)/debian/ripwavemon-oml2/usr/bin
+	(cd debian/iperf-oml2/usr/bin; ln -s iperf-oml2 oml2-iperf; ln -s iperf-oml2 iperf_oml2)
+	@echo "The following should only show empty directories:"
+	@tree -F $(CURDIR)/debian/tmp
+	install -dm 755 $(CURDIR)/debian/oml2-apps-omfdef/usr/share/omf-expctl-5.4/repository/oml/app
+	find $(CURDIR)/debian -not -path "*/oml2-apps-omfdef/*" -name *.rb -exec install -Dm644 -t $(CURDIR)/debian/oml2-apps-omfdef/usr/share/omf-expctl-5.4/repository/oml/app {} \;
 
 # Build architecture-independent files here.
 binary-indep: build install

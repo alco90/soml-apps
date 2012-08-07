@@ -66,15 +66,18 @@ end
 def run
   changelog_version = debian_changelog_version
   treeish = treeish_from_version(changelog_version)
+  iperf_treeish = "v2.0.5+oml#{changelog_version}"
 
   puts "OML Applications version #{changelog_version}\n"
-  puts "Building package from tree at '#{treeish}'\n"
+  puts "Building package from tree at '#{treeish} (iperf: #{iperf_treeish})'\n"
 
-  fetch_result = system("git archive #{treeish} | tar xf -")
+  fetch_result = system("git archive #{treeish} | tar x && \
+			 git archive --remote git://mytestbed.net/iperf.git #{iperf_treeish} --prefix=iperf/ | tar x")
   if not fetch_result or $? != 0 then
     $stderr.print "ERROR:  could not fetch tree from #{treeish}:  command failed (#{$?})\n"
     Kernel.exit 1
   end
+
 
   #
   # Check that the version number in configure.ac matches the version from debian/changelog.

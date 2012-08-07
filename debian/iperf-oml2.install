@@ -1,0 +1,2 @@
+iperf/doc/dast.gif usr/share/doc/iperf-oml2/html
+iperf/doc/*.html usr/share/doc/iperf-oml2/html
