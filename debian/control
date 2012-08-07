@@ -11,17 +11,17 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: oml2-gpslogger, oml2-wlanconfig, oml2-trace, oml2-nmetrics, oml2-otg2
+Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, trace-oml2, wlanconfig-oml2
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef
 Conflicts: oml-client, oml2-apps-all
 Description: A meta-package that installs all the bundled OML2 Applications
  This package installs all the OML2 Application packages:
   - gpslogger-oml2 -- measure GPS data from gpds;
-  - iperf-oml2 --
+  - iperf-oml2 -- iperf with OML2 measurement recording;
   - nmetrics-oml2 -- node metrics using libsigar;
   - otg2-oml2 -- the otg2/otr2 programs for generating background traffic;
-  - ripwavemon-oml2 --
+  - ripwavemon-oml2 -- use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
   - trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
   - wlanconfig-oml2 -- record wireless lan information from wlanconfig.
 
@@ -71,7 +71,7 @@ Package: otg2-oml2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
 Replaces: otg, otg2
-Conflicts: otg, otg2
+Conflicts: otg, otg2, oml2-otg2
 Description: Orbit Traffic Generator
  OTG provides an instrumented traffic source/sink pair, with
  measurement collection on the transmitted and received traffic
