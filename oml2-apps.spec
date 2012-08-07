@@ -12,7 +12,7 @@ Source:                 http://oml.mytestbed.net/attachments/download/724/oml2-a
 Packager:               Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
 Prefix:                 /usr
 Group:                  Applications/Internet
-BuildRequires:		autoconf make automake libtool gcc gcc-c++ oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby
+BuildRequires:		autoconf make automake libtool gcc gcc-c++ oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby libxml2-devel
 
 %description
 This package provides some OML2 Applications:
