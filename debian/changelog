@@ -1,4 +1,4 @@
-oml2-apps (2.8.0-ubuntu1) quantal; urgency=low
+oml2-apps (2.8.0-ubuntu1) precise; urgency=low
 
   * new upstream release
   * general rename of applications to APPNAME-oml2
