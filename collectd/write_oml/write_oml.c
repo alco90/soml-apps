@@ -76,15 +76,15 @@ find_mpoint_struct(
     const char* name
 ) {
   MPoint* first_mp = session.mpoint;
-  MPoint* mp = first_mp;
+  MPoint* mp = first_mp->next;
 
-  do {
+  while (mp != first_mp) {
     if (mp == NULL) return NULL;
     if (strncmp(mp->name, name, DATA_MAX_NAME_LEN) == 0) {
       return mp;
     }
     mp = mp->next;
-  } while (mp != first_mp);
+  } 
   return NULL;
 }
 
@@ -143,7 +143,6 @@ create_mpoint(
     const value_list_t *vl
 ) {
   MPoint* mp;
-
   // Create MPoint and insert it into session's existing MP chain.
   mp = (MPoint*)malloc(sizeof(MPoint));
   strncpy(mp->name, name, DATA_MAX_NAME_LEN);
@@ -170,7 +169,7 @@ find_mpoint(
 
   if (mp == NULL) {
     if (session.oml_intialized) {
-      ERROR("We assumed that all collectors already checked in, but now we found '%s'", name);
+      ERROR("oml_writer plugin: We assumed that all collectors already checked in, but now we found '%s'", name);
     }
     mp = create_mpoint(name, ds, vl);
   }
@@ -186,7 +185,7 @@ find_mpoint(
       // OK it's time to commit
       pthread_mutex_lock(&session.init_lock);
       if (! session.oml_intialized) { // just make sure nothing has changed since we aquired the lock
-        DEBUG("Starting OML");
+        DEBUG("oml_writer plugin: Starting OML");
         omlc_start();
         session.oml_intialized = 1;
       }
@@ -204,13 +203,12 @@ oml_write (
     user_data_t __attribute__((unused)) *user_data
 ) {
   MPoint* mp = find_mpoint(ds->type, ds, vl);
-  if (mp == NULL) return(0);
-
+  if (mp == NULL || !session.oml_intialized) return(0);
 
   OmlValueU v[64];
   int header = 6;
   if (vl->values_len >= 64 - header) {
-    ERROR("Can't handle more than 64 values per measurement");
+    ERROR("oml_writer plugin: Can't handle more than 64 values per measurement");
     return(-1);
   }
 
@@ -265,6 +263,11 @@ static int
 oml_init(
     void
 ) {
+  MPoint* mp;
+  mp = (MPoint*)malloc(sizeof(MPoint));
+  mp->next = 0;
+  session.mpoint = mp;
+
   const char* app_name = "collectd";
   const char* argv[] = {"--oml-server", "file:-", "--oml-id", hostname_g, "--oml-exp-id", "collectd"};
   int argc = 6;
@@ -276,7 +279,6 @@ oml_init(
 
   return 0;
 }
-
 
 void
 module_register(void)
