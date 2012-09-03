@@ -75,11 +75,9 @@ static MPoint*
 find_mpoint_struct(
     const char* name
 ) {
-  MPoint* first_mp = session.mpoint;
-  MPoint* mp = first_mp->next;
+  MPoint* mp = session.mpoint;
 
-  while (mp != first_mp) {
-    if (mp == NULL) return NULL;
+  while (mp) {
     if (strncmp(mp->name, name, DATA_MAX_NAME_LEN) == 0) {
       return mp;
     }
@@ -147,13 +145,7 @@ create_mpoint(
   mp = (MPoint*)malloc(sizeof(MPoint));
   strncpy(mp->name, name, DATA_MAX_NAME_LEN);
   MPoint* pmp = session.mpoint;
-  if (pmp == NULL) {
-    // first one created
-    mp->next = mp;
-  } else {
-    mp->next = pmp;
-    pmp = mp;
-  }
+  mp->next = pmp;
   session.mpoint = mp;
   configure_mpoint(mp, ds, vl);
   return mp;
@@ -194,7 +186,6 @@ find_mpoint(
   }
   return mp;
 }
-
 
 static int
 oml_write (
@@ -263,11 +254,6 @@ static int
 oml_init(
     void
 ) {
-  MPoint* mp;
-  mp = (MPoint*)malloc(sizeof(MPoint));
-  mp->next = 0;
-  session.mpoint = mp;
-
   const char* app_name = "collectd";
   const char* argv[] = {"--oml-server", "file:-", "--oml-id", hostname_g, "--oml-exp-id", "collectd"};
   int argc = 6;
