@@ -25,6 +25,7 @@
 #include <pthread.h>
 
 #include <oml2/omlc.h>
+#include <ocomm/o_log.h>
 
 #include "collectd.h"
 #include "plugin.h"
@@ -250,6 +251,33 @@ oml_config(
   return(0);
 }
 
+static void o_log_collectd(int log_level, const char* format, ...)
+{
+ va_list va;
+ va_start(va, format);
+ switch(log_level) {
+ case O_LOG_ERROR:
+	 ERROR(format, va);
+	 break;
+ case O_LOG_WARN:
+	 WARNING(format, va);
+	 break;
+ case O_LOG_INFO:
+	 INFO(format, va);
+	 break;
+ case O_LOG_DEBUG:
+ case O_LOG_DEBUG2:
+ case O_LOG_DEBUG3:
+ case O_LOG_DEBUG4:
+	 DEBUG(format, va);
+	 break;
+ default:
+	 NOTICE(format, va);
+	 break;
+ }
+ va_end(va);
+}
+
 static int
 oml_init(
     void
@@ -261,7 +289,7 @@ oml_init(
   if (session.server_url != NULL) argv[1] = session.server_url;
   if (session.node_id != NULL) argv[3] = session.node_id;
   if (session.context_name != NULL) argv[5] = session.context_name;
-  omlc_init(app_name, &argc, argv, NULL);
+  omlc_init(app_name, &argc, argv, o_log_collectd);
 
   return 0;
 }
