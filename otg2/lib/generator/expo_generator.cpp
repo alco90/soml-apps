@@ -46,9 +46,15 @@ void Expo_Generator::init()
   //burstLength_.setMean(ontime_/pktInterval_);
   //burstLength_.setMean(ontime_*rate_)
   lastPktStamp_ = 0 ;
-  offtimeVar_.setMean(offtime_);
+  update();
 }
 
+void
+Expo_Generator::update()
+
+{
+  offtimeVar_.setMean(offtime_);
+}
 
 /**
  * Determine the parameters of next packet, set size and timestamp.

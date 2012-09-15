@@ -41,6 +41,8 @@ private:
   void
   defOpts();
   
+  void
+  update();
 
   int pktSize_;   ///< packet size variable, constant.
   float pktInterval_;  ///< interarrival time defined as the offset between two beginnings of consecutive packets

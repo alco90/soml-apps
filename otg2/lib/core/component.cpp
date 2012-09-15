@@ -13,6 +13,12 @@ Component::Component()
   opts_ = NULL;
 }
 
+void
+Component::update()
+
+{
+}
+
 const struct poptOption* 
 Component::getOptions()
 

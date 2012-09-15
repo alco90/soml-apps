@@ -25,6 +25,14 @@ public:
   init() = 0;
   
   /**
+   * Function to inform component that some of its
+   * options have been changed.
+   *
+   */
+  virtual void
+  update() = 0;
+
+  /**
    * Function to get Command line Options
    *
    */
@@ -45,6 +53,9 @@ public:
    */
   const struct poptOption* 
   getOptions();
+
+  void
+  update();
   
 protected:
   virtual const char*

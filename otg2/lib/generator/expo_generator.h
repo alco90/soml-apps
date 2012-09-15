@@ -22,6 +22,8 @@ public:
   Expo_Generator(int size=512, double rate=4096.0, double ontime=1.0, double offtime=1.0);
 
   void init();
+  void update();
+
   Packet* nextPacket(Packet* p);  
   
   inline void 

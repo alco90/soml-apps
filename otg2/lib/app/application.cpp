@@ -258,6 +258,9 @@ Application::parseRuntimeOptions(
             << " (" << poptStrerror(rc) << ")" << endl;
   }
   poptFreeContext(optCon);
+  dynamic_cast<IComponent*>(sender_)->update();
+  dynamic_cast<IComponent*>(source_)->update();
+  dynamic_cast<IComponent*>(stream_)->update();
   return rc;  
 }
 

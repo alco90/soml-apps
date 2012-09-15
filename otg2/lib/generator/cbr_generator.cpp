@@ -22,11 +22,19 @@ CBR_Generator::CBR_Generator()
 }
 
 void
+CBR_Generator::update()
+
+{
+  if (pktRate_ == 0) throw "Rate cannot be set to zero!";
+  pktInterval_ = (8.0 * pktSize_) / pktRate_;
+}
+
+void
 CBR_Generator::defOpts()
 
 {
   defOpt("size", POPT_ARG_INT, &pktSize_, "Size of packet", "bytes");
-  defOpt("interval", POPT_ARG_FLOAT, &pktInterval_, "Internval between consecutive packets", "msec");
+  defOpt("interval", POPT_ARG_FLOAT, &pktInterval_, "Interval between consecutive packets", "msec");
   defOpt("rate", POPT_ARG_FLOAT, &pktRate_, "Data rate of the flow", "kbps");
 }
 
@@ -37,8 +45,7 @@ CBR_Generator::defOpts()
 void CBR_Generator::init()
 {
   lastPktStamp_ = 0;
-  if (pktRate_ == 0) throw "Rate cannot be set to zero!";
-  pktInterval_ = (8.0 * pktSize_) / pktRate_;
+  this->update();
 }
 
 /**
