@@ -19,9 +19,10 @@ missing
 autom4te.cache
 stamp-h1
 m4/*.m4
+!m4/gnulib-cache.m4
 *.o
 *.lo
 *.la
 *.deps
 *.libs
-
+build-aux/*
