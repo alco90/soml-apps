@@ -21,7 +21,9 @@ CLEANFILES = \
 	$(appname)_popt.h \
 	$(appname)_oml.h
 
-EXTRA_DIST=$(appname).rb.in
+EXTRA_DIST = m4/gnulib-cache.m4 \
+	     $(appname).rb.in
+
 
 $(appname)_popt.h: $(appname).rb Makefile
 	oml2-scaffold --opts $<
