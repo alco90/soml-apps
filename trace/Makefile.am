@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -Wall
+ACLOCAL_AMFLAGS = -I m4 -Wall
 
 appname = trace
 installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
@@ -17,10 +17,12 @@ BUILT_SOURCES = \
 
 CLEANFILES = \
 	$(pkgdata_DATA) \
+	$(appname).rb \
 	$(appname)_popt.h \
 	$(appname)_oml.h
 
-EXTRA_DIST=$(appname).rb.in
+EXTRA_DIST = m4/gnulib-cache.m4 \
+	     $(appname).rb.in
 
 $(appname)_popt.h: $(appname).rb Makefile
 	oml2-scaffold --opts $<
