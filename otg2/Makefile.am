@@ -32,7 +32,8 @@ otr2_oml2_LDADD = $(otgrlibs)
 pkglib_LTLIBRARIES = libotg2.la
 pkgdata_DATA = $(appotg2).rb $(appotr2).rb
 
-EXTRA_DIST = $(appotg2).rb.in $(appotr2).rb.in
+EXTRA_DIST = m4/gnulib-cache.m4 \
+	     $(appotg2).rb.in $(appotr2).rb.in
 CLEANFILES = $(appotg2).rb $(appotr2).rb
 
 $(appotg2).rb: $(appotg2).rb.in
