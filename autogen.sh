@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ ! -f iperf/autogen.sh ]; then
+	git submodule update --init
+fi
+
 APPS=`sed -n "s/SUBDIRS * =//p" Makefile.am`
 for i in $APPS; do
 	cd $i

@@ -10,6 +10,6 @@ rm -rf aclocal.m4 build-aux/ config.h.in configure m4/00gnulib.m4 m4/gnulib-com*
 APPS=`sed -n "s/SUBDIRS * =//p" Makefile.am`
 for i in $APPS; do
 	cd $i
-	./autoclean.sh
+	test -x autoclean.sh && ./autoclean.sh
 	cd -
 done
