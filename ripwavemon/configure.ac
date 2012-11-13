@@ -1,15 +1,22 @@
 AC_PREREQ([2.69])
-AC_INIT([ripwavemon-oml2], [2.9.pre0], [oml-user@lists.nicta.com.au])
-AC_CONFIG_AUX_DIR([.])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AC_INIT([ripwavemon-oml2],
+	m4_esyscmd([build-aux/git-version-gen .tarball-version]),
+	[oml-user@lists.nicta.com.au])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
+
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+gl_EARLY
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
+
+gl_INIT
 
 #Checks for libraries.
 missing_libs=""
