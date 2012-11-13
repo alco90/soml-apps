@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -Wall
+ACLOCAL_AMFLAGS = -I m4 -Wall
 
 appname = wlanconfig
 installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
@@ -10,7 +10,8 @@ wlanconfig_oml2_LDADD = -loml2 -locomm
 
 pkgdata_DATA = $(appname).rb
 
-EXTRA_DIST = $(appname).rb.in
+EXTRA_DIST = m4/gnulib-cache.m4 \
+	     $(appname).rb.in
 CLEANFILES = $(appname).rb
 
 $(appname).rb: $(appname).rb.in
