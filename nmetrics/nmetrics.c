@@ -30,6 +30,7 @@
  * THE SOFTWARE.
 */
 
+
 #include <config.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,10 +41,6 @@
 
 #define OML_FROM_MAIN
 #include "nmetrics_oml.h"
-
-OmlMP*   cpu_mp;
-OmlMP*   memory_mp;
-OmlMP*   net_mp;
 
 #include <sigar.h>
 
@@ -70,11 +67,103 @@ typedef struct _if_monitor_t {
   struct _if_monitor_t* next;
 } if_monitor_t;
 
-static void  run(if_monitor_t* first_if);
+
+
+void
+run(
+  opts_t* opts,
+  oml_mps_t* oml_mps,
+  if_monitor_t* first_if
+) {
+  long val = 1;
+  sigar_t* sigar_p;
+  if_monitor_t* if_p;
+  sigar_cpu_t c;
+  sigar_mem_t m;
+  sigar_net_interface_stat_t is;
+  while(1) {
+    sigar_open(&sigar_p);
+
+    if (opts->report_cpu) {
+
+      sigar_cpu_get(sigar_p, &c);
+      oml_inject_cpu(oml_mps->cpu,
+		      c.user,
+		      (uint64_t) c.sys,
+		      (uint64_t)c.nice,
+		      (uint64_t)c.idle,
+		      (uint64_t)c.wait,
+		      (uint64_t)c.irq,
+		      (uint64_t)c.soft_irq,
+		      (uint64_t)c.stolen,
+		      (uint64_t)c.total);
+    }
+    if (opts->report_memory) {
+
+      sigar_mem_get(sigar_p, &m);
+
+      oml_inject_memory(oml_mps->memory,
+		      (uint64_t)m.ram,
+		      (uint64_t)m.total,
+		      (uint64_t)m.used,
+		      (uint64_t)m.free,
+		      (uint64_t)m.actual_used,
+		      (uint64_t)m.actual_free);
+    }
+
+    if_p = first_if;
+    while (if_p) {
+
+      sigar_net_interface_stat_get(sigar_p, if_p->if_name, &is);
+      if (! if_p->not_first) {
+        if_p->start_rx_packets = is.rx_packets;
+        if_p->start_rx_bytes = is.rx_bytes;
+        if_p->start_rx_errors = is.rx_errors;
+        if_p->start_rx_dropped = is.rx_dropped;
+        if_p->start_rx_overruns = is.rx_overruns;
+        if_p->start_rx_frame = is.rx_frame;
+        if_p->start_tx_packets = is.tx_packets;
+        if_p->start_tx_bytes = is.tx_bytes;
+        if_p->start_tx_errors = is.tx_errors;
+        if_p->start_tx_dropped = is.tx_dropped;
+        if_p->start_tx_overruns = is.tx_overruns;
+        if_p->start_tx_collisions = is.tx_collisions;
+        if_p->start_tx_carrier = is.tx_carrier;
+        if_p->not_first = 1;
+      }
+      oml_inject_network(oml_mps->network,
+		      if_p->if_name,
+		      (uint64_t)(is.rx_packets - if_p->start_rx_packets),
+		      (uint64_t)(is.rx_bytes - if_p->start_rx_bytes),
+		      (uint64_t)(is.rx_errors - if_p->start_rx_errors),
+		      (uint64_t)(is.rx_dropped - if_p->start_rx_dropped),
+		      (uint64_t)(is.rx_overruns - if_p->start_rx_overruns),
+		      (uint64_t)(is.rx_frame - if_p->start_rx_frame),
+		      (uint64_t)(is.tx_packets - if_p->start_tx_packets),
+		      (uint64_t)(is.tx_bytes - if_p->start_tx_bytes),
+		      (uint64_t)(is.tx_errors - if_p->start_tx_errors),
+		      (uint64_t)(is.tx_dropped - if_p->start_tx_dropped),
+		      (uint64_t)(is.tx_overruns - if_p->start_tx_overruns),
+		      (uint64_t)(is.tx_collisions - if_p->start_tx_collisions),
+		      (uint64_t)(is.tx_carrier),
+		      (uint64_t)(is.speed / 1000000));
+
+
+
+      if_p = if_p->next;
+    }
+
+    sigar_close(sigar_p);
+    sleep(opts->sample_interval);
+  }
+
+}
 
 int
-main(int argc, const char **argv)
-{
+main(
+  int argc,
+  const char *argv[]
+) {
   char c;
   if_monitor_t* first = NULL;
   if_monitor_t* if_p;
@@ -109,7 +198,7 @@ main(int argc, const char **argv)
     case 'i': {
       if_monitor_t* im = (if_monitor_t *)malloc(sizeof(if_monitor_t));
       memset(im, 0, sizeof(if_monitor_t));
-      sprintf(im->if_name, "%s", g_opts->if_name);
+      strncpy(im->if_name, g_opts->if_name, 64);
       im->next = first;
       first = im;
 
@@ -119,146 +208,11 @@ main(int argc, const char **argv)
     }
   }
 
-  // Initialize measurment points
-  if (g_opts->report_cpu) {
-    cpu_mp = omlc_add_mp("cpu", oml_cpu_def);
-  }
-  if (g_opts->report_memory) {
-    memory_mp = omlc_add_mp("memory", oml_memory_def);
-  }
-  if (first) {
-    net_mp = omlc_add_mp("net_if", oml_network_def);
-  }
+  oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
 
-  run(first);
+// Do some work
+  run(g_opts, g_oml_mps, first);
+
   return(0);
 }
-
-static void
-cpu(
-  sigar_t* sigar_p,
-  OmlMP*   mp_p
-) {
-  OmlValueU v[9];
-  sigar_cpu_t c;
-
-  sigar_cpu_get(sigar_p, &c);
-
-  // NOTE: We cast from a u_64 to a long
-  omlc_set_uint64(v[0], c.user);
-  omlc_set_uint64(v[1], c.sys);
-  omlc_set_uint64(v[2], c.nice);
-  omlc_set_uint64(v[3], c.idle);
-  omlc_set_uint64(v[4], c.wait);
-  omlc_set_uint64(v[5], c.irq);
-  omlc_set_uint64(v[6], c.soft_irq);
-  omlc_set_uint64(v[7], c.stolen);
-  omlc_set_uint64(v[8], c.total);
-  omlc_inject(mp_p, v);
-}
-
-static void
-memory(
-  sigar_t* sigar_p,
-  OmlMP*   mp_p
-) {
-  OmlValueU v[6];
-  sigar_mem_t m;
-
-  sigar_mem_get(sigar_p, &m);
-
-  // NOTE: We cast from a u_64 to a long
-  omlc_set_uint64(v[0], (m.ram ));
-  omlc_set_uint64(v[1], (m.total ));
-  omlc_set_uint64(v[2],(m.used ));
-  omlc_set_uint64(v[3], (m.free ));
-  omlc_set_uint64(v[4], (m.actual_used ));
-  omlc_set_uint64(v[5], (m.actual_free ));
-  omlc_inject(mp_p, v);
-}
-
-static void
-network_if(
-  sigar_t*      sigar_p,
-  if_monitor_t* net_if
-) {
-  OmlValueU v[15];
-  sigar_net_interface_stat_t is;
-
-  sigar_net_interface_stat_get(sigar_p, net_if->if_name, &is);
-  if (! net_if->not_first) {
-    net_if->start_rx_packets = is.rx_packets;
-    net_if->start_rx_bytes = is.rx_bytes;
-    net_if->start_rx_errors = is.rx_errors;
-    net_if->start_rx_dropped = is.rx_dropped;
-    net_if->start_rx_overruns = is.rx_overruns;
-    net_if->start_rx_frame = is.rx_frame;
-    net_if->start_tx_packets = is.tx_packets;
-    net_if->start_tx_bytes = is.tx_bytes;
-    net_if->start_tx_errors = is.tx_errors;
-    net_if->start_tx_dropped = is.tx_dropped;
-    net_if->start_tx_overruns = is.tx_overruns;
-    net_if->start_tx_collisions = is.tx_collisions;
-    net_if->start_tx_carrier = is.tx_carrier;
-    net_if->not_first = 1;
-  }
-
-  static char name[34] = "foo";
-
-  omlc_set_const_string(v[0], net_if->if_name);
-  omlc_set_uint64(v[1], (is.rx_packets - net_if->start_rx_packets));
-  omlc_set_uint64(v[2], (is.rx_bytes - net_if->start_rx_bytes));
-  omlc_set_uint64(v[3], (is.rx_errors - net_if->start_rx_errors));
-  omlc_set_uint64(v[4], (is.rx_dropped - net_if->start_rx_dropped));
-  omlc_set_uint64(v[5], (is.rx_overruns - net_if->start_rx_overruns));
-  omlc_set_uint64(v[6], (is.rx_frame - net_if->start_rx_frame));
-  omlc_set_uint64(v[7], (is.tx_packets - net_if->start_tx_packets));
-  omlc_set_uint64(v[8], (is.tx_bytes - net_if->start_tx_bytes));
-  omlc_set_uint64(v[9], (is.tx_errors - net_if->start_tx_errors));
-  omlc_set_uint64(v[10], (is.tx_dropped - net_if->start_tx_dropped));
-  omlc_set_uint64(v[11], (is.tx_overruns - net_if->start_tx_overruns));
-  omlc_set_uint64(v[12], (is.tx_collisions - net_if->start_tx_collisions));
-  omlc_set_uint64(v[13], (is.tx_carrier)); // - net_if->start_tx_carrier);
-  omlc_set_uint64(v[14], (is.speed / 1000000));
-
-  omlc_inject(net_mp, v);
-}
-
-
-static void
-run(
-  if_monitor_t* first_if
-) {
-  sigar_t* sigar_p;
-  if_monitor_t* if_p;
-
-  while(1) {
-    sigar_open(&sigar_p);
-
-    if (g_opts->report_cpu) {
-      cpu(sigar_p, cpu_mp);
-    }
-    if (g_opts->report_memory) {
-      memory(sigar_p, memory_mp);
-    }
-
-    if_p = first_if;
-    while (if_p) {
-      network_if(sigar_p, if_p);
-      if_p = if_p->next;
-    }
-
-    sigar_close(sigar_p);
-    sleep(g_opts->sample_interval);
-  }
-}
-
-/*
- Local Variables:
- mode: C
- tab-width: 2
- indent-tabs-mode: nil
- End:
- vim: sw=2:sts=2:expandtab
-*/
