@@ -2,7 +2,6 @@
 using namespace std;
 
 #include <otg2/otg2_app.h>
-
 int main(
   int argc, 
   const char * argv[]

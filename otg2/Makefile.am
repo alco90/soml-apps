@@ -12,6 +12,9 @@ pkgdatadir = $(datadir)/$(installed_otg2)
 
 SUBDIRS = lib/core lib/port lib/generator
 
+BUILT_SOURCES = otg2_oml.h \
+		otr2_oml.h
+
 AM_CPPFLAGS = \
 	-I $(srcdir) \
 	-I $(srcdir)/lib \
@@ -22,11 +25,14 @@ otgrlibs = -lpthread libotg2.la
 bin_PROGRAMS = otg2-oml2 otr2-oml2
 
 otg2_oml2_SOURCES = \
-	version.h \
-	otg2.cpp
+		    version.h \
+		    otg2.cpp \
+		    otg2_oml.h
 otg2_oml2_LDADD = $(otgrlibs)
 
-otr2_oml2_SOURCES = otr2.cpp
+otr2_oml2_SOURCES = \
+		    otr2.cpp \
+		    otr2_oml.h
 otr2_oml2_LDADD = $(otgrlibs)
 
 pkglib_LTLIBRARIES = libotg2.la
@@ -34,12 +40,18 @@ pkgdata_DATA = $(appotg2).rb $(appotr2).rb
 
 EXTRA_DIST = m4/gnulib-cache.m4 \
 	     $(appotg2).rb.in $(appotr2).rb.in
-CLEANFILES = $(appotg2).rb $(appotr2).rb
+CLEANFILES = $(appotg2).rb $(appotr2).rb \
+	     $(BUILT_SOURCES)
 
 $(appotg2).rb: $(appotg2).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotg2)/$(installed_otg2)/" $< > $@
 $(appotr2).rb: $(appotr2).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotr2)/$(installed_otr2)/" $< > $@
+
+$(appotg2)_oml.h: $(appotg2).rb
+	oml2-scaffold --oml $<
+$(appotr2)_oml.h: $(appotr2).rb
+	oml2-scaffold --oml $<
 
 libotg2_la_SOURCES = \
 	lib/app/application.cpp \

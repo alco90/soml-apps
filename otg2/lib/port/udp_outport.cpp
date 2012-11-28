@@ -12,31 +12,20 @@ using namespace std;
 #include <time.h>
 
 #ifdef WITH_OML
-extern "C" {
-#include <oml2/omlc.h>
-}
-static OmlMPDef oml_def[] = {
-   {"ts", OML_DOUBLE_VALUE},
-   {"flow_id", OML_INT32_VALUE},
-   {"seq_no", OML_UINT32_VALUE},
-   {"pkt_length", OML_UINT32_VALUE},
-   {"dst_host",OML_STRING_VALUE},
-   {"dst_port", OML_UINT32_VALUE},
-   {NULL, (OmlValueT)0},
-};
-static OmlMP* oml_mp = NULL;
+#define OML_FROM_MAIN
+#include "otg2_oml.h"
 #endif
-
 
 UDPOutPort::UDPOutPort()
 
 {
-  
+
   //cout << "creation of udp_out"<< endl;
 #ifdef WITH_OML
   //cout << "creation MP"<< endl;
-  
-  oml_mp = omlc_add_mp("udp_out",  oml_def);
+
+  oml_register_mps();
+  //oml_mp = omlc_add_mp("udp_out",  oml_def);
 #endif
 }
 
@@ -45,7 +34,7 @@ UDPOutPort::defOpts()
 
 {
   Socket::defOpts();
-  
+
   defOpt("broadcast", POPT_ARG_INT, (void*)&bcastflag_, "Use UDP broadcast", "on|off");
   defOpt("nonblock", POPT_ARG_STRING, NULL, "Use Non-blocking UDP", "on|off");
 }
@@ -54,38 +43,38 @@ UDPOutPort::defOpts()
  *  Init will do
  *  - create socket
  *  - bind socket
- * 
+ *
  *  Notes:
- * Bind to local address is one important task in init() 
+ * Bind to local address is one important task in init()
  * Here source address of node itself (myaddr_) does not really be used by bind function of port.
  * The program use INADDR_ANY as the address filled in address parameters of bind().
  * So, we need an empty hostname with the port number.
- * 
+ *
  * Usually, port state should changed from uninitialized to running
  * but in case of port being paused from beginning, we keep it paused.
- *  
- * 
+ *
+ *
  */
 void UDPOutPort::init()
 {
-    
+
   struct timeval time;
   int i = gettimeofday(&time, NULL);
   timestamp = time.tv_sec;
 
-  
+
   if (sockfd_ != 0) return; // already initialized
-  
+
   if (dsthost_ == NULL || strcmp(dsthost_, "") == 0) {
     throw "Missing destination host";
   }
   if (dstport_ <= 0) {
     throw "Missing dest_host port";
   }
-  
+
   Socket::init();
-  
-  if (bcastflag_ == 1) { 
+
+  if (bcastflag_ == 1) {
     if (setsockopt(sockfd_, SOL_SOCKET, SO_BROADCAST, &bcastflag_, sizeof(bcastflag_)) == -1) {
       perror("setsockopt");
       throw "Set broadcast option failed.";
@@ -132,14 +121,13 @@ UDPOutPort::sendPacket(Packet* pkt)
   }
 
 #ifdef WITH_OML
-  OmlValueU v[6];
-  omlc_set_double(v[0], now);
-  omlc_set_int32(v[1], pkt->getFlowId());
-  omlc_set_uint32(v[2], pkt->getSequenceNum());
-  omlc_set_uint32(v[3], pktLength);
-  omlc_set_string(v[4], dsthost_);
-  omlc_set_uint32(v[5], dstport_);
-  omlc_inject(oml_mp, v);
+  oml_inject_udp_out(g_oml_mps->udp_out,
+		  now,
+		  pkt->getFlowId(),
+		  pkt->getSequenceNum(),
+		  pktLength,
+		  dsthost_,
+		  dstport_);
 #endif
   return pkt;
 }
