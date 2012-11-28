@@ -10,9 +10,18 @@ gpslogger_oml2_LDADD = -loml2 -lgps -lm
 
 pkgdata_DATA = $(appname).rb
 
+BUILT_SOURCES = \
+        $(appname).rb \
+        $(appname)_oml.h
+
 EXTRA_DIST = m4/gnulib-cache.m4 \
 	     $(appname).rb.in
-CLEANFILES = $(appname).rb
+CLEANFILES = $(appname).rb\
+             $(appname)_oml.h
+
+
+$(appname)_oml.h: $(appname).rb Makefile
+	oml2-scaffold --oml $<
 
 $(appname).rb: $(appname).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@

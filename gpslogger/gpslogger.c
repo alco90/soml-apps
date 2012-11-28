@@ -4,7 +4,7 @@
  * Fetches latitude, longitude, elevation, fix mode and time from gpsd
  * and feeds them into OML.
  *
- * To compile: gcc -o gpslogger gpslogger.c -loml2 -lgps 
+ * To compile: gcc -o gpslogger gpslogger.c -loml2 -lgps
  *
  * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2010
  * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
@@ -39,15 +39,15 @@
 #include <errno.h>
 #include <gps.h>
 #include <oml2/omlc.h>
-
+#define OML_FROM_MAIN
+#include "gpslogger_oml.h"
 static time_t int_time, old_int_time;
 static time_t timeout = 5; /* seconds */
 static bool verbose = false;
-OmlMP* mp;
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
-struct fixsource_t 
+struct fixsource_t
 {
   char *spec;
   char *server;
@@ -71,22 +71,22 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
 
   if (verbose) {
     // print fix data
-    (void)printf("lat=\"%f\" lon=\"%f\" ele=\"%f\" track=\"%f\" speed=\"%f\" climb=\"%f\" fix=\"%s\" ts=\"%s\"\n", 
+    (void)printf("lat=\"%f\" lon=\"%f\" ele=\"%f\" track=\"%f\" speed=\"%f\" climb=\"%f\" fix=\"%s\" ts=\"%s\"\n",
         fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode, time_string);
     (void)fflush (stdout);
   }
 
   // log fix data to OML
-  OmlValueU values[8];
-  omlc_set_double (values[0], fix->latitude);
-  omlc_set_double (values[1], fix->longitude);
-  omlc_set_double (values[2], fix->altitude);
-  omlc_set_double (values[3], fix->track);
-  omlc_set_double (values[4], fix->speed);
-  omlc_set_double (values[5], fix->climb);
-  omlc_set_string (values[6], mode);
-  omlc_set_string (values[7], time_string);
-  omlc_inject (mp, values);
+  oml_inject_gps_data(g_oml_mps_gpslogger->gps_data,
+      fix->latitude,
+      fix->longitude,
+      fix->altitude,
+      fix->track,
+      fix->speed,
+      fix->climb,
+      mode,
+      time_string);
+
 }
 
 static void conditionally_log_fix(struct gps_fix_t *gpsfix)
@@ -100,7 +100,7 @@ static void conditionally_log_fix(struct gps_fix_t *gpsfix)
   }
 }
 
-static void quit_handler (int signum) 
+static void quit_handler (int signum)
 {
   omlc_close();
   exit(0);
@@ -174,7 +174,7 @@ static int socket_mainloop(void)
   return 0;
 }
 
-static void usage(const char* progname) 
+static void usage(const char* progname)
 {
   fprintf(stderr,
       "usage: %s [-h] [-v] [server[:port:[device]]]\n"
@@ -184,7 +184,7 @@ static void usage(const char* progname)
       progname);
 }
 
-int main (int argc, const char **argv) 
+int main (int argc, const char **argv)
 {
   char *progname=strdup(argv[0]), *p=progname, *p2;
   int result, l;
@@ -210,32 +210,15 @@ int main (int argc, const char **argv)
     exit (1);
   }
 
-  OmlMPDef mp_def [] =
-  {
-    { "lat", OML_DOUBLE_VALUE },
-    { "lon", OML_DOUBLE_VALUE },
-    { "ele", OML_DOUBLE_VALUE },
-    { "track", OML_DOUBLE_VALUE },
-    { "speed", OML_DOUBLE_VALUE },
-    { "climb", OML_DOUBLE_VALUE },
-    { "fix", OML_STRING_VALUE },
-    { "time", OML_STRING_VALUE },
-    { NULL, (OmlValueT)0 }
-  };
 
-  mp = omlc_add_mp ("gps_data", mp_def);
-
-  if (mp == NULL) {
-    fprintf (stderr, "error: could not register Measurement Point \"gps_data\"");
-    exit (1);
-  }
+  oml_register_mps();
 
   int ch;
 
   /* getopt(3) expects arg 2 to be char * const (i.e., pointer to an array of
    * immutable strings), however, omlc_init(3) needs argv to be mutable, so our
    * main() cannot declare it as such we cast it here to make the C compiler
-   * happy by letting it know wo know what we are doing 
+   * happy by letting it know wo know what we are doing
    */
   while ((ch = getopt(argc, (char* const*)argv, "hv")) != -1) {
     switch (ch) {
