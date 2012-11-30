@@ -123,7 +123,6 @@ void receive_reports (int sockfd)
     navini_report_t report;
     ssize_t len;
     unsigned int *p;
-    OmlValueU values[14];
 
     printf("# Modem ID\tMM/DD/YY HH:MM:SS\tSyncStr\tBTS ID\tNet ID\tAntenna\tSyncStr\tSNR\tTemperature\n");
 
@@ -158,22 +157,21 @@ void receive_reports (int sockfd)
                 report.temperature
         );
 
-        omlc_set_uint32(values[0], ntohl(report.modemid));
-        omlc_set_uint32(values[1], report.month);
-        omlc_set_uint32(values[2], report.day);
-        omlc_set_uint32(values[3], report.year);
-        omlc_set_uint32(values[4], report.hour);
-        omlc_set_uint32(values[5], report.minute);
-        omlc_set_uint32(values[6], report.second);
-        omlc_set_int32(values[7], -report.syncstrength1);
-        omlc_set_uint32(values[8], report.btsid);
-        omlc_set_uint32(values[9], ntohs(report.networkid));
-        omlc_set_uint32(values[10], report.antenna);
-        omlc_set_int32(values[11], -report.syncstrength2);
-        omlc_set_uint32(values[12], report.snr);
-        omlc_set_uint32(values[13], report.temperature);
-        omlc_inject(g_oml_mps->ripwave_stats, values);
-
+        oml_inject_ripwave_stats(g_oml_mps->ripwave_stats,
+            ntohl(report.modemid),
+            report.month,
+            report.day,
+            report.year,
+            report.hour,
+            report.minute,
+            report.second,
+            -report.syncstrength1,
+            report.btsid,
+            ntohs(report.networkid),
+            report.antenna,
+            -report.syncstrength2,
+            report.snr,
+            report.temperature);
     }
 }
 
