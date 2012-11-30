@@ -1,4 +1,4 @@
-CLOCAL_AMFLAGS = -I m4 -Wall
+ACLOCAL_AMFLAGS = -I m4 -Wall
 
 appname = nmetrics
 installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`

@@ -6,12 +6,15 @@ fi
 
 APPS=`sed -n "s/SUBDIRS * =//p" Makefile.am`
 for i in $APPS; do
+	echo $i
 	cd $i
 	./autogen.sh --quick # Don't run autoreconf just yet
-	cd -
+	cd - >/dev/null
 done
 
 rm -rf autom4te.cache/
-gnulib-tool --update --quiet --quiet
+# Let the user know what we do, tersely
+echo "gnulib-tool: updating portability libary files" >&2
+gnulib-tool --update --quiet --quiet >/dev/null
 chmod a+x build-aux/git-version-gen
 autoreconf -i $*
