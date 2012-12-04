@@ -1,5 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
+SCAFFOLD=oml2-scaffold
+
 appotg2 = otg2
 progotg2 = $(appotg2)-oml2
 installed_otg2 = `echo '$(progotg2)' | sed '$(transform)'`
@@ -49,9 +51,9 @@ $(appotr2).rb: $(appotr2).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotr2)/$(installed_otr2)/" $< > $@
 
 $(appotg2)_oml.h: $(appotg2).rb
-	oml2-scaffold --oml $<
+	$(SCAFFOLD) --oml $<
 $(appotr2)_oml.h: $(appotr2).rb
-	oml2-scaffold --oml $<
+	$(SCAFFOLD) --oml $<
 
 libotg2_la_SOURCES = \
 	lib/app/application.cpp \

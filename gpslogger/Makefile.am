@@ -1,5 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
+SCAFFOLD=oml2-scaffold
+
 appname = gpslogger
 installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
 pkgdatadir = $(datadir)/$(installed_name)
@@ -21,7 +23,7 @@ CLEANFILES = $(appname).rb\
 
 
 $(appname)_oml.h: $(appname).rb Makefile
-	oml2-scaffold --oml $<
+	$(SCAFFOLD) --oml $<
 
 $(appname).rb: $(appname).rb.in
 	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@
