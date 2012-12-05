@@ -2,6 +2,8 @@ ACLOCAL_AMFLAGS = -I ../m4 -Wnone
 
 AM_CPPFLAGS = \
 	-I $(srcdir)/.. \
+	-I $(top_srcdir) \
+	-I $(top_builddir) \
 	-DWITH_OML
 
 noinst_LTLIBRARIES = libotg2port.la

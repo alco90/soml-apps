@@ -14,25 +14,25 @@ pkgdatadir = $(datadir)/$(installed_otg2)
 
 SUBDIRS = lib/core lib/port lib/generator
 
-BUILT_SOURCES = otg2_oml.h \
+BUILT_SOURCES = $(appotg2).rb \
+		$(appotr2).rb \
+		otg2_oml.h \
 		otr2_oml.h
 
-AM_CPPFLAGS = \
-	-I $(srcdir) \
-	-I $(srcdir)/lib \
-	-DWITH_OML
+AM_CPPFLAGS = -I $(srcdir) \
+	      -I $(srcdir)/lib \
+	      -DWITH_OML
 
 otgrlibs = -lpthread libotg2.la
 
 bin_PROGRAMS = otg2-oml2 otr2-oml2
 
-otg2_oml2_SOURCES = \
-		    version.h \
+otg2_oml2_SOURCES = version.h \
 		    otg2.cpp \
 		    otg2_oml.h
 otg2_oml2_LDADD = $(otgrlibs)
 
-otr2_oml2_SOURCES = \
+otr2_oml2_SOURCES = version.h \
 		    otr2.cpp \
 		    otr2_oml.h
 otr2_oml2_LDADD = $(otgrlibs)
@@ -41,14 +41,28 @@ pkglib_LTLIBRARIES = libotg2.la
 pkgdata_DATA = $(appotg2).rb $(appotr2).rb
 
 EXTRA_DIST = m4/gnulib-cache.m4 \
-	     $(appotg2).rb.in $(appotr2).rb.in
-CLEANFILES = $(appotg2).rb $(appotr2).rb \
-	     $(BUILT_SOURCES)
+	     $(appotg2).rb.in \
+	     $(appotr2).rb.in \
+	     $(appotg2).rb \
+	     $(appotr2).rb
+
+CLEANFILES =  otg2_oml.h \
+	      otr2_oml.h
+MAINTAINERCLEANFILES = $(appotg2).rb \
+		       $(appotr2).rb
 
 $(appotg2).rb: $(appotg2).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotg2)/$(installed_otg2)/" $< > $@
+	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \
+		sed -e 's|@bindir[@]|$(bindir)|g' \
+		-e "/a\.path/s/$(appotg2)/$(installed_otg2)/" \
+		-e "s/a\.version.*/a.version($$VER)/" \
+		$< > $@
 $(appotr2).rb: $(appotr2).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(appotr2)/$(installed_otr2)/" $< > $@
+	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \
+		sed -e 's|@bindir[@]|$(bindir)|g' \
+		-e "/a\.path/s/$(appotr2)/$(installed_otr2)/" \
+		-e "s/a\.version.*/a.version($$VER)/" \
+		$< > $@
 
 $(appotg2)_oml.h: $(appotg2).rb
 	$(SCAFFOLD) --oml $<

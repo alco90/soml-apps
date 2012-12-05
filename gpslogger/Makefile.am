@@ -12,21 +12,25 @@ gpslogger_oml2_LDADD = -loml2 -lgps -lm
 
 pkgdata_DATA = $(appname).rb
 
-BUILT_SOURCES = \
-        $(appname).rb \
-        $(appname)_oml.h
+BUILT_SOURCES = $(appname).rb \
+		$(appname)_oml.h
 
 EXTRA_DIST = m4/gnulib-cache.m4 \
-	     $(appname).rb.in
-CLEANFILES = $(appname).rb\
-             $(appname)_oml.h
+	     $(appname).rb.in \
+	     $(appname).rb
 
+CLEANFILES = $(appname)_oml.h
+MAINTAINERCLEANFILES = $(appname).rb
 
-$(appname)_oml.h: $(appname).rb Makefile
+$(appname)_oml.h: $(appname).rb
 	$(SCAFFOLD) --oml $<
 
 $(appname).rb: $(appname).rb.in
-	sed -e 's|@bindir[@]|$(bindir)|g' -e "/a\.path/s/$(PACKAGE)/$(installed_name)/" $< > $@
+	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \
+		sed -e 's|@bindir[@]|$(bindir)|g' \
+		-e "/a\.path/s/$(PACKAGE)/$(installed_name)/" \
+		-e "s/a\.version.*/a.version($$VER)/" \
+		$< > $@
 
 installed_link_names = \
 		       $(DESTDIR)$(bindir)/`echo "$(appname)_oml2" | sed '$(transform)'`$(EXEEXT) \
