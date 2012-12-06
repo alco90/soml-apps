@@ -15,7 +15,9 @@ pkgdata_DATA = $(appname).rb
 BUILT_SOURCES = $(appname).rb \
 		$(appname)_oml.h
 
-EXTRA_DIST = m4/gnulib-cache.m4 \
+EXTRA_DIST = autogen.sh \
+	     autoclean.sh \
+	     m4/gnulib-cache.m4 \
 	     $(appname).rb.in \
 	     $(appname).rb
 

@@ -16,10 +16,12 @@ BUILT_SOURCES = $(appname).rb \
 		$(appname)_oml.h \
 		$(appname)_popt.h
 
-EXTRA_DIST = m4/gnulib-cache.m4 \
-	   $(appname).rb.in \
-	   $(appname).rb \
-	   navini-protocol.txt
+EXTRA_DIST = autogen.sh \
+	     autoclean.sh \
+	     m4/gnulib-cache.m4 \
+	     $(appname).rb.in \
+	     $(appname).rb \
+	     navini-protocol.txt
 
 CLEANFILES = $(appname)_oml.h \
 	     $(appname)_popt.h
