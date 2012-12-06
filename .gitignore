@@ -24,6 +24,9 @@ m4/*
 */m4/*
 !m4/gnulib-cache.m4
 !*/m4/gnulib-cache.m4
+!m4/ax_with_prog.m4
+!m4/oml_distribution_is.m4
+!m4/oml_git_search_treeish.m4
 gnulib/
 */gnulib/
 *.o

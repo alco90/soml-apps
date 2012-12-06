@@ -57,6 +57,71 @@ AS_IF([test "x$ac_cv_header_pcap_h" = "xno" -o "x$ac_cv_libtrace_h" = "xno" ],
       built_apps="$built_apps trace"]
 )
 
+AC_ARG_ENABLE([packaging],
+	      [AS_HELP_STRING([--enable-packaging],
+			      [enable targets to create distribution-specific packages (Git clone needed)])],
+	      [
+	       AX_WITH_PROG([GIT],[git])
+	       AS_IF([test "x$enable_packaging" != "xno" && test -n "$GIT"],
+		     [
+		      AC_MSG_CHECKING([whether \$srcdir is a Git repo])
+		      AS_IF([test "x${srcdir}" = "x." && $GIT status >/dev/null 2>&1],
+			    [
+			     AC_MSG_RESULT([yes])
+			     AC_MSG_CHECKING([current Git branch])
+			     gitbranch=`${GIT} describe --contains --all HEAD`
+			     AC_MSG_RESULT([$gitbranch])
+
+			     AC_MSG_CHECKING([current Git tag])
+			     gittag=`${GIT} describe --exact-match 2>/dev/null`
+			     AS_IF([ test "x" != "x$gittag"],
+				   [
+				    AC_MSG_RESULT([$gittag])
+				    gitistag=yes
+				   ],
+				   [
+				    AC_MSG_RESULT([none])
+				    gitistag=no
+
+				    AC_MSG_CHECKING([closest Git tag])
+				    gittag=`${GIT} describe --abbrev=0 2>/dev/null`
+				    AC_MSG_RESULT([$gittag])
+				   ])
+
+			     AX_WITH_PROG([DPKG_BUILDPACKAGE],[dpkg-buildpackage])
+			     AX_WITH_PROG([DCH],[dch])
+			     AS_IF([test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"],[
+				    OML_DISTRIBUTION_IS([Debian-based],
+							[/etc/debian_version],
+							[isdebian],
+							[],
+							[AC_SUBST([DPKG_BUILDPACKAGE_FLAGS_ADD],[-d])])
+				    OML_GIT_SEARCH_TREEISH([Debian],
+							  [gitdebref],
+							  [debian/$gittag,
+							   origin/debian/$gittag,
+							   debian/$gitbranch,
+							   origin/debian/$gitbranch,
+							   debian/master],
+							   [origin/debian/master])
+				   ])
+			    ],
+			    [
+			     AC_MSG_RESULT([no])
+			     AC_MSG_WARN([--enable-packaging needs git and a Git repo for binary distributions])
+			     enable_packaging=partial
+			    ])
+		      ])],
+	      [enable_packaging=no])
+AC_SUBST([GITBRANCH],[$gitbranch])
+AC_SUBST([GITTAG],[$gittag])
+AC_SUBST([GITHEAD],[$githead])
+AC_SUBST([GITDEBREF],[$gitdebref])
+AM_CONDITIONAL([ENABLE_PACKAGING], [test "x$enable_packaging" != "xno" && test "x$enable_packaging" != "xpartial"])
+AM_CONDITIONAL([GITISTAG], [test "x$gitistag" != "xno"])
+AM_CONDITIONAL([BUILD_DEBIAN], [test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"])
+AM_CONDITIONAL([IS_DEBIAN], [test "x$isdebian" != "x"])
+
 # Generate output files
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
