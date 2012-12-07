@@ -4,7 +4,14 @@ SUBDIRS = gpslogger nmetrics iperf otg2 ripwavemon trace wlanconfig
 
 EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
-	     m4/gnulib-cache.m4
+	     m4/gnulib-cache.m4 \
+	     $(top_srcdir)/.version
+
+BUILT_SOURCES = $(top_srcdir)/.version
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
 
 if ENABLE_PACKAGING
 

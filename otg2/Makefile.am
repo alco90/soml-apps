@@ -1,5 +1,9 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
+AM_CPPFLAGS = -I $(srcdir) \
+	      -I $(srcdir)/lib \
+	      -DWITH_OML
+
 SCAFFOLD=oml2-scaffold
 
 appotg2 = otg2
@@ -14,14 +18,30 @@ pkgdatadir = $(datadir)/$(installed_otg2)
 
 SUBDIRS = lib/core lib/port lib/generator
 
-BUILT_SOURCES = $(appotg2).rb \
+EXTRA_DIST = autogen.sh \
+	     autoclean.sh \
+	     m4/gnulib-cache.m4 \
+	     $(top_srcdir)/.version \
+	     $(appotg2).rb.in \
+	     $(appotr2).rb.in \
+	     $(appotg2).rb \
+	     $(appotr2).rb
+
+BUILT_SOURCES = $(top_srcdir)/.version \
+		$(appotg2).rb \
 		$(appotr2).rb \
 		otg2_oml.h \
 		otr2_oml.h
 
-AM_CPPFLAGS = -I $(srcdir) \
-	      -I $(srcdir)/lib \
-	      -DWITH_OML
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
+
+CLEANFILES =  otg2_oml.h \
+	      otr2_oml.h
+MAINTAINERCLEANFILES = $(appotg2).rb \
+		       $(appotr2).rb
 
 otgrlibs = -lpthread libotg2.la
 
@@ -40,18 +60,6 @@ otr2_oml2_LDADD = $(otgrlibs)
 pkglib_LTLIBRARIES = libotg2.la
 pkgdata_DATA = $(appotg2).rb $(appotr2).rb
 
-EXTRA_DIST = autogen.sh \
-	     autoclean.sh \
-	     m4/gnulib-cache.m4 \
-	     $(appotg2).rb.in \
-	     $(appotr2).rb.in \
-	     $(appotg2).rb \
-	     $(appotr2).rb
-
-CLEANFILES =  otg2_oml.h \
-	      otr2_oml.h
-MAINTAINERCLEANFILES = $(appotg2).rb \
-		       $(appotr2).rb
 
 $(appotg2).rb: $(appotg2).rb.in
 	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \

@@ -13,15 +13,22 @@ nmetrics_oml2_CPPFLAGS = $(LIBSIGAR_CFLAGS)
 
 pkgdata_DATA = $(appname).rb
 
-BUILT_SOURCES = $(appname).rb \
-		$(appname)_oml.h \
-		$(appname)_popt.h
-
 EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
 	     m4/gnulib-cache.m4 \
+	     $(top_srcdir)/.version \
 	     $(appname).rb.in \
 	     $(appname).rb
+
+BUILT_SOURCES = $(top_srcdir)/.version \
+		$(appname).rb \
+		$(appname)_oml.h \
+		$(appname)_popt.h
+
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
 
 CLEANFILES = $(appname)_oml.h \
 	     $(appname)_popt.h

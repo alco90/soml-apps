@@ -13,8 +13,15 @@ pkgdata_DATA = $(appname).rb
 EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
 	     m4/gnulib-cache.m4 \
+	     $(top_srcdir)/.version \
 	     $(appname).rb.in \
 	     $(appname).rb
+
+BUILT_SOURCES = $(top_srcdir)/.version
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
 
 MAINTAINERCLEANFILES = $(appname).rb
 
