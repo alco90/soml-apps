@@ -18,8 +18,8 @@ ltmain.sh
 missing
 autom4te.cache
 stamp-h1
-build-aux/
-*/build-aux/
+!build-aux/gen-authors.sh
+*/build-aux/*
 m4/*
 */m4/*
 !m4/gnulib-cache.m4
