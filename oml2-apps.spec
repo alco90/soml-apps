@@ -1,26 +1,29 @@
-%define name            oml2-apps
-%define version         2.7.0
+%define name		oml2-apps
+%define version		2.8.0
+%define redmineid	724
 
-BuildRoot:              %{_tmppath}/%{name}-%{version}-build
-Summary:                OML application collection
-License:                MIT
-URL:                    http://oml.mytestbed.net/projects/omlapp
-Name:                   %{name}
-Version:                %{version}
-Release:                1
-Source:                 http://oml.mytestbed.net/attachments/download/645/oml2-apps-2.7.0.tar.gz
-Packager:               Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Prefix:                 /usr
-Group:                  Applications/Internet
-BuildRequires:		autoconf make automake libtool gcc gcc-c++ oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby
+BuildRoot:		%{_tmppath}/%{name}-%{version}-build
+Summary:		OML application collection
+License:		MIT
+URL:			http://oml.mytestbed.net/projects/omlapp
+Name:			%{name}
+Version:		%{version}
+Release:		1
+Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%{version}.tar.gz
+Packager:		Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
+Prefix:			/usr
+Group:			Applications/Internet
+BuildRequires:		autocon make automake libtool gcc gcc-c++ gnulib oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby
 
 %description
 This package provides some OML2 applications:
-- oml2-gpslogger -- measure GPS data from gpds;
-- oml2-wlanconfig -- record wireless lan information from wlanconfig;
-- oml2-trace -- wrapper around libtrace with OML2 measurement recording
-- oml2-nmetrics -- node metrics using libsigar;
-- oml2-otg2 -- the otg2/otr2 programs for generating background traffic.
+* gpslogger-oml2 -- measure GPS data from gpds;
+* iperf-oml2 -- traffic generator and path capacity testing, with OML2 reporting;
+* nmetrics-oml2 -- node metrics using libsigar;
+* otg2-oml2 -- OTG2/OTR2 programs for generating and capturing background traffic;
+* ripwavemon-oml2 -- parse and report status message from Navini RipWave modems;
+* trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
+* wlanconfig-oml2 -- record wireless lan information from wlanconfig.
 
 %prep
 %setup -q
