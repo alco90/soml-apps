@@ -1,3 +1,9 @@
+oml2-apps (2.9.0-mytestbed1) precise; urgency=low
+
+  * new upstream release
+
+ -- Olivier Mehani <olivier.mehani@nicta.com.au>  Tue, 11 Dec 2012 14:44:20 +1100
+
 oml2-apps (2.8.0-ubuntu2) precise; urgency=low
 
   * patched OTG to dynamically update sender parameters

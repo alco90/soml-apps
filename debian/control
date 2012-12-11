@@ -2,7 +2,7 @@ Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7),  autotools-dev, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev,liboml2-dev, libgps-dev, dh-autoreconf, tree, gnulib
+Build-Depends: cdbs, debhelper (>= 7), pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, tree
 Standards-Version: 3.9.1
 Homepage: http://omlapp.mytestbed.net/
 
@@ -14,15 +14,15 @@ Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, 
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef
 Conflicts: oml-client, oml2-apps-all
-Description: A meta-package that installs all the bundled OML2 Applications
+Description: A meta-package that installs the complite OML2 applications collection
  This package installs all the OML2 Application packages:
-  - gpslogger-oml2 -- measure GPS data from gpds;
-  - iperf-oml2 -- iperf with OML2 measurement recording;
-  - nmetrics-oml2 -- node metrics using libsigar;
-  - otg2-oml2 -- the otg2/otr2 programs for generating background traffic;
-  - ripwavemon-oml2 -- use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
-  - trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
-  - wlanconfig-oml2 -- record wireless lan information from wlanconfig.
+     * gpslogger-oml2: measure GPS data from gpds;
+     * iperf-oml2: iperf with OML2 measurement recording;
+     * nmetrics-oml2: node metrics using libsigar;
+     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
+     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
+     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
+     * wlanconfig-oml2: record wireless lan information from wlanconfig.
 
 Package: oml2-apps-omfdef
 Section: net
@@ -35,7 +35,7 @@ Description: A meta-package that installs OML2 Applications and their OMF-5.4 de
 
 Package: gpslogger-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gpsd, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, gpsd, liboml2-9
 Replaces: oml-client, oml2-gpslogger
 Conflicts: oml-client, oml2-gpslogger
 Description: Record and store GPS measurements using OML
@@ -45,17 +45,38 @@ Description: Record and store GPS measurements using OML
 
 Package: iperf-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, liboml2-9
 Replaces: oml2-iperf
 Conflicts: oml2-iperf
-Description: Iperf with OML support
- This project is meant to implement OML support following Iperf development. 
- It is based on iperf 2.0.5.
+Description: Internet Protocol bandwidth measuring tool, with OML support
+ Iperf is a modern alternative for measuring TCP and UDP bandwidth performance,
+ allowing the tuning of various parameters and characteristics
+ .
+ This version implements OML support following Iperf development. It is based
+ on Iperf 2.0.5.
+ .
+ Features:
+    * Measure bandwidth, packet loss, delay jitter
+    * Report MSS/MTU size and observed read sizes.
+    * Support for TCP window size via socket buffers.
+    * Multi-threaded. Client and server can have multiple simultaneous
+      connections.
+    * Client can create UDP streams of specified bandwidth.
+    * Multicast and IPv6 capable.
+    * Options can be specified with K (kilo-) and M (mega-) suffices.
+    * Can run for specified time, rather than a set amount of data to transfer.
+    * Picks the best units for the size of data being reported.
+    * Server handles multiple connections.
+    * Print periodic, intermediate bandwidth, jitter, and loss reports at
+      specified intervals.
+    * Server can be run as a daemon.
+    * Use representative streams to test out how link layer compression affects
+      your achievable bandwidth.
 
 
 Package: nmetrics-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libsigar
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, libsigar
 Replaces: oml-client, oml2-nmetrics
 Conflicts: oml-client, oml2-nmetrics
 Description: Measure and record system information from libsigar using OML
@@ -68,7 +89,7 @@ Description: Measure and record system information from libsigar using OML
 
 Package: otg2-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9
 Replaces: otg, otg2
 Conflicts: otg, otg2, oml2-otg2
 Description: Orbit Traffic Generator
@@ -79,7 +100,7 @@ Description: Orbit Traffic Generator
 
 Package: ripwavemon-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9
 Description: Report statistics from a Navini RipWave modem
  This application parses periodic UDP status messages from a Navini RipWave
  modem (Unwired, Exetel, nTelos).
@@ -87,7 +108,7 @@ Description: Report statistics from a Navini RipWave modem
 
 Package: trace-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0, libtrace3
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, libtrace3
 Replaces: oml-client, oml2-trace
 Conflicts: oml-client, oml2-trace
 Description: Measure and record libtrace data using OML
@@ -99,7 +120,7 @@ Description: Measure and record libtrace data using OML
 
 Package: wlanconfig-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9
 Replaces: oml-client, oml2-wlanconfig
 Conflicts: oml-client, oml2-wlanconfig
 Description: Record WLAN information from wlanconfig using OML
