@@ -27,6 +27,39 @@ SED=sed
 PKG_PACKAGES=
 PKG_CLEANFILES=
 
+if BUILD_ANDROID
+PKG_AND_BASE_NAME=$(PACKAGE)-$(VERSION)-android
+PKG_AND_BUILD_DIR=p-android
+PKG_AND_OUT_DIR=$(PKG_AND_BUILD_DIR)/$(PKG_AND_BASE_NAME)
+
+PKG_PACKAGES+=pkg-and
+PKG_CLEANFILES+=$(PKG_AND_BUILD_DIR)
+
+$(PKG_AND_BUILD_DIR):
+	rm -rf $(PKG_AND_BUILD_DIR)
+# It's OK to do the following as --enable-packaging is not compatible with VPATH
+# builds (it needs a Git checkout).
+	for APP in $(SUBDIRS); do \
+		$(MAKE) -C $(top_srcdir)/$${APP} $${APP}_oml.h $${APP}_popt.h || true; \
+		mkdir -p $(PKG_AND_OUT_DIR)/external/$${APP}-oml2; \
+		find $(top_srcdir)/$${APP}/ -not -path \*/gnulib/\* \( -name "*.c" -o -name "*.h" \) -exec $(install_sh_DATA) {} $(abs_top_builddir)/$(PKG_AND_OUT_DIR)/external/$${APP}-oml2/{} \; ; \
+		rm -f $(top_srcdir)/$${APP}/$${APP}_oml.h $(top_srcdir)/$${APP}/$${APP}_popt.h; \
+	done
+# Less trivial files
+	$(MAKE) -C $(top_srcdir)/otg2 otr2_oml.h
+	$(GIT) archive $(GITANDREF) | $(am__untar) -C $(PKG_AND_OUT_DIR)/
+# XXX: This sed invocation requires GNU sed.
+	cd $(PKG_AND_OUT_DIR); \
+		find . -name "Android.mk" -exec $(SED) -i "s/@version@/$(VERSION)/g" {} \;
+
+pkg-and: $(PKG_AND_BUILD_DIR)/$(PKG_AND_BASE_NAME).tar.gz
+$(PKG_AND_BUILD_DIR)/$(PKG_AND_BASE_NAME).tar.gz: $(PKG_AND_BUILD_DIR)
+	cd $(PKG_AND_BUILD_DIR); \
+		tardir=$(PKG_AND_BASE_NAME) && $(am__tar) | \
+		GZIP=$(GZIP_ENV) gzip -c > $(PKG_AND_BASE_NAME).tar.gz
+
+endif #BUILD_ANDROID
+
 if BUILD_ARCH
 PKG_ARCH_BASE_NAME=$(PACKAGE)-$(OML_ALT_VER)
 PKG_ARCH_BUILD_DIR=p-arch

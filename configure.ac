@@ -90,6 +90,22 @@ AC_ARG_ENABLE([packaging],
 				    AC_MSG_RESULT([$gittag])
 				   ])
 
+			    AC_ARG_ENABLE([android],
+					  [AS_HELP_STRING([--disable-android],
+							  [do not prepare Android source])],
+							  [],
+							  [enable_android=yes])
+			    AS_IF([test "x$enable_android" == "xyes"],
+				   OML_GIT_SEARCH_TREEISH([Android],
+							 [gitandref],
+							 [android/$gittag,
+							  origin/android/$gittag,
+							  android/$gitbranch,
+							  origin/android/$gitbranch,
+							  android/master],
+							  [origin/android/master])
+				   )
+
 			     AX_WITH_PROG([MAKEPKG],[makepkg])
 			     AS_IF([test "x$MAKEPKG" != "x"],[
 				    OML_DISTRIBUTION_IS([ArchLinux],
@@ -150,11 +166,13 @@ AC_ARG_ENABLE([packaging],
 AC_SUBST([GITBRANCH],[$gitbranch])
 AC_SUBST([GITTAG],[$gittag])
 AC_SUBST([GITHEAD],[$githead])
+AC_SUBST([GITANDREF],[$gitandref])
 AC_SUBST([GITARCHREF],[$gitarchref])
 AC_SUBST([GITDEBREF],[$gitdebref])
 AC_SUBST([GITRPMREF],[$gitrpmref])
 AM_CONDITIONAL([ENABLE_PACKAGING], [test "x$enable_packaging" != "xno" && test "x$enable_packaging" != "xpartial"])
 AM_CONDITIONAL([GITISTAG], [test "x$gitistag" != "xno"])
+AM_CONDITIONAL([BUILD_ANDROID], [test "x$enable_android" == "xyes"])
 AM_CONDITIONAL([BUILD_ARCH], [test "x$MAKEPKG" != "x"])
 AM_CONDITIONAL([BUILD_DEBIAN], [test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"])
 AM_CONDITIONAL([BUILD_RPM], [test "x$RPMBUILD" != "x"])
