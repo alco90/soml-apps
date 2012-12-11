@@ -1,8 +1,8 @@
 %define name		oml2-apps
-%define version		2.8.0
+%define version		2.9.0
 %define redmineid	724
 
-BuildRoot:		%{_tmppath}/%{name}-%{version}-build
+BuildRoot:		%{_tmppath}/%{name}-%{version}
 Summary:		OML application collection
 License:		MIT
 URL:			http://oml.mytestbed.net/projects/omlapp
@@ -13,17 +13,33 @@ Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%
 Packager:		Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
 Prefix:			/usr
 Group:			Applications/Internet
-BuildRequires:		autocon make automake libtool gcc gcc-c++ gnulib oml2-devel gpsd-devel popt-devel sigar-devel libpcap-devel libtrace-devel ruby
+Requires:		glibc
+Requires:		gpsd
+Requires:		oml2
+Requires:		popt
+Requires:		libpcap
+Requires:		libtrace
+Requires:		sigar
+BuildRequires:		make
+BuildRequires:		gcc
+BuildRequires:		gcc-c++
+BuildRequires:		glibc-devel
+BuildRequires:		gpsd-devel
+BuildRequires:		oml2-devel
+BuildRequires:		popt-devel
+BuildRequires:		libpcap-devel
+BuildRequires:		libtrace-devel
+BuildRequires:		sigar-devel
 
 %description
-This package provides some OML2 applications:
-* gpslogger-oml2 -- measure GPS data from gpds;
-* iperf-oml2 -- traffic generator and path capacity testing, with OML2 reporting;
-* nmetrics-oml2 -- node metrics using libsigar;
-* otg2-oml2 -- OTG2/OTR2 programs for generating and capturing background traffic;
-* ripwavemon-oml2 -- parse and report status message from Navini RipWave modems;
-* trace-oml2 -- wrapper around libtrace with OML2 measurement recording;
-* wlanconfig-oml2 -- record wireless lan information from wlanconfig.
+This package installs all the OML2 Application packages:
+    * gpslogger-oml2: measure GPS data from gpds;
+    * iperf-oml2: iperf with OML2 measurement recording;
+    * nmetrics-oml2: node metrics using libsigar;
+    * otg2-oml2: the otg2/otr2 programs for generating background traffic;
+    * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
+    * trace-oml2: wrapper around libtrace with OML2 measurement recording;
+    * wlanconfig-oml2: record wireless lan information from wlanconfig.
 
 %prep
 %setup -q
