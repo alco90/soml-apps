@@ -16,6 +16,8 @@ AC_PROG_MAKE_SET
 
 gl_INIT
 
+AC_SUBST([OML_ALT_VER], [`echo "$PACKAGE_VERSION" | sed 's/-/./g'`])
+
 built_apps="iperf ripwavemon wlanconfig"
 AC_CONFIG_SUBDIRS([iperf ripwavemon wlanconfig])
 
@@ -105,6 +107,22 @@ AC_ARG_ENABLE([packaging],
 							   debian/master],
 							   [origin/debian/master])
 				   ])
+			     AX_WITH_PROG([RPMBUILD],[rpmbuild])
+			     AS_IF([test "x$RPMBUILD" != "x"], [
+				    OML_DISTRIBUTION_IS([RedHat-based],
+							[/etc/redhat-release],
+							[isredhat],
+							[],
+							[AC_SUBST([RPMBUILD_FLAGS_ADD],[--nodeps])])
+				    OML_GIT_SEARCH_TREEISH([RPM],
+							  [gitrpmref],
+							  [rpm/$gittag,
+							   origin/rpm/$gittag,
+							   rpm/$gitbranch,
+							   origin/rpm/$gitbranch,
+							   rpm/master],
+							   [origin/rpm/master])
+				   ])
 			    ],
 			    [
 			     AC_MSG_RESULT([no])
@@ -117,10 +135,13 @@ AC_SUBST([GITBRANCH],[$gitbranch])
 AC_SUBST([GITTAG],[$gittag])
 AC_SUBST([GITHEAD],[$githead])
 AC_SUBST([GITDEBREF],[$gitdebref])
+AC_SUBST([GITRPMREF],[$gitrpmref])
 AM_CONDITIONAL([ENABLE_PACKAGING], [test "x$enable_packaging" != "xno" && test "x$enable_packaging" != "xpartial"])
 AM_CONDITIONAL([GITISTAG], [test "x$gitistag" != "xno"])
 AM_CONDITIONAL([BUILD_DEBIAN], [test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"])
+AM_CONDITIONAL([BUILD_RPM], [test "x$RPMBUILD" != "x"])
 AM_CONDITIONAL([IS_DEBIAN], [test "x$isdebian" != "x"])
+AM_CONDITIONAL([IS_REDHAT], [test "x$isredhat" != "x"])
 
 # Generate output files
 AC_CONFIG_FILES([Makefile])

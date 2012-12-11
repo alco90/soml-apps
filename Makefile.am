@@ -60,6 +60,54 @@ pkg-deb: $(PKG_DEB_BUILD_DIR)/$(distdir)/debian/rules
 	cd $(PKG_DEB_BUILD_DIR)/$(distdir)/; $(DPKG_BUILDPACKAGE) $(DPKG_BUILDPACKAGE_FLAGS)
 endif #BUILD_DEBIAN
 
+if BUILD_RPM
+
+
+PKG_RPM_BASE_NAME=$(PACKAGE)-$(OML_ALT_VER)
+PKG_RPM_SPEC=$(PKG_RPM_BUILD_DIR)/SPECS/$(PACKAGE).spec
+PKG_RPM_BUILD_DIR=p-rpm
+
+PKG_PACKAGES+=pkg-rpm
+PKG_CLEANFILES+=$(PKG_RPM_BUILD_DIR)
+
+RPMBUILD_FLAGS=-bb --clean $(RPMBUILD_FLAGS_ADD)
+
+$(PKG_RPM_SPEC):
+	rm -rf $(PKG_RPM_BUILD_DIR)
+	mkdir -p $(PKG_RPM_BUILD_DIR)/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+	$(GIT) archive $(GITRPMREF) | $(am__untar) -C $(PKG_RPM_BUILD_DIR)/SPECS/
+if GITISTAG
+# Releases should have a valid specfile and know where to get the tarball
+#
+# Extract all defines from a SPECFILE, and reformat them into VAR=VALUE, to be
+# evaluated by the shell. Then, replace %{VAR} with ${VAR} in the Source entries
+# of the SPECFILE, and let the shell substitute these variables with their newly
+# assigned values.
+	URL=$$(eval "`sed -n "s/%define\s\+\(\S\+\)\s\+\(\S\+\)$$/\1=\2/p;/Source[0-9]*:/{s/Source[0-9]*:\s*/echo /;s/%/\$$/g;p}" $(PKG_RPM_SPEC)`"); \
+		wget -q $${URL} -O $(PKG_RPM_BUILD_DIR)/SOURCES/`basename $${URL}`
+else
+	$(MAKE) distdir=$(PKG_RPM_BUILD_DIR)/BUILD/$(PKG_RPM_BASE_NAME) distdir
+	cd $(PKG_RPM_BUILD_DIR)/BUILD/; \
+		tardir=$(PKG_RPM_BASE_NAME) && $(am__tar) | \
+		GZIP=$(GZIP_ENV) gzip -c >../SOURCES/$(PKG_RPM_BASE_NAME).tar.gz
+	mv $(PKG_RPM_SPEC) $(PKG_RPM_SPEC).orig
+	cat $(PKG_RPM_SPEC).orig | \
+		$(SED) -e "s/^%define version.*/%define version	$(OML_ALT_VER)/" \
+		-e "s/^%define pkgver.*/%define pkgver $(VERSION)/" \
+		-e "s/^%define liboml2cur.*/%define liboml2cur $(LIBOML2_LT_VER_CUR)/" \
+		-e "s/^%define liboml2rev.*/%define liboml2rev $(LIBOML2_LT_VER_REV)/" \
+		-e "s/^%define liboml2age.*/%define liboml2age $(LIBOML2_LT_VER_AGE)/" \
+		-e "s/^%define libocommcur.*/%define libocommcur $(LIBOCOMM_LT_VER_CUR)/" \
+		-e "s/^%define libocommrev.*/%define libocommrev $(LIBOCOMM_LT_VER_REV)/" \
+		-e "s/^%define libocommage.*/%define libocommage $(LIBOCOMM_LT_VER_AGE)/" \
+		> $(PKG_RPM_SPEC)
+	rm $(PKG_RPM_SPEC).orig
+endif
+
+pkg-rpm: $(PKG_RPM_SPEC)
+	$(RPMBUILD) $(RPMBUILD_FLAGS) --define "_topdir $(abs_top_builddir)/$(PKG_RPM_BUILD_DIR)" $(PKG_RPM_SPEC)
+endif #BUILD_RPM
+
 pkg-all: $(PKG_PACKAGES)
 
 pkg-clean:
