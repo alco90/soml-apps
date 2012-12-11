@@ -90,6 +90,22 @@ AC_ARG_ENABLE([packaging],
 				    AC_MSG_RESULT([$gittag])
 				   ])
 
+			     AX_WITH_PROG([MAKEPKG],[makepkg])
+			     AS_IF([test "x$MAKEPKG" != "x"],[
+				    OML_DISTRIBUTION_IS([ArchLinux],
+							[/etc/arch-release],
+							[isarch],
+							[],
+							[AC_SUBST([MAKEPKG_FLAGS_ADD],[--nodeps])])
+				    OML_GIT_SEARCH_TREEISH([ArchLinux],
+							  [gitarchref],
+							  [archlinux/$gittag,
+							   origin/archlinux/$gittag,
+							   archlinux/$gitbranch,
+							   origin/archlinux/$gitbranch,
+							   archlinux/master],
+							   [origin/archlinux/master])
+				   ])
 			     AX_WITH_PROG([DPKG_BUILDPACKAGE],[dpkg-buildpackage])
 			     AX_WITH_PROG([DCH],[dch])
 			     AS_IF([test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"],[
@@ -134,12 +150,15 @@ AC_ARG_ENABLE([packaging],
 AC_SUBST([GITBRANCH],[$gitbranch])
 AC_SUBST([GITTAG],[$gittag])
 AC_SUBST([GITHEAD],[$githead])
+AC_SUBST([GITARCHREF],[$gitarchref])
 AC_SUBST([GITDEBREF],[$gitdebref])
 AC_SUBST([GITRPMREF],[$gitrpmref])
 AM_CONDITIONAL([ENABLE_PACKAGING], [test "x$enable_packaging" != "xno" && test "x$enable_packaging" != "xpartial"])
 AM_CONDITIONAL([GITISTAG], [test "x$gitistag" != "xno"])
+AM_CONDITIONAL([BUILD_ARCH], [test "x$MAKEPKG" != "x"])
 AM_CONDITIONAL([BUILD_DEBIAN], [test "x$DPKG_BUILDPACKAGE" != "x" -a "x$DCH" != "x"])
 AM_CONDITIONAL([BUILD_RPM], [test "x$RPMBUILD" != "x"])
+AM_CONDITIONAL([IS_ARCH], [test "x$isarch" != "x"])
 AM_CONDITIONAL([IS_DEBIAN], [test "x$isdebian" != "x"])
 AM_CONDITIONAL([IS_REDHAT], [test "x$isredhat" != "x"])
 
