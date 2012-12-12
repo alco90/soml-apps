@@ -8,6 +8,7 @@
  * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2009
  * Author: Jolyon White  <jolyon.white@nicta.com.au>, (C) 2010
  * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2012
+ * Author: François Hoguet  <françois.hoguet@nicta.com.au>, (C) 2012
  *
  * Copyright (c) 2007-2012 National ICT Australia (NICTA)
  *
@@ -106,6 +107,52 @@ trace_oml_inject_udp(oml_mps_t* oml_mps, libtrace_udp_t* udp, libtrace_packet_t 
         time_now);
 }
 
+static void
+trace_oml_inject_ip6(oml_mps_t* oml_mps, libtrace_ip6_t* ip6,
+               double time_now, uint64_t pktid)
+{
+    char buf_addr_src[INET6_ADDRSTRLEN];
+    char buf_addr_dst[INET6_ADDRSTRLEN];
+    char addr_src[INET6_ADDRSTRLEN];
+    char addr_dst[INET6_ADDRSTRLEN];
+
+    inet_ntop(AF_INET6, &(ip6->ip_src), buf_addr_src, INET6_ADDRSTRLEN);
+    inet_ntop(AF_INET6, &(ip6->ip_dst), buf_addr_dst, INET6_ADDRSTRLEN);
+    strcpy(addr_src,buf_addr_src);
+    strcpy(addr_dst,buf_addr_dst);
+
+    oml_inject_ip6(oml_mps->ip6,
+        pktid,
+        addr_src,
+        addr_dst,
+        time_now);
+}
+
+static void
+trace_oml_inject_ip6_mh(oml_mps_t* oml_mps, char* type, uint64_t pktid,
+    uint16_t sequ_nb, struct timeval tv, char* data)
+{
+    oml_inject_ip6_mh(oml_mps->ip6_mh,
+        pktid,
+        type,
+        sequ_nb,
+        tv.tv_sec,
+        tv.tv_usec,
+        data);
+}
+
+static void
+trace_oml_inject_icmp6(oml_mps_t* oml_mps, uint64_t pktid, uint8_t type,
+                  uint16_t sequ_nb, struct timeval tv)
+{
+    oml_inject_icmp6(oml_mps->icmp6,
+        pktid,
+        type,
+        sequ_nb,
+        tv.tv_sec,
+        tv.tv_usec);
+}
+
 void
 mac_to_s (uint8_t *mac, char *s, int n)
 {
@@ -185,6 +232,12 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
   void*                 payload;
   void*                 linkptr;
   libtrace_linktype_t   linktype;
+  uint8_t              hdr_type; // determine type of mobility header
+  uint8_t               hdr_len;  // length of header in decimal
+  void*                 hdr;      // point at the beginning of the header
+  uint8_t*              hdr_next; // code of next header
+  uint16_t              mh_sequ_nb; // sequence nb of mobility header
+
   last_ts = trace_get_seconds(packet);
   //  size_t size_of_packet = 0;
   struct timeval tv = trace_get_timeval(packet);
@@ -206,7 +259,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
 
   /* Get the UDP/TCP/ICMP header from the IPv4/IPv6 packet */
   switch (ethertype) {
-  case 0x0800: {
+  case 0x0800: /* IPv4 */ {
     libtrace_ip_t* ip = (libtrace_ip_t*)l3;
     transport = trace_get_payload_from_ip(ip, &proto, &remaining);
     trace_oml_inject_ip(oml_mps, ip, packet, now, pktid);
@@ -214,17 +267,98 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
     if (!transport) return;
     break;
   }
-  case 0x86DD:
-    transport = trace_get_payload_from_ip6((libtrace_ip6_t*)l3,
-                                           &proto,
-                                           &remaining);
-    if (!transport)
-      return;
+
+  case 0x86DD: /* IPv6 */ {
+    libtrace_ip6_t* ip6 = (libtrace_ip6_t*)l3;
+    int resume = 0;
+
+    /* PARSING IPV6 HEADERS TO FIND SPECIFIC MOBILITY HEADERS
+     *
+     * possible headers:  0 = 0x00 = STEP      4 = 0x04 = IPv4
+     *                   43 = 0x2b = ROUT      6 = 0x06 = TCP
+     *                   44 = 0x2c = FRAG     17 = 0x11 = UDP
+     *                   50 = 0x32 = PRIV     41 = 0x29 = IPv6
+     *                   51 = 0x33 = AUTH     58 = 0x3a = ICMP6
+     *                   59 = 0x3b = NOMORE  132 = 0x84 = SCTP
+     *                   60 = 0x3c = DSTOPT  136 = 0x88 = UDP lite
+     *                  135 = 0x87 = MOBIL
+     *                  140 = 0x8c = SHIM6
+     * mobility header 135 -> 3rd octet values: 5=0x05=BU 6=0x06=BAck
+     */
+    hdr = l3;
+    hdr_next = (uint8_t*)(l3 + 6);
+    hdr_len = 40;
+
+    while(*hdr_next != 59 && !resume) {
+      switch(*hdr_next) { /* add your case to treat other headers XXX; doesn't libtrace know that? */
+      case 0x29:
+        /* IPv6-in-IPv6, report the current packet, then start processing the
+         * encapsulated one */
+        trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
+
+        ip6 = (libtrace_ip6_t*)hdr;
+        hdr_next = (uint8_t*)(hdr + 6);
+        hdr_len = 40;
+        hdr = (hdr + hdr_len);
+        break;
+
+      case 0x2b: /* routing header in BAck */
+        hdr = (hdr + hdr_len);
+        hdr_len = *(char*)(hdr + 1)*8 + 8;
+        /* XXX: Do something here */
+        break;
+
+      case 0x3c: /* destination option in BU */
+        hdr = (hdr + hdr_len);
+        hdr_len = *(char*)(hdr + 1)*8 + 8;
+        /* XXX: Do something here */
+        break;
+
+      case 0x87: { /* mobility header */
+        char* mhtype;
+        char  addr_coa[INET6_ADDRSTRLEN];
+
+        hdr = (hdr + hdr_len);
+        hdr_type = *(uint8_t*)(hdr + 2);
+        hdr_len = *(uint8_t*)(hdr + 1)*8 + 8;
+
+        switch(hdr_type) {
+
+        case 0x05: /* BU */
+          mhtype="BU";
+          mh_sequ_nb = htons(*(uint16_t*)(hdr + 6));
+          inet_ntop(AF_INET6, (struct in6_addr*)(hdr + 16), addr_coa, INET6_ADDRSTRLEN);
+          break;
+
+        case 0x06: /* BAck */
+          mhtype="BAck";
+          mh_sequ_nb = htons(*(uint16_t*)(hdr + 8));
+          addr_coa[0] = '\0';
+          break;
+        }
+
+        trace_oml_inject_ip6_mh(oml_mps, mhtype, pktid, mh_sequ_nb, tv, addr_coa);
+        break;
+      }
+
+      default:
+                 resume = 1; /* Not a header we know, resume normal processing */
+                 break;
+      }
+      hdr_next = (uint8_t*)(hdr);
+    }
+
+    transport = trace_get_payload_from_ip6(ip6, &proto, &remaining);
+    trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
+    if (!transport) return;
 
     break;
+  }
+
   default:
     return;
   }
+
   /* Parse the udp/tcp/icmp payload */
   switch(proto) {
   case 1:
@@ -245,6 +379,14 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
     if (!payload)
       return;
     break;
+  }
+  case 0x3a: /* ICMP6 */ { /* XXX; doesn't libtrace know that? */
+    hdr = (hdr + hdr_len);
+    uint8_t icmp_type = *(uint8_t*)hdr;
+    if(icmp_type == 128 || icmp_type == 129) { // only report ping
+      uint16_t icmp_sequ_nb = htons(*(uint16_t*)(hdr + 6));
+      trace_oml_inject_icmp6(oml_mps, pktid, icmp_type, icmp_sequ_nb, tv);
+    }
   }
   default:
     return;

@@ -78,6 +78,30 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('udp_ts',       :double, ' timestamp of the measurement')
   end
 
+  a.defMeasurement("ip6") do |m|
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('ip6_src',      :string, ' Source Address')
+    m.defMetric('ip6_dst',      :string, ' Destination Address')
+    m.defMetric('ip6_ts',       :double, ' timestamp of the measurement')
+  end
+
+  a.defMeasurement("ip6_mh") do |m|
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('mh_type',      :string, ' BU or BAck')
+    m.defMetric('sequ_nb',      :uint32, ' binding sequence number')
+    m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
+    m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
+    m.defMetric('payload',      :string, ' CoA for BU, nothing for BAck')
+  end
+
+  a.defMeasurement("icmp6") do |m|
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('type',         :uint32, ' ICMP type')
+    m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
+    m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
+    m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
+  end
+
   a.path = "@bindir@/trace-oml2"
 end
 
