@@ -1,0 +1,109 @@
+#!/usr/bin/ruby
+#
+# OML4R wrapper for ping
+#
+# This application runs the system ping, parses its output and reports the
+# measurements via OML
+#
+# Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2012
+# Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
+#
+# Copyright (c) 2012 National ICT Australia (NICTA)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+require 'rubygems'
+require 'oml4r'
+
+class MPStat < OML4R::MPBase
+  name :ping
+  param :dest_addr, :type => :string
+  param :ttl, :type => :uint32
+  param :rtt, :type => :double
+  param :rtt_unit, :type => :string
+end
+
+class PingWrapper
+
+  def initialize(args)
+    @addr = nil
+    @count = 0
+    @interval = 1
+    @verbose = 1
+
+    OML4R::init(args, :appName => 'ping') do |argParser|
+      argParser.banner = "Runs the system ping and reports measurements via OML\n Use -h or --help for a list of options\n\n"
+      argParser.on("-a","--dest_addr ADDRESS","Address to ping") { |address| @addr = address.to_s() }
+      argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = count.to_i()}
+      argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = interval.to_i()}
+      argParser.on("-q","--quiet ","Don't show ping output on the console"){ @verbose = 0}
+    end
+
+    unless @addr != nil
+      raise "ERROR	You did not specify an address to ping! (-a option)"
+    end
+  end
+
+  def process_output(output)
+    lines = output.split("\n")
+    row=lines[1]
+    column = row.split(" ")
+    column[3].delete!(":")
+    ttl=column[5].split('=')
+    rtt=column[6].split('=')
+
+    if @verbose
+      puts row
+    end
+
+    MPStat.inject(column[3], ttl[1], rtt[1], column[7])
+  end
+
+  def ping()
+    output = `/bin/ping -n -c 1 #{@addr}`
+    process_output(output)
+    sleep @interval
+  end
+
+  def start()
+    if @count != 0
+      (1..@count).each{
+	ping
+      }
+    else
+      loop {ping}
+    end
+  end
+
+end #end of class
+
+begin
+  $stderr.puts "INFO\t@PACKAGE@ @VERSION@\n"
+  app = PingWrapper.new(ARGV)
+  app.start()
+rescue Interrupt
+rescue Exception => ex
+  puts "ERROR	#{ex}\n"
+end
+
+# Local Variables:
+# mode:ruby
+# End:
+# vim: ft=ruby:sw=2
