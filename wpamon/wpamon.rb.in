@@ -30,6 +30,10 @@ This application connect to wpa_supplicant's control socket and reports Wi-Fi ev
 
   a.defProperty('interface', 'Wireless interface to monitor', ?i,
         :type => :string, :impl => { :var_name => 'interface' })
+  a.defProperty('ctrl_interface', "Path to wpa_supplicant's ctrl_interface socket", ?C,
+        :type => :string, :impl => { :var_name => 'ctrl_interface' })
+  a.defProperty('socket', 'Path to local socket', ?S,
+        :type => :string, :impl => { :var_name => 'local_path' })
 
   a.defMeasurement("network_event") do |m|
     m.defMetric('event', 'string')

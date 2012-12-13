@@ -88,6 +88,23 @@ int main(int argc, const char *argv[]) {
   poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
   while (poptGetNextOpt(optCon) > 0);
 
+  if (g_opts_storage.local_path) {
+    if (g_opts_storage.interface)
+      fprintf(stderr, "WARN\t both --interface (%s) and --socket (%s) were specified; using the latter\n",
+          g_opts_storage.interface, g_opts_storage.local_path);
+    strncpy(local_path, g_opts_storage.local_path, UNIX_PATH_MAX);
+  } else {
+    snprintf(local_path, sizeof(local_path), LOCAL_PATH, g_opts_storage.interface);
+  }
+  if (g_opts_storage.ctrl_interface) {
+    if (g_opts_storage.interface)
+      fprintf(stderr, "WARN\t both --interface (%s) and --ctrl_interface (%s) were specified; using the latter\n",
+          g_opts_storage.interface, g_opts_storage.ctrl_interface);
+    strncpy(sock_path, g_opts_storage.ctrl_interface, UNIX_PATH_MAX);
+  } else {
+    snprintf(sock_path, sizeof(local_path), SOCK_PATH, g_opts_storage.interface);
+  }
+
   omlc_init("wpamon", &argc, argv, NULL);
   oml_register_mps();
 
