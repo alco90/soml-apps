@@ -39,7 +39,9 @@ This package installs all the OML2 Application packages:
     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
-    * wlanconfig-oml2: record wireless lan information from wlanconfig.
+    * wlanconfig-oml2: record wireless lan information from wlanconfig;
+    * wpamon-oml2: connect to wpa_supplicant's control socket and reports Wi-Fi
+      events.
 
 %prep
 %setup -q
