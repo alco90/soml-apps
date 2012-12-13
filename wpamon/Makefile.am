@@ -29,6 +29,9 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+CLEANFILES = $(appname)_oml.h \
+	     $(appname)_popt.h
+
 MAINTAINERCLEANFILES = $(appname).rb
 
 $(appname)_popt.h: $(appname).rb
@@ -44,17 +47,5 @@ $(appname).rb: $(appname).rb.in
 		-e "s/a\.version.*/a.version($$VER)/" \
 		$< > $@
 
-installed_link_names = \
-		       $(DESTDIR)$(bindir)/`echo "$(appname)_oml2" | sed '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo "oml2-$(appname)" | sed '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo "omf_$(appname)" | sed '$(transform)'`$(EXEEXT)
-
-install-exec-hook:
-	for OLDNAME in $(installed_link_names); do \
-		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
-		$(LN_S) $(installed_name) $${OLDNAME}; \
-	done
-
 uninstall-hook:
-	rm -f $(installed_link_names)
 	rm -f $(DESTDIR)/$(pkgdatadir)/$(appname).rb
