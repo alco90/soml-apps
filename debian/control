@@ -126,3 +126,11 @@ Conflicts: oml-client, oml2-wlanconfig
 Description: Record WLAN information from wlanconfig using OML
  wlanconfig-oml2 provides WLAN information taken from the wlanconfig
  program.
+
+
+Package: wpamon-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9
+Description: Report events from wpa_supplicant using OML
+ This application connects to wpa_supplicant's control socket and reports Wi-Fi
+ events.
