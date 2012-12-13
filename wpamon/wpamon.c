@@ -29,155 +29,178 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <signal.h>
-#include <time.h>
+#include <sys/time.h>
 #include <oml2/omlc.h>
 
-#define SOCK_PATH "/var/run/wpa_supplicant/eth1"
-#define LOCAL_PATH "/tmp/awesome_socket"
-// Known MAC@
-#define HOME_MAC "00:0b:6b:0a:83:4a"
-#define FOR1_MAC "06:0b:6b:0a:83:4a"
-#define FOR2_MAC "0a:0b:6b:0a:83:4a"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__
+#endif
 
-int s;
 
-typedef struct {
-	OmlMP* network_event;
-} oml_mps_t;
+#define OML_FROM_MAIN
+#include "wpamon_oml.h"
+#define USE_OPTS
+#include "wpamon_popt.h"
 
-static OmlMPDef oml_network_event_def[] = {
-	{"event", OML_STRING_VALUE},
-	{"network", OML_STRING_VALUE},
-	{"tv_sec", OML_UINT32_VALUE},
-	{"tv_usec", OML_UINT32_VALUE},
-	{NULL, (OmlValueT)0}
-};
+#define SOCK_PATH "/var/run/wpa_supplicant/%s"
+#define LOCAL_PATH "/tmp/wpamon_%s.sock"
+#define DEFAULT_IF "wlan0"
 
-static oml_mps_t g_oml_mps_storage;
-oml_mps_t* g_oml_mps = &g_oml_mps_storage;
+#ifndef UNIX_PATH_MAX /* Could have been defined from <linux/un.h> */
+/* 108 under Linux, but only 104 for OpenBSD */
+# define UNIX_PATH_MAX 104
+#endif
 
-static void oml_register_mps() {
-	g_oml_mps->network_event = omlc_add_mp("network_event", oml_network_event_def);
-}
+int exit_loop = 0;
 
 void sigfun(int sig) {
-	printf("catching signal ctrl+c, will quit\n");
-	close(s);
-	if(remove(LOCAL_PATH) == -1) {
-		perror("Error removing socket file");
-	}
-	printf("Socket closed\n");
-	omlc_close();
-	exit(0);
+  fprintf(stderr, "INFO\tCaught signal %d, exiting...\n", sig);
+  exit_loop = 1;
 }
 
-int main(int argc, char *argv[]) {
-    int t, len, loclen;
-    struct sockaddr_un local, remote;
-    char str[100], temp[100] = "\0";
-	char *found;
-	char* OMLevent;
-	char* OMLnetwork = "homenet";
-	OmlValueU v_network_event[4];
-	struct timeval tv;
+int main(int argc, const char *argv[]) {
+  int s;
+  int t, len;
+  struct sockaddr_un local, remote;
+  char local_path[UNIX_PATH_MAX];
+  char sock_path[UNIX_PATH_MAX];
+  char str[100], temp[100] = "\0";
+  char *saveptr, *event, *bssid;
+  struct sigaction new_action, old_action;
+  struct timeval tv;
 
-	//(void) signal(SIGINT, sigfun);
+  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
 
-	// just for fun
-	printf("+-------------------------------------+\n");
-	printf("| Welcome to the OML spy and reporter |\n");
-	printf("|     Featuring : wpa_supplicant      |\n");
-	printf("+-------------------------------------+\n\n");
+  /* FIXME: Initialisation should be done by scaffold */
+  g_opts_storage.interface = DEFAULT_IF;
+  g_opts_storage.ctrl_interface = NULL;
+  g_opts_storage.local_path = NULL;
 
-	omlc_init("wpa_suppl", &argc, argv, NULL);
-	oml_register_mps();
-	omlc_start();
+  poptContext optCon = poptGetContext(NULL, argc, argv, options, 0);
+  while (poptGetNextOpt(optCon) > 0);
 
-	(void) signal(SIGINT, sigfun);
+  omlc_init("wpamon", &argc, argv, NULL);
+  oml_register_mps();
 
-    if ((s = socket(PF_UNIX, SOCK_DGRAM, 0)) == -1) {
-        perror("socket");
-        exit(1);
-    }
+  if ((s = socket(PF_UNIX, SOCK_DGRAM, 0)) == -1) {
+    fprintf(stderr, "ERROR\tCould not create socket: %s\n", strerror(errno));
+    exit_loop = 2;
+    goto cleanup_socket;
+  }
 
-    local.sun_family = AF_UNIX;
-    strcpy(local.sun_path, LOCAL_PATH);
-    loclen = strlen(local.sun_path) + sizeof(local.sun_family);
-    if(bind(s, (struct sockaddr *) &local, sizeof(local)) < 0) {
-	perror("bind");
-	exit(1);
-    }
+  local.sun_family = AF_UNIX;
+  strcpy(local.sun_path, local_path);
+  if(bind(s, (struct sockaddr *) &local, sizeof(local)) < 0) {
+    fprintf(stderr, "ERROR\tCould not bind socket to '%s': %s\n", local_path, strerror(errno));
+    exit_loop = 2;
+    goto cleanup_socket;
+  }
 
-    printf("Trying to connect...\n");
+  remote.sun_family = AF_UNIX;
+  strcpy(remote.sun_path, sock_path);
+  len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+  if (connect(s, (struct sockaddr *)&remote, len) == -1) {
+    fprintf(stderr, "ERROR\tCould not connect to wpa_supplicant socket '%s': %s\n", sock_path, strerror(errno));
+    exit_loop = 2;
+    goto cleanup_socket;
+  }
 
-    remote.sun_family = AF_UNIX;
-    strcpy(remote.sun_path, SOCK_PATH);
-    len = strlen(remote.sun_path) + sizeof(remote.sun_family);
-    if (connect(s, (struct sockaddr *)&remote, len) == -1) {
-        perror("connect");
-        exit(1);
-    }
-    
-    if(send(s, "ATTACH", 6, 0) < 0) {
-	printf("erorr in send\n");
-    }
+  if(send(s, "ATTACH", 6, 0) < 0) {
+    fprintf(stderr, "ERROR\tCould not send 'ATTACH' command to wpa_supplicant: %s\n", strerror(errno));
+    exit_loop = 3;
+    goto cleanup_socket;
+  }
+  fprintf(stderr, "INFO\tAttached to wpa_supplicant socket '%s'\n", sock_path);
 
-    printf("Connected.\n");
+  new_action.sa_handler = sigfun;
+  sigemptyset (&new_action.sa_mask);
+  new_action.sa_flags = 0;
 
-    for(;;) {
-        if ((t=recv(s, str, 100, 0)) > 0) {
-			gettimeofday(&tv, NULL);
-            str[t] = '\0';
-			if(strcmp(temp, str) != 0) {
-				// Detection disctonnect event
-				found = strstr(str, "EVENT-DISCONNECTED");
-				if(found != NULL) {
-					printf("**** Found DISCONNECTED EVENT ****\n");
-					omlc_set_string(v_network_event[0], "Disconnected");
-					omlc_set_string(v_network_event[1], OMLnetwork);
-					omlc_set_uint32(v_network_event[2], tv.tv_sec);
-					omlc_set_uint32(v_network_event[3], tv.tv_usec);
-					omlc_inject(g_oml_mps->network_event, v_network_event);
-					printf("<3 <3 <3 OML Inject Done <3 <3 <3\n");
-				}
-				// Detection connect event
-				found = strstr(str, "EVENT-CONNECTED");
-				if(found != NULL) {
-					printf("**** Found CONNECTED EVENT ****\n");
-					omlc_set_string(v_network_event[0], "Connected");
-					if(strstr(str, HOME_MAC) != NULL) {
-						OMLnetwork = "homenet";
-					} else if(strstr(str, FOR1_MAC) != NULL) {
-						OMLnetwork = "theone";
-					} else if(strstr(str, FOR2_MAC) != NULL) {
-						OMLnetwork = "thetwo";
-					} else {
-						OMLnetwork = "Unknown";
-					} 
-					omlc_set_string(v_network_event[1], OMLnetwork);
-					omlc_set_uint32(v_network_event[2], tv.tv_sec);
-					omlc_set_uint32(v_network_event[3], tv.tv_usec);
-					omlc_inject(g_oml_mps->network_event, v_network_event);
-					printf("<3 <3 <3 OML Inject Done <3 <3 <3\n");
-				}
-			}
-			strcpy(temp, str);
-        } else {
-	    printf("Nothing recieved\n");
-            if (t < 0) perror("recv");
-            else printf("Server closed connection\n");
-            exit(1);
+  omlc_start();
+
+  /* Replace OML's handling of SIGINT.
+   * It's ok as we call omlc_close() ourselves */
+  sigaction (SIGINT, NULL, &old_action);
+  if (old_action.sa_handler != SIG_IGN)
+    sigaction (SIGINT, &new_action, NULL);
+
+  fprintf(stdout, "event,bssid,full_string\n");
+  while(!exit_loop) {
+    if ( (t=recv(s, str, sizeof(str), 0)) > 0) {
+      gettimeofday(&tv, NULL);
+      str[t] = '\0';
+      if(strcmp(temp, str)) { /* Avoid duplicate messages */
+        strcpy(temp, str); /* Prepare to fiddle */
+        /* XXX: This is not very robust parsing... */
+        strtok_r(temp, "> ", &saveptr);
+        event = strtok_r(NULL, " ", &saveptr);
+        if(!event) continue;
+
+        if(!strncmp(event, "CTRL-EVENT-", 11)) {
+          bssid = NULL;
+          if(!strncmp(event+11, "CONNECTED", 9)) {
+            /* CTRL-EVENT-CONNECTED - Connection to 00:14:bf:0c:e7:a4 completed (reauth) [id=9 id_str=dd-wrt] */
+            bssid = strtok_r(NULL, " ", &saveptr); /* - */
+            bssid = strtok_r(NULL, " ", &saveptr); /* Connection */
+            bssid = strtok_r(NULL, " ", &saveptr); /* to */
+            bssid = strtok_r(NULL, " ", &saveptr);
+
+          } else if(!strncmp(event+11, "DISCONNECTED", 12)) {
+            /* CTRL-EVENT-DISCONNECTED bssid=00:14:bf:0c:e7:a4 reason=3 */
+            bssid = strtok_r(NULL, "= ", &saveptr); /* bssid */
+            bssid = strtok_r(NULL, "= ", &saveptr);
+
+          } else if(!strncmp(event+11, "BSS-ADDED", 9) || !strncmp(event+11, "BSS-REMOVED", 11) ) {
+            /* CTRL-EVENT-BSS-ADDED 219 00:22:55:ee:b2:91
+             * CTRL-EVENT-BSS-REMOVED 212 00:60:64:6c:82:f6 */
+            bssid = strtok_r(NULL, " ", &saveptr); /* entry id */
+            bssid = strtok_r(NULL, " ", &saveptr);
+          } else if(!strncmp(event+11, "SCAN-RESULTS", 12)) {
+            /* Skip this one */
+            event = NULL;
+          }
+
+          if(event) {
+            if(!bssid) bssid = "";
+            fprintf(stdout, "%s,%s,%s\n", event, bssid, str+3);
+            oml_inject_network_event(g_oml_mps_wpamon->network_event, event, bssid, str, tv.tv_sec, tv.tv_usec);
+          }
         }
+        strcpy(temp, str); /* Prepare to avoid duplicate messages */
+      }
+    } else if (t < 0) {
+      fprintf(stderr, "ERROR\tCould not receive anything from wpa_supplicant: %s\n", strerror(errno));
+      exit_loop = 4;
+    } else {
+      fprintf(stderr, "INFO\tServer closed connection\n");
+      exit_loop = 1;
     }
+  }
 
-    close(s);
-	omlc_close();
+  omlc_close();
 
-    return 0;
+cleanup_socket:
+  close(s);
+  if(remove(local_path) == -1) {
+    fprintf(stderr, "ERROR\tCould not connect remove socket '%s': %s\n", local_path, strerror(errno));
+  }
+  exit(exit_loop - 1);
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/
