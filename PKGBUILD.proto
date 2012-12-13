@@ -15,7 +15,8 @@ license=('custom:MIT-Nicta')
 depends=('oml2')
 optdepends=('gpsd: for gpslogger'
 'libsigar: for nmetrics'
-'libtrace: for trace')
+'libtrace: for trace'
+'wpa_supplicant: for wpamon')
 makedepends=('git')
 source=(
 #<!GIT
