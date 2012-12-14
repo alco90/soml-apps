@@ -37,6 +37,7 @@ This package installs all the OML2 Application packages:
     * iperf-oml2: iperf with OML2 measurement recording;
     * nmetrics-oml2: node metrics using libsigar;
     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
+    * ping-oml2: a simple OML4R wrapper around the system ping tool;
     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
     * wlanconfig-oml2: record wireless lan information from wlanconfig;
@@ -61,3 +62,8 @@ rm -rf %{buildroot}
 %{_bindir}/*
 /usr/lib/*
 /usr/share/*
+
+%post
+echo "Trying to install the OML4R gem..." >&2
+/usr/bin/gem install oml4r || \
+        echo "Could not install the oml4r gem; ping-oml2 will not be usable until you do so manually (maybe after installing the rubygems package)" >&2
