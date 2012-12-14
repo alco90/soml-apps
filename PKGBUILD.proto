@@ -14,10 +14,13 @@ url="http://omlapp.mytestbed.net/"
 license=('custom:MIT-Nicta')
 depends=('oml2')
 optdepends=('gpsd: for gpslogger'
+'iputils: for ping'
 'libsigar: for nmetrics'
 'libtrace: for trace'
+'ruby: for ping'
 'wpa_supplicant: for wpamon')
 makedepends=('git')
+install='oml2-apps.install'
 source=(
 #<!GIT
 	http://oml.mytestbed.net/attachments/download/${_redmineid}/oml2-apps-${pkgver}.tar.gz
