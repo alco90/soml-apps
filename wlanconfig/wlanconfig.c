@@ -70,6 +70,8 @@ main(int argc, const char *argv[])
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
+  omlc_zero_array(v, 4);
+
   fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
 
   /* Get basename */
@@ -170,7 +172,7 @@ main(int argc, const char *argv[])
 	  scanf ("%s", command); /* DBM */
 	  omlc_set_int32(v[2], atol(command));
 
-	  omlc_set_const_string(v[3], macAddress);
+	  omlc_set_string(v[3], macAddress);
 
 	  omlc_inject(oml_mp, v);
 	}
@@ -189,6 +191,8 @@ main(int argc, const char *argv[])
     }
     sleep(1);
   }
+
+  omlc_reset_string(v[3]);
 
   omlc_close();
 
