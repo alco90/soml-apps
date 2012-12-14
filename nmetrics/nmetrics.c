@@ -35,14 +35,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sigar.h>
+#include <oml2/omlc.h>
 
-#define USE_OPTS
-#include "nmetrics_popt.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__
+#endif
 
 #define OML_FROM_MAIN
 #include "nmetrics_oml.h"
-
-#include <sigar.h>
+#define USE_OPTS
+#include "nmetrics_popt.h"
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
@@ -170,6 +175,8 @@ main(
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
+  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+
   /* Get basename */
   p2 = strtok(p, "/");
   while(p2) {
@@ -181,13 +188,13 @@ main(
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "nmetrics_oml2", MIN(l,13))) {
 	  fprintf(stderr,
-              "warning: binary name `%s' is deprecated and will disappear with OML 2.9.0, please use `nmetrics-oml2' instead\n", p);
+              "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `nmetrics-oml2' instead\n", p);
   }
   free(progname);
 
   omlc_init("nmetrics", &argc, argv, NULL);
   if (result == -1) {
-    fprintf (stderr, "error: could not initialise OML\n");
+    fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);
   }
 
@@ -202,7 +209,7 @@ main(
       im->next = first;
       first = im;
 
-      printf("IF: %s\n", g_opts->if_name);
+      fprintf(stderr, "INFO\tMonitoring interface %s\n", g_opts->if_name);
       break;
     }
     }

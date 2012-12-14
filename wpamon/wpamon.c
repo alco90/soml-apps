@@ -45,7 +45,6 @@
 # define PACKAGE_STRING __FILE__
 #endif
 
-
 #define OML_FROM_MAIN
 #include "wpamon_oml.h"
 #define USE_OPTS

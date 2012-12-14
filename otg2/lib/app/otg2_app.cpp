@@ -13,7 +13,7 @@ using namespace std;
 #define MAX_INPUT_SIZE 256
 
 OTG::OTG(
-  int argc, 
+  int argc,
   const char* argv[],
   const char* senderName,
   const char* sourceName,
@@ -24,7 +24,6 @@ OTG::OTG(
 {
   sender_name_ = senderName == NULL ? Port::getDefOutPortName() : senderName;
   source_name_ = sourceName == NULL ? Generator::getDefGeneratorName() : sourceName;
-  
   setSenderInfo("protocol", 'p', "Protocol to use to send packet", Port::listOutPorts());
   setSourceInfo("generator", 'g', "Generator producing packets", Generator::listGenerators());
 
@@ -38,14 +37,14 @@ OTG::getComponentOptions(
   const struct poptOption* opts= NULL;
   ISource* gen;
   Sender*      port;
-  
+
   if ((gen = createSource(component_name)) != NULL) {
     opts = gen->getConfigurable()->getOptions();
-    cout << "Options for generator '" << component_name << "'." << endl
+    cerr << "Options for generator '" << component_name << "'." << endl
         <<endl;
   } else if ((port = createSender(component_name)) != NULL) {
     opts = port->getConfigurable()->getOptions();
-    cout << "Options for port '" << component_name << "'." << endl <<endl;
+    cerr << "Options for port '" << component_name << "'." << endl <<endl;
   }
   return opts;
 }

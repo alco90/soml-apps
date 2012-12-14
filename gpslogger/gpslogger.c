@@ -39,6 +39,13 @@
 #include <errno.h>
 #include <gps.h>
 #include <oml2/omlc.h>
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__
+#endif
+
 #define OML_FROM_MAIN
 #include "gpslogger_oml.h"
 static time_t int_time, old_int_time;
@@ -128,7 +135,7 @@ static int socket_mainloop(void)
 #if GPSD_API_MAJOR_VERSION >= 5
   gpsdata = malloc(sizeof(struct gps_data_t));
   if (!gpsdata) {
-    fprintf(stderr, "error: cannot allocate memory for gpsdata structure\n");
+    fprintf(stderr, "ERROR\tCannot allocate memory for gpsdata structure: %s\n", strerror(errno));
     exit(1);
   }
   gps_open(source.server, source.port, gpsdata);
@@ -137,8 +144,8 @@ static int socket_mainloop(void)
 #endif
   if (!gpsdata) {
     fprintf(stderr,
-        "error: no gpsd running or network error: %d, %s\n",
-        errno, gps_errstr(errno));
+        "ERROR\tNo gpsd running or network error: %s (%d)\n",
+        gps_errstr(errno), errno);
     exit(1);
   }
 
@@ -159,7 +166,7 @@ static int socket_mainloop(void)
     data = select(gpsdata->gps_fd + 1, &fds, NULL, NULL, &tv);
 
     if (data == -1) {
-      (void)fprintf(stderr,"error: %s\n", strerror(errno));
+      (void)fprintf(stderr,"ERROR\tDid not receive data from gpsd: %s\n", strerror(errno));
       break;
     }
     else if (data) {
@@ -189,6 +196,8 @@ int main (int argc, const char **argv)
   char *progname=strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
+  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+
   /* Get basename */
   p2 = strtok(p, "/");
   while(p2) {
@@ -200,13 +209,13 @@ int main (int argc, const char **argv)
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "gpslogger_oml2", MIN(l,13))) {
     fprintf(stderr,
-        "warning: binary name `%s' is deprecated and will disappear with OML 2.9.0, please use `gpslogger-oml2' instead\n", p);
+        "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `gpslogger-oml2' instead\n", p);
   }
   free(progname);
 
   result = omlc_init ("gpslogger", &argc, argv, NULL);
   if (result == -1) {
-    fprintf (stderr, "error: could not initialise OML\n");
+    fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);
   }
 

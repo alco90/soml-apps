@@ -6,14 +6,14 @@
 using namespace std;
 
 Address::Address():port_(-1)
-{   
-  hostname_[0] = '\0';  
+{
+  hostname_[0] = '\0';
   macaddr_[0] = '\0';
 }
 
 Address::Address(char* hostname, short port)
-{ 
-   setPort(port); 
+{
+   setPort(port);
    setHostname(hostname);
 }
 
@@ -24,7 +24,7 @@ Address::Address(char* hostname, short port)
  * - there are no other charcter except colon
  */
 void Address::setHWAddrFromColonFormat(const char* colonmac)
-{  
+{
   char HexChar;
   //First verify the address
   int Count  = 0;
@@ -35,14 +35,14 @@ void Address::setHWAddrFromColonFormat(const char* colonmac)
     { /* Scan string for first non-hex character.  Also stop scanning at end
          of string (HexChar == 0), or when out of six binary storage space */
       HexChar = (char)colonmac[Count++];
-      if (HexChar == ':') continue;     
+      if (HexChar == ':') continue;
       if (HexChar > 0x39) HexChar = HexChar | 0x20;  /* Convert upper case to lower */
       if ( (HexChar == 0x00) || num_mac_char  >= (MAC_ADDR_LENGTH * 2) ||
            (!(((HexChar >= 0x30) && (HexChar <= 0x39))||  /* 0 - 9 */
-             ((HexChar >= 0x61) && (HexChar <= 0x66))) ) ) /* a - f */ 
+             ((HexChar >= 0x61) && (HexChar <= 0x66))) ) ) /* a - f */
 	{
 	  error_end = true;
-	} else 
+	} else
             num_mac_char++;
     }
   if (num_mac_char != MAC_ADDR_LENGTH * 2 )
@@ -71,10 +71,10 @@ void Address::setHWAddrFromColonFormat(const char* colonmac)
 	  mac_byte_num++;
         }
 
-    }  
+    }
 
   return;
-   
+
 }
 
 
@@ -87,7 +87,7 @@ char *Address::convertHWAddrToColonFormat()
   //printf("HW Address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",u[0], u[1], u[2], u[3], u[4], u[5]);
   sprintf(colonformat,"%02X:%02X:%02X:%02X:%02X:%02X",
           macaddr_[0],macaddr_[1],macaddr_[2],macaddr_[3],macaddr_[4],macaddr_[5]);
-  // cout << colonformat << endl;
+  // cerr << "DEBUG\t" << colonformat << endl;
   return colonformat;
 
 }

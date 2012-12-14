@@ -20,12 +20,10 @@ UDPOutPort::UDPOutPort()
 
 {
 
-  //cout << "creation of udp_out"<< endl;
+  //cerr << "DEBUG\tCreation of udp_out"<< endl;
 #ifdef WITH_OML
-  //cout << "creation MP"<< endl;
-
+  //cerr << "DEBUG\tRegistering MPs"<< endl;
   oml_register_mps();
-  //oml_mp = omlc_add_mp("udp_out",  oml_def);
 #endif
 }
 
@@ -104,7 +102,7 @@ UDPOutPort::sendPacket(Packet* pkt)
   gettimeofday(&tv, NULL);
   double now = tv.tv_sec - timestamp + 0.000001 * tv.tv_usec;
 
- // cout << timestamp << endl;
+ // cerr << "DEBUG\t" << timestamp << endl;
   pkt->stampPacket(0x01);
   pkt->stampShortVal(pkt->getFlowId());
   pkt->stampLongVal(pkt->getSequenceNum());

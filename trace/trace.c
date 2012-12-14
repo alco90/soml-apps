@@ -36,12 +36,18 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <oml2/omlc.h>
 
-#define USE_OPTS
-#include "trace_popt.h"
-#include <netinet/in.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__
+#endif
+
 #define OML_FROM_MAIN
 #include "trace_oml.h"
+#define USE_OPTS
+#include "trace_popt.h"
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
@@ -398,7 +404,7 @@ void iferr(libtrace_t *trace)
   libtrace_err_t err = trace_get_err(trace);
   if (err.err_num==0)
     return;
-  printf("error: %s\n",err.problem);
+  fprintf(stderr,"ERROR\tlibtrace reports: %s\n", err.problem);
   exit(1);
 }
 
@@ -415,28 +421,28 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 
   trace = trace_create(opts->interface);
   if (trace_is_err(trace)) {
-    trace_perror(trace,"error opening trace file ");
+    trace_perror(trace, "ERROR\tCannot open trace file ");
     return 1;
   }
 
   if (opts->snaplen > 0) {
     if (trace_config(trace, TRACE_OPTION_SNAPLEN, &opts->snaplen)) {
-      trace_perror(trace, "ignoring ");
+      trace_perror(trace, "WARN\tCannot set snaplen");
     }
   }
 
   if (opts->filter) {
     filter = trace_create_filter(opts->filter);
-    printf("info: filter is `%s' \n", opts->filter);
+    fprintf(stderr,"INFO\tfilter is `%s' \n", opts->filter);
     if (trace_config(trace, TRACE_OPTION_FILTER, filter)) {
-      trace_perror(trace, "ignoring ");
+      trace_perror(trace, "WARN\tCannot set filter");
     }
     iferr(trace);
   }
 
   if (opts->promisc) {
     if (trace_config(trace, TRACE_OPTION_PROMISC, &opts->promisc)) {
-      trace_perror(trace, "ignoring ");
+      trace_perror(trace, "WARN\tCannot set interface in PROMISC mode");
     }
   }
   if (trace_start(trace)==-1) {
@@ -450,7 +456,7 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 
   trace_destroy_packet(packet);
   if (trace_is_err(trace)) {
-    trace_perror(trace, "error reading packets ");
+      trace_perror(trace, "ERROR\tCannot capture packets");
   }
   trace_destroy(trace);
 
@@ -466,6 +472,8 @@ main(int argc, const char *argv[])
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
+  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+
   /* Get basename */
   p2 = strtok(p, "/");
   while(p2) {
@@ -477,13 +485,13 @@ main(int argc, const char *argv[])
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "trace_oml2", MIN(l,13))) {
 	  fprintf(stderr,
-              "warning: binary name `%s' is deprecated and will disappear with OML 2.9.0, please use `trace-oml2' instead\n", p);
+              "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `trace-oml2' instead\n", p);
   }
   free(progname);
 
   omlc_init("trace", &argc, argv, NULL);
   if (result == -1) {
-    fprintf (stderr, "error: could not initialise OML\n");
+    fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);
   }
 
@@ -493,7 +501,7 @@ main(int argc, const char *argv[])
   while ((c = poptGetNextOpt(optCon)) > 0) {}
 
   if (g_opts->interface == NULL) {
-    fprintf(stderr, "error: missing interface\n");
+    fprintf(stderr, "ERROR\tMissing interface (use -i)\n");
     return 1;
   }
 
@@ -503,8 +511,8 @@ main(int argc, const char *argv[])
 
     radio_dev_type = fopen(radiotap_dev,"rb");
     if(radio_dev_type == NULL){
-      fprintf(stderr, "warning: You need to enable radiotap by setting value `803' in `%s'. "
-             "Radiotap measurements are disabled for this run.\n", radiotap_dev);
+      fprintf(stderr, "WARN\tYou need to enable radiotap by setting value `803' in `%s'.\n"
+             "INFO\tRadiotap measurements are disabled for this run.\n", radiotap_dev);
       g_opts->radiotap = 0;
     }
   }

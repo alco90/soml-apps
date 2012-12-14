@@ -23,20 +23,20 @@ using namespace std;
 #define STDIN 0
 #define MAX_INPUT_SIZE 256
 
-static struct poptOption 
+static struct poptOption
 phase1[] = {
   { "help", 'h', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, NULL, HELP_FLAG, "Show help", "[component]"},
-  { "usage", '\0', POPT_ARG_NONE, NULL, USAGE_FLAG, "Display brief use message"},     
+  { "usage", '\0', POPT_ARG_NONE, NULL, USAGE_FLAG, "Display brief use message"},
   { "sender", '\0', POPT_ARG_STRING, NULL, 0},
   { "source", '\0', POPT_ARG_STRING, NULL, 0},
-  { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},  
+  { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
   { "debug-level", 'd', POPT_ARG_INT, NULL, 0, "Debug level - error:-2 .. debug:1-3"},
   { "logfile", 'l', POPT_ARG_STRING, NULL, 0, "File to log to"},
   { "version", 'v', 0, 0, VERSION_FLAG, "Print version information and exit" },
   { NULL, 0, 0, NULL, 0 }
 };
 
-static struct poptOption 
+static struct poptOption
 phase2[] = {
     { "help", 'h', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, NULL, HELP_FLAG, "Show help", "[component]"},
     { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
@@ -55,21 +55,21 @@ phase2[] = {
 
 
 /**
-*  Genral structure of an OTx application
-*
-* The major purpose of this function are:
-* - handle command-line inputs, before starting the program and at run-time. 
-* - arrange wait, send, and stdin reading operations.
-*
-* It is designed as: First, parse all options in two phases.
-* After parsing the second level options, check the readiness of Source and Sender (if this is sender)
-* then initialize the port and set-up the scenario, and ready to start.
+ *  Genral structure of an OTx application
+ *
+ * The major purpose of this function are:
+ * - handle command-line inputs, before starting the program and at run-time.
+ * - arrange wait, send, and stdin reading operations.
+ *
+ * It is designed as: First, parse all options in two phases.
+ * After parsing the second level options, check the readiness of Source and Sender (if this is sender)
+ * then initialize the port and set-up the scenario, and ready to start.
 
-* Here. we are going to have multiple streams in one OTG.  
-* using multiple thread. the main thread is handling commands.
-* each stream is a seperate thread, by calling th stream_init functon, the stream is independently sending packets 
-* 
-*/
+ * Here. we are going to have multiple streams in one OTG.
+ * using multiple thread. the main thread is handling commands.
+ * each stream is a seperate thread, by calling th stream_init functon, the stream is independently sending packets
+ *
+ */
 
 Application::Application(int argc, const char * argv[], const char* defLogFile)
 {
@@ -83,23 +83,25 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   app_long_name_ = applongname == NULL ? appname : applongname;
   copyright_ = copyright == NULL ? COPYRIGHT : copyright;
 
+  o_log(O_LOG_INFO, "%s %s\n", app_long_name_, OTG2_VERSION);
+
 #ifdef WITH_OML
   omlc_init(app_name_, &argc, argv, NULL);
 #endif
 
   argc_ = argc;
   argv_ = argv;
-  //cout << "initialisation of the application \n" <<endl;
+  //cerr << "DEBUG\tInitialisation of the application" <<endl;
   clockref_ = -1;
-  
+
   component_name_ = NULL;
-  
+
   log_level_ = O_LOG_INFO;
   logfile_name_ = defLogFile;
-  
+
   stream_ = new Stream();
-  //cout << "initialisation of the application after Stream creation \n " <<endl;
-  
+  //cerr << "DEBUG\tInitialisation of the application after Stream creation" <<endl;
+
   phase1_ = phase1;
   phase1_[0].arg = &component_name_;
   phase1_[2].arg = &sender_name_;
@@ -107,16 +109,16 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   phase1_[4].arg = (void*)stream_->getOptions();
   phase1_[5].arg = &log_level_;
   phase1_[6].arg = &logfile_name_;
-  //cout << "initialisation of the application end of phase 1 \n " <<endl;
+  //cerr << "DEBUG\tInitialisation of the application end of phase 1" <<endl;
   phase2_ = phase2;
   phase2_[0].arg = &component_name_;
   phase2_[4].argDescrip = "FIXED";
   phase2_[5].arg = (void*)stream_->getOptions();
   phase2_[6].argDescrip = "FIXED";
-  phase2_[7].argDescrip = "FIXED";  
+  phase2_[7].argDescrip = "FIXED";
   phase2_[8].argDescrip = "FIXED";
-  //cout << "initialisation of the application end of phase 2 \n " <<endl;
-  
+  //cerr << "DEBUG\tInitialisation of the application end of phase 2" <<endl;
+
 }
 
 Application::~Application()
@@ -130,8 +132,8 @@ Application::~Application()
 /**
 *  Parse options for phase 1: Protocol and Generator Type
 */
-void 
-Application::parseOptionsPhase1() 
+void
+Application::parseOptionsPhase1()
 
 {
   int rc;
@@ -151,17 +153,14 @@ Application::parseOptionsPhase1()
         // ignore here
         break;
       default:
-        cout << "Unknown flag operation '" << rc << "'." << endl;
+        cerr << "ERROR\tUnknown flag operation '" << rc << "'." << endl;
         exit(-1);
     }
   }
   poptFreeContext(optCon);
   o_set_log_file((char*)logfile_name_);
   o_set_log_level(log_level_);
-  
-  o_log(O_LOG_INFO, "%s V%s\n", app_long_name_, OTG2_VERSION);
-  o_log(O_LOG_INFO, "%s\n", copyright_);
-  
+
 }
 
 void
@@ -176,7 +175,7 @@ Application::showHelp(
     // help about a component. Let's find it.
     const struct poptOption* opts= getComponentOptions(component_name);
     if (opts == NULL) {
-      cout << "Unknown component '" << component_name << "'." << endl <<endl;
+      cerr << "WARN\tUnknown component '" << component_name << "'" <<endl;
     } else {
       poptContext ctxt =
           poptGetContext(NULL, argc_, argv_, opts, POPT_CONTEXT_NO_EXEC);
@@ -191,14 +190,14 @@ Application::showHelp(
 *  in Phase I.
 */
 void
-Application::parseOptionsPhase2() 
+Application::parseOptionsPhase2()
 
 {
   int rc;
   poptContext optCon = poptGetContext(NULL, argc_, argv_, phase2_, 0);
   while ((rc = poptGetNextOpt(optCon)) >= 0);
   if (rc < -1) {
-    cerr << "ERROR: " << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
+    cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
             << " (" << poptStrerror(rc) << ")" << endl;
     poptPrintUsage(optCon, stderr, 0);
     exit(-1);
@@ -206,14 +205,14 @@ Application::parseOptionsPhase2()
 
 //  const char** leftover = poptGetArgs(optCon);
 //  if (leftover != NULL) {
-//    cerr << "ERROR: Additional argument '" << leftover[0] << "' found." << endl;
+//    cerr << "ERROR\tAdditional argument '" << leftover[0] << "' found" << endl;
 //    goto err;
 //  }
   poptFreeContext(optCon);
   return;
 }
 
-int 
+int
 Application::parseRuntimeOptions(
   char * msg
 ) {
@@ -232,7 +231,7 @@ Application::parseRuntimeOptions(
 //  char* component_name;
 //  phase2_[0].arg = &component_name;
   poptContext optCon = poptGetContext(NULL, argc, argv, phase2_, POPT_CONTEXT_KEEP_FIRST);
- 
+
   int rc;
   while ((rc = poptGetNextOpt(optCon)) > 0) {
     switch(rc) {
@@ -240,7 +239,7 @@ Application::parseRuntimeOptions(
         stream_->exitStream();
         exit(0);  //exit terminate process and all its threads
       case 2:
-        stream_->pauseStream();  
+        stream_->pauseStream();
         break;
       case 3:
         stream_->resumeStream();
@@ -254,75 +253,71 @@ Application::parseRuntimeOptions(
     }
   }
   if (rc < -1) {
-    cerr << "ERROR: " << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
+    cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
             << " (" << poptStrerror(rc) << ")" << endl;
   }
   poptFreeContext(optCon);
   dynamic_cast<IComponent*>(sender_)->update();
   dynamic_cast<IComponent*>(source_)->update();
   dynamic_cast<IComponent*>(stream_)->update();
-  return rc;  
+  return rc;
 }
 
-
-
-
-
 void
-Application::run() 
+Application::run()
 
 {
-  
+
   parseOptionsPhase1();
-  
+
   source_ = createSource(source_name_);
 
   if (source_ == NULL) {
-    cerr << "Error: Unknown source '" << source_name_ << "'." << endl;
+    cerr << "ERROR\tUnknown source '" << source_name_ << "'." << endl;
     exit(-1);
   }
-  
+
   sender_ = createSender(sender_name_);
 
   if (sender_ == NULL) {
-    cerr << "Error: Unknown sender '" << sender_name_ << "'." << endl;
+    cerr << "ERROR\tUnknown sender '" << sender_name_ << "'." << endl;
     exit(-1);
   }
-  //cout << "Sender/Source created  " <<endl;
-  
+  //cerr << "DEBUG\tSender/Source created" <<endl;
+
   phase2_[1].arg = (void*)sender_->getConfigurable()->getOptions();
   phase2_[2].arg = (void*)source_->getConfigurable()->getOptions();
   parseOptionsPhase2();
-  //cout << "Parsing phase 2 finished  " <<endl;
-  
+  //cerr << "DEBUG\tParsing phase 2 finished" <<endl;
+
   source_->getConfigurable()->init();
   sender_->getConfigurable()->init();
   stream_->setSource(source_);
   stream_->setSender(sender_);
-  
-  //cout << "Stream configured   " <<endl;
-  
-  
+
+  //cerr << "DEBUG\tStream configured" <<endl;
+
+
 #ifdef WITH_OML
   omlc_start();
 #endif
-  
+
   stream_->run();
-  
+
   int rc;
   char msg[MAX_INPUT_SIZE];
   while (1) {
     cin.getline(msg, MAX_INPUT_SIZE );
-    rc = parseRuntimeOptions(msg);    
+    rc = parseRuntimeOptions(msg);
   }
 }
 
 void
 Application::printVersion()
 
-{  
-  cout << app_long_name_ << " V" << OTG2_VERSION << endl;
-  cout << copyright_ << endl;
+{
+  cerr << app_long_name_ << " " << OTG2_VERSION << endl;
+  cerr << copyright_ << endl;
 }
 
 void
@@ -330,11 +325,11 @@ Application::setSenderInfo(
   const char* longName,
   char        shortName,        /* may be ’\0’ */
   const char*       descrip,        /* description for autohelp -- may be NULL */
-  const char*       argDescrip   
+  const char*       argDescrip
 ) {
   struct poptOption& p1 = phase1_[2];
-  struct poptOption& p2 = phase2_[3];  
-  
+  struct poptOption& p2 = phase2_[3];
+
   p1.longName = p2.longName = longName;
   p1.shortName = p2.shortName = shortName;
   p1.descrip = p2.descrip = descrip;
@@ -346,14 +341,13 @@ Application::setSourceInfo(
   const char* longName,
   char        shortName,        /* may be ’\0’ */
   const char* descrip,        /* description for autohelp -- may be NULL */
-  const char* argDescrip   
+  const char* argDescrip
 ) {
   struct poptOption& p1 = phase1_[3];
-  struct poptOption& p2 = phase2_[4];  
-  
+  struct poptOption& p2 = phase2_[4];
+
   p1.longName = p2.longName = longName;
   p1.shortName = p2.shortName = shortName;
   p1.descrip = p2.descrip = descrip;
   p1.argDescrip = p2.argDescrip = argDescrip;
 }
-

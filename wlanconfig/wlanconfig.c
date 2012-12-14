@@ -37,6 +37,12 @@
 #include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__
+#endif
+
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
 static OmlMPDef oml_def[] = {
@@ -64,6 +70,8 @@ main(int argc, const char *argv[])
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
+  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+
   /* Get basename */
   p2 = strtok(p, "/");
   while(p2) {
@@ -75,7 +83,7 @@ main(int argc, const char *argv[])
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "wlanconfig_oml2", MIN(l,13))) {
 	  fprintf(stderr,
-              "warning: binary name `%s' is deprecated and will disappear in later versions, please use `wlanconfig-oml2' instead\n", p);
+              "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `wlanconfig-oml2' instead\n", p);
   }
   free(progname);
 
@@ -83,7 +91,7 @@ main(int argc, const char *argv[])
 
   ifwifi = "ath0";
   if (pipe (mypipe)) {
-    fprintf (stderr, "error: pipe failed.\n");
+    fprintf (stderr, "ERROR\tpipe() failed: %s\n", strerror(errno));
     return EXIT_FAILURE;
   }
   pid = fork ();
@@ -92,11 +100,11 @@ main(int argc, const char *argv[])
     close(1);
     dup(mypipe[1]);
     if (execl("/sbin/ifconfig", "ifconfig", "ath0", NULL) < 0) {
-      fprintf(stderr,"error: execl failed\n");
+      fprintf(stderr,"ERROR\texecl(/sbing/ifconfig,...) failed: %s\n", strerror(errno));
       exit(1);
     }
   } else if (pid < (pid_t) 0) {
-    fprintf (stderr, "error: fork failed\n");
+    fprintf (stderr, "ERROR\tfork() failed: %s\n", strerror(errno));
     return EXIT_FAILURE;
   } else {
     close(mypipe[1]);
@@ -123,7 +131,7 @@ main(int argc, const char *argv[])
     i = 0;
     stop = 1;
     if (pipe (mypipe)) {
-      fprintf (stderr, "error: pipe failed\n");
+      fprintf (stderr, "ERROR\tpipe() failed: %s\n", strerror(errno));
       return EXIT_FAILURE;
     }
     pid = fork ();
@@ -132,11 +140,11 @@ main(int argc, const char *argv[])
       close(1);
       dup(mypipe[1]);
       if (execl("/sbin/wlanconfig", "wlanconfig", "ath0", "list", NULL) < 0) {
-        fprintf(stderr, "error: execl failed\n");
+      fprintf(stderr,"ERROR\texecl(/sbing/wlanconfig,...) failed: %s\n", strerror(errno));
         exit(1);
       }
     } else if (pid < (pid_t) 0) {
-      fprintf (stderr, "error: fork failed\n");
+      fprintf (stderr, "ERROR\tfork() failed: %s\n", strerror(errno));
       return EXIT_FAILURE;
     } else {
       close(mypipe[1]);

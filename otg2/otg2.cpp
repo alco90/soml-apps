@@ -3,7 +3,7 @@ using namespace std;
 
 #include <otg2/otg2_app.h>
 int main(
-  int argc, 
+  int argc,
   const char * argv[]
 ) {
   try {
@@ -11,9 +11,9 @@ int main(
     //otg->registerOutPortType("mp_udp", createMPOutPort);
     otg->run();
   } catch (const char *reason ) {
-    cerr << "Exception: " << reason << endl;
+    cerr << "ERROR\t" << reason << endl;
     return -1;
-  }  
+  }
   return 0;
 }
 

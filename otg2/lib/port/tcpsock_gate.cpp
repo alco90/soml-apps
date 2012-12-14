@@ -21,33 +21,33 @@ using namespace std;
  * This TCP socket will be used by sender to send packets, and for receiver to "listen".
  * Packet reception will use new socket file desciptor.
  *
- * Bind to local address is one important task in init() 
+ * Bind to local address is one important task in init()
  * Here source address of node itself (myaddr_) does not really be used by bind function of port.
  * The program use INADDR_ANY as the address filled in address parameters of bind().
- * So, we need an empty hostname with the port number. 
+ * So, we need an empty hostname with the port number.
  */
 
 void TCPSockGate::init()
 {
 
-  SockGate::init(); 
+  SockGate::init();
   if ((sockfd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("socket");
-    throw "Error while opening TCP socket";
+    perror("ERROR\tsocket()");
+    throw "Could not create TCP socket";
   }
   Address *emptyAddr = new Address("", myaddr_.getPort());
   struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
   if (  bind(sockfd_, addr, sizeof(struct sockaddr_in)) < 0)
-     throw " TCP Socket Bind error";
-  cout << "listening TCP connections from port:" << myaddr_.getPort() << "......" << endl;  
+     throw "TCP Socket Bind error";
+  cerr << "INFO\tListening for TCP connections on port" << myaddr_.getPort() << << endl;
   // TCP revceiver is actually a TCP server
-  listen(sockfd_, BACKLOG);  
+  listen(sockfd_, BACKLOG);
 
 }
 
 
 /**
- *  Function to start an endless loop for Listing TCP connections 
+ *  Function to start an endless loop for Listing TCP connections
  *  This Marks the beginning of an independent receiving thread
  *  Each incomming connection will be assigned to a flow.
  */
@@ -60,29 +60,29 @@ void TCPSockGate::startReceive()
   FD_SET(sockfd_,&master);
   fdmax = sockfd_;
   while (1)
-  {  
+  {
         readfds =  master;
         select(fdmax+1, &readfds, (fd_set *)0, (fd_set *)0, NULL);
         for ( i=0; i<=fdmax; i++)
 	  if (FD_ISSET(i, &readfds))
-	    { 
+	    {
                if (i == sockfd_)
 	       {
 	            newfd =  acceptNewConnection();
                     FD_SET(newfd, &master);  // add to master set
                        if (newfd > fdmax)    // keep track of the maximum
                               fdmax = newfd;
-		     
-	       } 
+
+	       }
 	       else{
                  if (receivePacket(i)== false)
-		               FD_CLR(i, &master); 
+		               FD_CLR(i, &master);
 		 else
-		    inboundPacket(); 
+		    inboundPacket();
 	       }
 	    }
-	          
-   }   // end while   
+
+   }   // end while
 }
 
 /**
@@ -94,7 +94,7 @@ bool TCPSockGate::receivePacket(int fd)
   rlcurr_ = searchFlowbyFd(fd);
   //rlcuur_->getID is the flow id (socket fd) of this flow
   //pkt_ = rlcurr_->packetcache_;
-  int len = (int)recv(rlcurr_->getID(), pkt_->getPayload(), pkt_->getBufferSize(),0); 
+  int len = (int)recv(rlcurr_->getID(), pkt_->getPayload(), pkt_->getBufferSize(),0);
   if (len == -1) perror("recvfrom");
   if (len <= 0  )
     {
@@ -103,7 +103,7 @@ bool TCPSockGate::receivePacket(int fd)
     }
   pkt_->rxMeasure_->setReceivedLength(len);
   //pkt_->rxMeasure_->setRxTime((long)(gateclock_.getCurrentTime()*1e6) );
- 
+
   return true;
 }
 
@@ -115,22 +115,22 @@ bool TCPSockGate::receivePacket(int fd)
  */
 
 int  TCPSockGate::acceptNewConnection()
-{ 
+{
   struct sockaddr_in tmpSockAddr; // connector's address information
   int sin_size =  sizeof(struct sockaddr_in);
   int newfd = accept(sockfd_, (struct sockaddr *)&tmpSockAddr, (socklen_t*)&sin_size);
 
   if ( newfd == -1){
-    perror("accept");
-    throw " accept new coonnection error.";
+    perror("ERROR\taccept()");
+    throw "Could not accept new connection";
   }
-  cout << "accepting a new connection" << endl;
+  cerr << "INFO\tAccepting a new connection" << endl;
   decodeSockAddress(&itsaddr_, &tmpSockAddr);
   addFlow(newfd, &itsaddr_);
-  //decodeSockAddress(rltail_->getAddr(), &tmpSockAddr);  
+  //decodeSockAddress(rltail_->getAddr(), &tmpSockAddr);
 
  //add some code to prohibit new connecitons if there are already 10 connections. Fix ME!!!
- 
+
   return newfd;
 }
 

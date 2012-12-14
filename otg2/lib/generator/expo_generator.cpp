@@ -9,7 +9,7 @@ using namespace std;
 
 
 /**
- * Constructor: This behaves as a Poisson generator if the rate is set to a 
+ * Constructor: This behaves as a Poisson generator if the rate is set to a
  * high value and ontime_ is set to zero
  */
 Expo_Generator::Expo_Generator(
@@ -61,7 +61,7 @@ Expo_Generator::update()
  * @param p: the packet structure pointer to carry the calclulated parameter values
  */
 Packet*
-Expo_Generator::nextPacket(Packet* p) 
+Expo_Generator::nextPacket(Packet* p)
 
 {
   p->setPayloadSize(pktSize_); //set size first
@@ -79,9 +79,9 @@ Expo_Generator::nextPacket(Packet* p)
   rem_--;
   lastPktStamp_ += t;
   p->setTxTime(lastPktStamp_);
-  //cout <<lastPktStamp_ <<endl;
+  //cerr << "DEBUG\t" << lastPktStamp_ <<endl;
   return p;
 }
- 
+
 
 

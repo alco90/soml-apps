@@ -13,7 +13,7 @@ using namespace std;
 #define MAX_INPUT_SIZE 256
 
 OTR::OTR(
-  int argc, 
+  int argc,
   const char* argv[],
   const char* senderName,
   const char* sourceName,
@@ -23,7 +23,7 @@ OTR::OTR(
 {
   sender_name_ = senderName == NULL ? (char*)"null" : senderName;
   source_name_ = sourceName == NULL ? Port::getDefInPortName() : sourceName;
-  
+
   setSenderInfo("protocol", 'p', "Protocol to use to send packet", Port::listInPorts());
   setSourceInfo("sink", 'g', "What to do with received packets", Port::listOutPorts());
 }
@@ -36,14 +36,14 @@ OTR::getComponentOptions(
   const struct poptOption* opts= NULL;
   ISource* gen;
   Sender*      port;
-  
+
   if ((gen = createSource(component_name)) != NULL) {
     opts = gen->getConfigurable()->getOptions();
-    cout << "Options for generator '" << component_name << "'." << endl
+    cerr << "Options for generator '" << component_name << "'." << endl
         <<endl;
   } else if ((port = createSender(component_name)) != NULL) {
     opts = port->getConfigurable()->getOptions();
-    cout << "Options for port '" << component_name << "'." << endl <<endl;
+    cerr << "Options for port '" << component_name << "'." << endl <<endl;
   }
   return opts;
 }
@@ -62,5 +62,3 @@ OTR::createSource(
 ) {
   return Port::createInPort(name);
 }
-
-
