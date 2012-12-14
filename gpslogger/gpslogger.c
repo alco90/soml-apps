@@ -63,17 +63,17 @@ struct fixsource_t
 
 static void log_fix(struct gps_fix_t *fix, struct tm *time)
 {
-  char time_string [20];
-  char mode [5];
+  char time_string [100];
+  char mode [10];
 
-  (void)sprintf(time_string, "%04d-%02d-%02dT%02d:%02d:%02dZ",
+  (void)snprintf(time_string, sizeof(time_string), "%04d-%02d-%02dT%02d:%02d:%02dZ",
       time->tm_year+1900, time->tm_mon+1, time->tm_mday,
       time->tm_hour, time->tm_min, time->tm_sec);
 
   if (fix->mode==MODE_NO_FIX)
-    (void)sprintf (mode, "none");
+    (void)snprintf (mode, sizeof(mode), "none");
   else
-    (void)sprintf (mode, "%dd", fix->mode);
+    (void)snprintf (mode, sizeof(mode), "%dd", fix->mode);
 
   if (verbose) {
     // print fix data
@@ -137,11 +137,11 @@ static int socket_mainloop(void)
     fprintf(stderr, "ERROR\tCannot allocate memory for gpsdata structure: %s\n", strerror(errno));
     exit(1);
   }
-  gps_open(source.server, source.port, gpsdata);
+  if(gps_open(source.server, source.port, gpsdata) < 0) {
 #else
   gpsdata = gps_open(source.server, source.port);
-#endif
   if (!gpsdata) {
+#endif
     fprintf(stderr,
         "ERROR\tNo gpsd running or network error: %s (%d)\n",
         gps_errstr(errno), errno);
@@ -217,7 +217,6 @@ int main (int argc, const char **argv)
     fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);
   }
-
 
   oml_register_mps();
 
