@@ -49,7 +49,6 @@
 #define OML_FROM_MAIN
 #include "gpslogger_oml.h"
 static time_t int_time, old_int_time;
-static time_t timeout = 5; /* seconds */
 static bool verbose = false;
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
@@ -240,10 +239,12 @@ int main (int argc, const char **argv)
     }
   }
 
-  if (optind < argc) {
-    gpsd_source_spec(argv[optind], &source);
-  } else
-    gpsd_source_spec(NULL, &source);
+  /* XXX: Remnant form gpsdclient, probably useless now
+     if (optind < argc) {
+     gpsd_source_spec(argv[optind], &source);
+     } else
+     gpsd_source_spec(NULL, &source);
+   */
 
   /* initialises the gpsfix data structure */
   gps_clear_fix(&gpsfix);
@@ -260,10 +261,10 @@ int main (int argc, const char **argv)
 }
 
 /*
-   Local Variables:
-mode: C
-tab-width: 2
-indent-tabs-mode: nil
-End:
-vim: sw=2:sts=2:expandtab
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
 */

@@ -177,7 +177,6 @@ static void
 trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
                      void* linkptr, libtrace_packet_t* packet, uint64_t pktid)
 {
-  OmlValueU v[14];
   uint64_t tsft;
   uint8_t rate;
   uint16_t freq;
@@ -229,7 +228,6 @@ trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
 static void
 per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint64_t pktid)
 {
-  double                last_ts;
   uint32_t              remaining;
   void*                 l3;
   uint16_t              ethertype;
@@ -244,7 +242,6 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
   uint8_t*              hdr_next; // code of next header
   uint16_t              mh_sequ_nb; // sequence nb of mobility header
 
-  last_ts = trace_get_seconds(packet);
   //  size_t size_of_packet = 0;
   struct timeval tv = trace_get_timeval(packet);
   double now = tv.tv_sec - start_time + 0.000001 * tv.tv_usec;
@@ -489,7 +486,7 @@ main(int argc, const char *argv[])
   }
   free(progname);
 
-  omlc_init("trace", &argc, argv, NULL);
+  result = omlc_init("trace", &argc, argv, NULL);
   if (result == -1) {
     fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);

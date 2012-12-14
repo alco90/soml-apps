@@ -80,7 +80,6 @@ run(
   oml_mps_t* oml_mps,
   if_monitor_t* first_if
 ) {
-  long val = 1;
   sigar_t* sigar_p;
   if_monitor_t* if_p;
   sigar_cpu_t c;
@@ -171,7 +170,6 @@ main(
 ) {
   char c;
   if_monitor_t* first = NULL;
-  if_monitor_t* if_p;
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
@@ -192,7 +190,7 @@ main(
   }
   free(progname);
 
-  omlc_init("nmetrics", &argc, argv, NULL);
+  result = omlc_init("nmetrics", &argc, argv, NULL);
   if (result == -1) {
     fprintf (stderr, "ERROR\tCould not initialise OML\n");
     exit (1);

@@ -57,8 +57,6 @@ static OmlMP* oml_mp = NULL;
 int
 main(int argc, const char *argv[])
 {
-  int i = 0;
-  int j = 0;
   int stop = 1;
   OmlValueU v[4];
   pid_t pid;
@@ -66,9 +64,9 @@ main(int argc, const char *argv[])
   char command[256];
   char command2[256] = "256";
   char macAddress[256] = "e";
-  char* ifwifi;
+  char *ifwifi = "ath0";
   char *progname = strdup(argv[0]), *p=progname, *p2;
-  int result, l;
+  int l;
 
   omlc_zero_array(v, 4);
 
@@ -91,7 +89,6 @@ main(int argc, const char *argv[])
 
   omlc_init("wlanconfig", &argc, argv, NULL);
 
-  ifwifi = "ath0";
   if (pipe (mypipe)) {
     fprintf (stderr, "ERROR\tpipe() failed: %s\n", strerror(errno));
     return EXIT_FAILURE;
@@ -101,7 +98,7 @@ main(int argc, const char *argv[])
     close (mypipe[0]);
     close(1);
     dup(mypipe[1]);
-    if (execl("/sbin/ifconfig", "ifconfig", "ath0", NULL) < 0) {
+    if (execl("/sbin/ifconfig", "ifconfig", ifwifi, NULL) < 0) {
       fprintf(stderr,"ERROR\texecl(/sbing/ifconfig,...) failed: %s\n", strerror(errno));
       exit(1);
     }
@@ -130,7 +127,6 @@ main(int argc, const char *argv[])
   omlc_start();
 
   while(1) {
-    i = 0;
     stop = 1;
     if (pipe (mypipe)) {
       fprintf (stderr, "ERROR\tpipe() failed: %s\n", strerror(errno));

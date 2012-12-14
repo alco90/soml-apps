@@ -111,7 +111,7 @@ int prepare_socket(void)
   return sockfd;
 }
 
-prepare_oml(int argc, const char **argv)
+int prepare_oml(int argc, const char **argv)
 {
   if (omlc_init("ripwavemon", &argc, argv, NULL) != 0) {
     fprintf(stderr, "ERROR\tCould not initialise OML\n");
@@ -139,8 +139,7 @@ void receive_reports (int sockfd)
     if (len != sizeof(report)) {
       fprintf(stderr, "WARN\tReceived packet of unexpected size (%d instead of %d); first 32 bytes:",
           (int)len, (int)sizeof(report));
-      for(p=(unsigned int *)&report; p++;
-          (p-(unsigned int *)&report)<4)
+      for((p=(unsigned int *)&report); (p-(unsigned int *)&report)<4; p++)
         fprintf(stderr, " %08x", *p);
       fprintf(stderr, "\n");
       continue;
