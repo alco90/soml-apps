@@ -18,8 +18,8 @@ gl_INIT
 
 AC_SUBST([OML_ALT_VER], [`echo "$PACKAGE_VERSION" | sed 's/-/./g'`])
 
-built_apps="iperf ripwavemon wpamon wlanconfig"
-AC_CONFIG_SUBDIRS([iperf ripwavemon wpamon wlanconfig])
+built_apps="iperf ping ripwavemon wpamon wlanconfig"
+AC_CONFIG_SUBDIRS([iperf ping ripwavemon wpamon wlanconfig])
 
 # gpslogger
 AC_CHECK_HEADER([gps.h], [
