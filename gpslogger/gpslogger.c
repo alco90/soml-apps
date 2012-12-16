@@ -63,6 +63,7 @@ struct fixsource_t
 
 static void log_fix(struct gps_fix_t *fix, struct tm *time)
 {
+  static int header_printed = 0;
   char time_string [100];
   char mode [10];
 
@@ -76,10 +77,13 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
     (void)snprintf (mode, sizeof(mode), "%dd", fix->mode);
 
   if (verbose) {
+    if (!header_printed) {
+      (void)printf("timestamp,\tlatitude,\tlongitude,\televation,\ttrack,\tspeed,\tclimb,\tfix\n");
+      header_printed = 1;
+    }
     // print fix data
-    (void)printf("lat=\"%f\" lon=\"%f\" ele=\"%f\" track=\"%f\" speed=\"%f\" climb=\"%f\" fix=\"%s\" ts=\"%s\"\n",
-        fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode, time_string);
-    (void)fflush (stdout);
+    (void)printf("%s,\t%f,\t%f,\t%f,\t%f,\t%f,\t%f,\t%s\n",
+        time_string, fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode, time_string);
   }
 
   // log fix data to OML
