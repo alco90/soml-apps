@@ -1,6 +1,14 @@
-#include "string.h"
 /*
- * Copyright 2012 National ICT Australia (NICTA), Australia
+ * OML writer plugin for collectd
+ *
+ * This plugin hooks into collectd and reports data over OML, creating
+ * measurement points on the fly.
+ *
+ * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2012
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
+ * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2012
+ *
+ * Copyright (c) 2012 National ICT Australia (NICTA)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +29,7 @@
  * THE SOFTWARE.
  *
  */
+#include <string.h>
 #include <time.h>
 #include <pthread.h>
 
@@ -126,7 +135,7 @@ configure_mpoint(
     case 0: md->param_types = OML_INT64_VALUE; break;
     case 1: md->param_types = OML_DOUBLE_VALUE; break;
     case 2: md->param_types = OML_INT64_VALUE; break;
-    case 3: md->param_types = OML_INT64_VALUE; break;  // TODO: Should really be u64, but sqlite doesn't handle well
+    case 3: md->param_types = OML_UINT64_VALUE; break;
     }
   }
   // NULL out last one
@@ -199,6 +208,9 @@ oml_write (
 
   OmlValueU v[64];
   int header = 6;
+
+  omlc_zero_array(v, 64);
+
   if (vl->values_len >= 64 - header) {
     ERROR("oml_writer plugin: Can't handle more than 64 values per measurement");
     return(-1);
@@ -222,10 +234,13 @@ oml_write (
     case 0: omlc_set_int64(v[i + header], vi->counter); break;
     case 1: omlc_set_double(v[i + header], vi->gauge); break;
     case 2: omlc_set_int64(v[i + header], vi->derive); break;
-    case 3: omlc_set_int64(v[i + header], vi->absolute); break;
+    case 3: omlc_set_uint64(v[i + header], vi->absolute); break;
     }
   }
   omlc_inject(mp->oml_mp, v);
+  for(i=1;i<6;i++)
+	  omlc_reset_string(v[i]);
+
   return(0);
 }
 
