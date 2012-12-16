@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
-SUBDIRS = gpslogger nmetrics iperf otg2 ping ripwavemon trace wpamon wlanconfig
+SUBDIRS = collectd gpslogger nmetrics iperf otg2 ping ripwavemon trace wpamon wlanconfig
 
 EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
