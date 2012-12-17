@@ -33,6 +33,7 @@ BuildRequires:		sigar-devel
 
 %description
 This package installs all the OML2 Application packages:
+    * collectd-write-oml2: writer plugin for collectd;
     * gpslogger-oml2: measure GPS data from gpds;
     * iperf-oml2: iperf with OML2 measurement recording;
     * nmetrics-oml2: node metrics using libsigar;
@@ -48,7 +49,7 @@ This package installs all the OML2 Application packages:
 %setup -q
 
 %build
-./configure --prefix /usr
+./configure --prefix /usr --sysconfdir /etc --with-collectd-version=4.10.8
 make %{?_smp_mflags}
 
 %install
@@ -60,6 +61,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
+/etc/*
 /usr/lib/*
 /usr/share/*
 
