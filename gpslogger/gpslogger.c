@@ -83,7 +83,7 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
     }
     // print fix data
     (void)printf("%s,\t%f,\t%f,\t%f,\t%f,\t%f,\t%f,\t%s\n",
-        time_string, fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode, time_string);
+        time_string, fix->latitude, fix->longitude, fix->altitude, fix->track, fix->speed, fix->climb, mode);
   }
 
   // log fix data to OML
