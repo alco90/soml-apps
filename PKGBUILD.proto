@@ -13,7 +13,9 @@ arch=(i686 x86_64)
 url="http://omlapp.mytestbed.net/"
 license=('custom:MIT-Nicta')
 depends=('oml2')
-optdepends=('gpsd: for gpslogger'
+optdepends=(
+'collectd: for the write_oml plugin'
+'gpsd: for gpslogger'
 'iputils: for ping'
 'libsigar: for nmetrics'
 'libtrace: for trace'
