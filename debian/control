@@ -2,7 +2,7 @@ Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7), pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, tree
+Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, tree
 Standards-Version: 3.9.1
 Homepage: http://omlapp.mytestbed.net/
 
@@ -16,6 +16,7 @@ Suggests: oml2-apps-omfdef
 Conflicts: oml-client, oml2-apps-all
 Description: A meta-package that installs the complite OML2 applications collection
  This package installs all the OML2 Application packages:
+     * collectd-write-oml2: writer plugin for collectd;
      * gpslogger-oml2: measure GPS data from gpds;
      * iperf-oml2: iperf with OML2 measurement recording;
      * nmetrics-oml2: node metrics using libsigar;
@@ -33,6 +34,17 @@ Depends: oml2-apps, omf-expctl-5.4
 Description: A meta-package that installs OML2 Applications and their OMF-5.4 definition
  This package installs all the OML2 Application packages, as well as the
  Application definition need by the OMF 5.4 experiment controller to use them.
+
+
+Package: collectd-write-oml2
+Section: net
+Priority: optional
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, collectd, liboml2-9
+Description: OML writer plugin for collectd
+ This plugin hooks into collectd and reports data over OML, creating
+ measurement points on the fly.
+
 
 Package: gpslogger-oml2
 Architecture: any
