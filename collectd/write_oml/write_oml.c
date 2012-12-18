@@ -125,7 +125,7 @@ configure_mpoint(
   mp->mp_defs = (OmlMPDef*)malloc((ds->ds_num + 6 + 1) * sizeof(OmlMPDef));
 
   int i = 0;
-  mp->mp_defs[i].name = "time"; mp->mp_defs[i].param_types = OML_INT64_VALUE;
+  mp->mp_defs[i].name = "time"; mp->mp_defs[i].param_types = OML_UINT64_VALUE;
   mp->mp_defs[++i].name = "host"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
   mp->mp_defs[++i].name = "plugin"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
   mp->mp_defs[++i].name = "plugin_instance"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
@@ -237,7 +237,7 @@ oml_write (
 
   DEBUG("oml_writer plugin: New data in %s (%s, %s, %s, %s, %s)",
       mp->name, vl->host, vl->plugin, vl->plugin_instance, vl->type, vl->type_instance);
-  omlc_set_int64(v[0], vl->time);
+  omlc_set_uint64(v[0], (uint64_t)vl->time);
   omlc_set_string(v[1], vl->host != NULL ? (char*)vl->host : "");
   omlc_set_string(v[2], vl->plugin != NULL ? (char*)vl->plugin : "");
   omlc_set_string(v[3], vl->plugin_instance != NULL ? (char*)vl->plugin_instance : "");
