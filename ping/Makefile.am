@@ -13,7 +13,6 @@ EXTRA_DIST = autogen.sh \
 	     m4/gnulib-cache.m4 \
 	     $(top_srcdir)/.version \
 	     $(appname).rb.in \
-	     $(appname).rb \
 	     $(appname)-oml2.in \
 	     $(appname)-oml2
 
@@ -25,7 +24,8 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
-CLEANFILES = $(appname)-oml2
+CLEANFILES = $(appname)-oml2 \
+	     $(appname).rb
 
 MAINTAINERCLEANFILES = $(appname).rb
 

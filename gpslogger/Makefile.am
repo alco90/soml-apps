@@ -16,8 +16,7 @@ EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
 	     m4/gnulib-cache.m4 \
 	     $(top_srcdir)/.version \
-	     $(appname).rb.in \
-	     $(appname).rb
+	     $(appname).rb.in
 
 BUILT_SOURCES = $(top_srcdir)/.version \
 		$(appname).rb \
@@ -28,8 +27,8 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
-CLEANFILES = $(appname)_oml.h
-MAINTAINERCLEANFILES = $(appname).rb
+CLEANFILES = $(appname)_oml.h \
+	     $(appname).rb
 
 $(appname)_oml.h: $(appname).rb
 	$(SCAFFOLD) --oml $<

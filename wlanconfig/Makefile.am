@@ -14,8 +14,7 @@ EXTRA_DIST = autogen.sh \
 	     autoclean.sh \
 	     m4/gnulib-cache.m4 \
 	     $(top_srcdir)/.version \
-	     $(appname).rb.in \
-	     $(appname).rb
+	     $(appname).rb.in
 
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
@@ -23,7 +22,7 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
-MAINTAINERCLEANFILES = $(appname).rb
+CLEANFILES = $(appname).rb
 
 $(appname).rb: $(appname).rb.in
 	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \

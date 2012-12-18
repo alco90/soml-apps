@@ -23,9 +23,7 @@ EXTRA_DIST = autogen.sh \
 	     m4/gnulib-cache.m4 \
 	     $(top_srcdir)/.version \
 	     $(appotg2).rb.in \
-	     $(appotr2).rb.in \
-	     $(appotg2).rb \
-	     $(appotr2).rb
+	     $(appotr2).rb.in
 
 BUILT_SOURCES = $(top_srcdir)/.version \
 		$(appotg2).rb \
@@ -39,9 +37,9 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
 CLEANFILES =  otg2_oml.h \
-	      otr2_oml.h
-MAINTAINERCLEANFILES = $(appotg2).rb \
-		       $(appotr2).rb
+	      otr2_oml.h \
+	      $(appotg2).rb \
+	      $(appotr2).rb
 
 otgrlibs = -lpthread libotg2.la
 
