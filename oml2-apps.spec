@@ -49,7 +49,7 @@ This package installs all the OML2 Application packages:
 %setup -q
 
 %build
-./configure --prefix /usr --sysconfdir /etc --with-collectd-version=4.10.8
+./configure --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --with-collectd-version=4.10.8
 make %{?_smp_mflags}
 
 %install
@@ -61,9 +61,9 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
-/etc/*
-/usr/lib/*
-/usr/share/*
+%{_sysconfdir}/*
+%{_libdir}/*
+%{_prefix}/share/*
 
 %post
 echo "Trying to install the OML4R gem..." >&2
