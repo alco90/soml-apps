@@ -1,9 +1,9 @@
 %define name		oml2-apps
 %define version		2.9.0
-%define redmineid	724
+%define redmineid	809
 
 BuildRoot:		%{_tmppath}/%{name}-%{version}
-Summary:		OML application collection
+Summary:		OML applications collection
 License:		MIT
 URL:			http://oml.mytestbed.net/projects/omlapp
 Name:			%{name}
