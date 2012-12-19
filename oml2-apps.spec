@@ -20,6 +20,8 @@ Requires:		popt
 Requires:		libpcap
 Requires:		libtrace
 Requires:		sigar
+BuildRequires:		tar
+BuildRequires:		bzip2
 BuildRequires:		make
 BuildRequires:		gcc
 BuildRequires:		gcc-c++
@@ -29,7 +31,9 @@ BuildRequires:		oml2-devel
 BuildRequires:		popt-devel
 BuildRequires:		libpcap-devel
 BuildRequires:		libtrace-devel
+BuildRequires:		libxml2-devel
 BuildRequires:		sigar-devel
+BuildRequires:		wget
 
 %description
 This package installs all the OML2 Application packages:
