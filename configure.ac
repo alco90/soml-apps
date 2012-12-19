@@ -33,7 +33,7 @@ AC_CHECK_HEADER([gps.h], [
 # nmetrics
 AC_CHECK_HEADER([sigar.h])
 AC_CHECK_HEADER([libsigar/sigar.h])
-AS_IF([test "x$ac_cv_header_libsigar_sigar_h" = "xno" -a "x$ac_cv_header_sigar_h" = "no"],
+AS_IF([test "x$ac_cv_header_libsigar_sigar_h" != "xyes" -a "x$ac_cv_header_sigar_h" != "xyes"],
       [AC_MSG_WARN([nmetrics will not be built])
       notbuilt_apps="$notbuilt_apps nmetrics"],
       [AC_CONFIG_SUBDIRS([nmetrics])
@@ -52,7 +52,7 @@ AC_CHECK_HEADER([pthread.h], [
 # trace
 AC_CHECK_HEADER([pcap.h])
 AC_CHECK_HEADER([libtrace.h])
-AS_IF([test "x$ac_cv_header_pcap_h" = "xno" -o "x$ac_cv_libtrace_h" = "xno" ],
+AS_IF([test "x$ac_cv_header_pcap_h" != "xyes" -o "x$ac_cv_header_libtrace_h" != "xyes" ],
       [AC_MSG_WARN([trace will not be built])
       notbuilt_apps="$notbuilt_apps trace"],
       [AC_CONFIG_SUBDIRS([trace])
