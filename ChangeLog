@@ -1,3 +1,18 @@
+2012-12-19  Olivier Mehani <olivier.mehani@nicta.com.au>
+	* oml2-apps: Release 2.9.0
+	* New applications:
+	  * collectd-write-oml2: a plugin for collectd to report all collected
+	    statistics via OML;
+	  * ping-oml2: an OML4r wrapper around the system ping(1);
+	  * wpamon-oml2: which connects to wpa_supplicant and reports wireless
+	    events, thanks to François Hoguet.
+	* Enhancements:
+	  * gpslogger: output CSV on -v
+	  * ripwavemon: output CSV
+	  * trace: IPv6 support (ICMPv6, IP6IP6, MH, MIPv6 BU and BAck),
+	    thanks to François Hoguet.
+	  * Up-to-date application descriptions for all applications
+
 2012-04-23  Olivier Mehani <olivier.mehani@nicta.com.au>
 	* oml2-app: re-canonalised all names to APPNAME-oml2 symlinks
 	omf_APPNAME, APPNAME_oml2 and oml2-APPNAME are still provided
