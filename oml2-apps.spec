@@ -32,7 +32,7 @@ BuildRequires:		libtrace-devel
 BuildRequires:		libxml2-devel
 BuildRequires:		sigar-devel
 BuildRequires:		wget
-%if 0%{?fedora} <= 16
+%if 0%{?fedora}
 Requires:		gpsd
 BuildRequires:		gpsd-devel
 %endif
