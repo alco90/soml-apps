@@ -162,10 +162,11 @@ AM_CONDITIONAL([IS_ARCH], [test "x$isarch" != "x"])
 AM_CONDITIONAL([IS_DEBIAN], [test "x$isdebian" != "x"])
 AM_CONDITIONAL([IS_REDHAT], [test "x$isredhat" != "x"])
 
+AC_MSG_NOTICE([The following applications will be built: $built_apps])
+AC_SUBST([BUILT_APPS],[$built_apps])
+AS_IF([test -n "$notbuilt_apps"],
+      [AC_MSG_WARN([The following applications will *not* be built (missing dependencies, see WARNINGs above): $notbuilt_apps])])
+
 # Generate output files
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
-
-AC_MSG_NOTICE([The following applications will be built: $built_apps])
-AS_IF([test -n "$notbuilt_apps"],
-      [AC_MSG_WARN([The following applications will *not* be built (missing dependencies, see WARNINGs above): $notbuilt_apps])])
