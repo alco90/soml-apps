@@ -30,8 +30,8 @@ CLEANFILES = $(appname)-oml2 \
 MAINTAINERCLEANFILES = $(appname).rb
 
 $(appname).rb: $(appname).rb.in
-	VER=`echo $(VERSION) | sed "s/-[0-9a-z]\+\(-dirty\)$$//;s/-.*//;s/\(pre\|rc\)\./-/;s/[^-0-9.]//g;s/\./, /g"`; \
-		sed -e 's|@bindir[@]|$(bindir)|g' \
+	VER=`echo $(VERSION) | sed "s/.*+oml//;s/\([0-9\+]\(\.[0-9]\+\)\{1,2\}\).*/\1/;s/\./, /g"`; \
+	    sed -e 's|@bindir[@]|$(bindir)|g' \
 		-e "/a\.path/s/$(PACKAGE)/$(installed_name)/" \
 		-e "s/a\.version.*/a.version($$VER)/" \
 		$< > $@
