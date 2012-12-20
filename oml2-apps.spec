@@ -14,7 +14,6 @@ Packager:		Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
 Prefix:			/usr
 Group:			Applications/Internet
 Requires:		glibc
-Requires:		gpsd
 Requires:		oml2
 Requires:		popt
 Requires:		libpcap
@@ -26,7 +25,6 @@ BuildRequires:		make
 BuildRequires:		gcc
 BuildRequires:		gcc-c++
 BuildRequires:		glibc-devel
-BuildRequires:		gpsd-devel
 BuildRequires:		oml2-devel
 BuildRequires:		popt-devel
 BuildRequires:		libpcap-devel
@@ -34,11 +32,15 @@ BuildRequires:		libtrace-devel
 BuildRequires:		libxml2-devel
 BuildRequires:		sigar-devel
 BuildRequires:		wget
+%if 0%{?fedora} <= 16
+Requires:		gpsd
+BuildRequires:		gpsd-devel
+%endif
 
 %description
 This package installs all the OML2 Application packages:
     * collectd-write-oml2: writer plugin for collectd;
-    * gpslogger-oml2: measure GPS data from gpds;
+    * gpslogger-oml2: measure GPS data from gpsd (only for Fedora);
     * iperf-oml2: iperf with OML2 measurement recording;
     * nmetrics-oml2: node metrics using libsigar;
     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
@@ -53,6 +55,7 @@ This package installs all the OML2 Application packages:
 %setup -q
 
 %build
+(cd collectd; tar xjf $RPM_SOURCE_DIR/collectd-4.10.8.tar.bz2; cd -) || true
 ./configure --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --with-collectd-version=4.10.8
 make %{?_smp_mflags}
 
