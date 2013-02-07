@@ -2,7 +2,7 @@ Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2, tree
+Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, ruby, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
 Standards-Version: 3.9.1
 Homepage: http://omlapp.mytestbed.net/
 
