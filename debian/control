@@ -39,7 +39,7 @@ Description: A meta-package that installs OML2 Applications and their OMF-5.4 de
 Package: collectd-write-oml2
 Section: net
 Priority: optional
-Architecture: all
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, collectd, liboml2-9
 Description: OML writer plugin for collectd
  This plugin hooks into collectd and reports data over OML, creating
