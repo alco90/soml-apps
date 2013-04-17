@@ -48,16 +48,18 @@ class PingWrapper
     @interval = 1
     @verbose = 1
 
-    OML4R::init(args, :appName => 'ping') do |argParser|
+    leftover = OML4R::init(args, :appName => 'ping') do |argParser|
       argParser.banner = "Runs the system ping and reports measurements via OML\n Use -h or --help for a list of options\n\n"
-      argParser.on("-a","--dest_addr ADDRESS","Address to ping") { |address| @addr = address.to_s() }
+      argParser.on("-a","--dest_addr ADDRESS","Address to ping (the -a switch is optional)") { |address| @addr = address.to_s() }
       argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = count.to_i()}
       argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = interval.to_i()}
       argParser.on("-q","--[no]-quiet ","Don't show ping output on the console"){ @verbose = 0 }
     end
 
-    unless @addr != nil
-      raise "ERROR	You did not specify an address to ping! (-a option)"
+    if @addr.nil? and leftover.length > 0
+      @addr = leftover[0]
+    else
+      raise "You did not specify an address to ping!"
     end
   end
 
@@ -100,7 +102,7 @@ begin
   app.start()
 rescue Interrupt
 rescue Exception => ex
-  puts "ERROR	#{ex}\n"
+  $stderr.puts "ERROR\t#{ex}\n"
 end
 
 # Local Variables:
