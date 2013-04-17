@@ -25,6 +25,8 @@ using namespace std;
 
 UDPOutPort::UDPOutPort()
 {
+  localhost_ = "localhost"; /* Socket::Init uses this */
+
   logdebug("Registering MPs\n");
   oml_register_mps();
 }
