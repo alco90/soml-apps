@@ -1,8 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
 AM_CPPFLAGS = -I $(srcdir) \
-	      -I $(srcdir)/lib \
-	      -DWITH_OML
+	      -I $(srcdir)/lib
 
 SCAFFOLD=oml2-scaffold
 

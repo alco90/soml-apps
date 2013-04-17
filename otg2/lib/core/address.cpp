@@ -118,8 +118,9 @@ Address::setHWAddr(unsigned char* hwaddr)
 bool
 Address::isSameMACAddr( Address *addr)
 {
-  if ( memcmp(macaddr_, addr->getHWAddr(), MAC_ADDR_LENGTH*sizeof(unsigned char))  == 0 )
+  if ( memcmp(macaddr_, addr->getHWAddr(), MAC_ADDR_LENGTH*sizeof(unsigned char))  == 0 ) {
     return true;
+  }
   return false;
 
 }

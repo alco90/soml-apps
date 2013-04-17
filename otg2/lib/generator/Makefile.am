@@ -1,8 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4 -Wnone
 
 AM_CPPFLAGS = \
-	-I $(srcdir)/.. \
-	-D WITH_OML
+	-I $(srcdir)/..
 
 noinst_LTLIBRARIES = libotg2generator.la
 

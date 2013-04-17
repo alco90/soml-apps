@@ -14,11 +14,8 @@
 #include <otg2/port.h>   // defines defaults
 #include <ocomm/o_log.h>
 
-#ifdef WITH_OML
 #define OML_FROM_MAIN
 #include "otr2_oml.h"
-#endif
-
 #include "udp_inport.h"
 
 #define DEF_PKT_LENGTH 1024
@@ -32,9 +29,7 @@ UDPInPort::UDPInPort()
   localport_ = DEFAULT_RECV_PORT;
   maxPktLength_ = DEF_PKT_LENGTH;
 
-#ifdef WITH_OML
   oml_register_mps();
-#endif
 }
 
 void
@@ -95,7 +90,6 @@ UDPInPort::nextPacket(Packet* pkt)
   }
   pkt->setTimeStamp(-1); // mark with current time
 
-#ifdef WITH_OML
   oml_inject_udp_in(g_oml_mps->udp_in,
       now,
       pkt->getFlowId(),
@@ -103,7 +97,6 @@ UDPInPort::nextPacket(Packet* pkt)
       len,
       senderHost,
       senderPort);
-#endif
 
   return pkt;
 }

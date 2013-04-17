@@ -20,18 +20,14 @@
 
 using namespace std;
 
-#ifdef WITH_OML
 #define OML_FROM_MAIN
 #include "otg2_oml.h"
-#endif
 
 UDPOutPort::UDPOutPort()
 {
   //cerr << "DEBUG\tCreation of udp_out"<< endl;
-#ifdef WITH_OML
   //cerr << "DEBUG\tRegistering MPs"<< endl;
   oml_register_mps();
-#endif
 }
 
 void
@@ -121,7 +117,6 @@ UDPOutPort::sendPacket(Packet* pkt)
     throw "Sending Error.";
   }
 
-#ifdef WITH_OML
   oml_inject_udp_out(g_oml_mps->udp_out,
       now,
       pkt->getFlowId(),
@@ -129,7 +124,6 @@ UDPOutPort::sendPacket(Packet* pkt)
       pktLength,
       dsthost_,
       dstport_);
-#endif
   return pkt;
 }
 

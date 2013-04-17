@@ -98,7 +98,6 @@ Stream::_run()
     delete p;
   }
   sender_->closeSender();
-  //  app_->close(); //close OML reporting
 
 }
 

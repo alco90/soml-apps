@@ -9,23 +9,18 @@
  * in the License.
  */
 
-#ifdef WITH_OML
-extern "C" {
-#  include <oml2/omlc.h>
-}
-#endif
 
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
-using namespace std;
-
 #include <sys/time.h>
 #include <iostream>
-using namespace std;
+#include <ocomm/o_log.h>
+#include <oml2/omlc.h>
+
 #include "otg2/application.h"
 
-# include <ocomm/o_log.h>
+using namespace std;
 
 #include "../version.h"
 
@@ -91,9 +86,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
 
   o_log(O_LOG_INFO, "%s %s\n", app_long_name_, OTG2_VERSION);
 
-#ifdef WITH_OML
   omlc_init(app_name_, &argc, argv, NULL);
-#endif
 
   argc_ = argc;
   argv_ = argv;
@@ -129,9 +122,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
 
 Application::~Application()
 {
-#ifdef WITH_OML
   omlc_close();
-#endif
 }
 
 /**  Parse options for phase 1: Protocol and Generator Type */
@@ -288,10 +279,7 @@ Application::run()
 
   //cerr << "DEBUG\tStream configured" <<endl;
 
-
-#ifdef WITH_OML
   omlc_start();
-#endif
 
   stream_->run();
 

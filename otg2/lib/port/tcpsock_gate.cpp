@@ -45,8 +45,9 @@ TCPSockGate::init()
   }
   Address *emptyAddr = new Address("", myaddr_.getPort());
   struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
-  if (  bind(sockfd_, addr, sizeof(struct sockaddr_in)) < 0)
+  if (  bind(sockfd_, addr, sizeof(struct sockaddr_in)) < 0) {
     throw "TCP Socket Bind error";
+  }
   cerr << "INFO\tListening for TCP connections on port" << myaddr_.getPort() << << endl;
   // TCP revceiver is actually a TCP server
   listen(sockfd_, BACKLOG);
