@@ -18,11 +18,11 @@ renders the timestamp field useless as an identifier. }
   a.defProperty('snaplen', '???', ?s,
         :type => :int, :unit => 'bytes')
   a.defProperty('promisc', '???', ?p,
-        :type => :flag)
+        :type => :boolean)
   a.defProperty('interface', 'Interface to trace', ?i,
         :type => :string)
   a.defProperty('radiotap', 'Enable radiotap', ?r,
-        :type => :flag)
+        :type => :boolean)
 
   a.defMeasurement("radiotap") do |m|
       m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
@@ -57,7 +57,7 @@ renders the timestamp field useless as an identifier. }
   end
 
   a.defMeasurement("tcp") do |m|
-    m.defMetric('pktid',    	:uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('tcp_source',   :uint32, ' Source Port')
     m.defMetric('tcp_dest',     :uint32, ' Destination Port')
     m.defMetric('tcp_seq',      :uint32, ' TCP sequence Number')
@@ -70,7 +70,7 @@ renders the timestamp field useless as an identifier. }
   end
 
   a.defMeasurement("udp") do |m|
-    m.defMetric('pktid', 	:uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('udp_source',   :uint32, ' Source Port')
     m.defMetric('udp_dest',     :uint32, ' Destination Port')
     m.defMetric('udp_len',      :uint32, ' Length of Datagram')
