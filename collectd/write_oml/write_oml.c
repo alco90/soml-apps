@@ -5,36 +5,23 @@
  * measurement points on the fly.
  *
  * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2012
- * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2013
  * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2012
  *
- * Copyright (c) 2012 National ICT Australia (NICTA)
+ * Copyright 2012-2013 National ICT Australia (NICTA)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
  */
 #include <string.h>
 #include <time.h>
 #include <pthread.h>
 
-#include <oml2/omlc.h>
 #include <ocomm/o_log.h>
+#include <oml2/omlc.h>
 
 #include "collectd.h"
 #include "plugin.h"
@@ -56,8 +43,7 @@
 # define PACKAGE_STRING __FILE__
 #endif
 
-static const char *config_keys[] =
-{
+static const char *config_keys[] = {
   "NodeID",
   "Domain",
   "CollectURI",
@@ -66,7 +52,7 @@ static const char *config_keys[] =
 static int config_keys_num = STATIC_ARRAY_SIZE(config_keys);
 
 
-typedef struct _mpoint {
+typedef struct MPoint {
   char   name[DATA_MAX_NAME_LEN];
 
   // From value_list_t (plugin.h)
@@ -77,7 +63,7 @@ typedef struct _mpoint {
 
   OmlMP*     oml_mp;
   OmlMPDef*  mp_defs;
-  struct _mpoint* next;
+  struct MPoint* next;
 } MPoint;
 
 typedef struct {
@@ -96,9 +82,8 @@ static Session session;
 static time_t start_time;
 
 static MPoint*
-find_mpoint_struct(
-    const char* name
-    ) {
+find_mpoint_struct(const char* name)
+{
   MPoint* mp = session.mpoint;
 
   while (mp) {
@@ -106,25 +91,18 @@ find_mpoint_struct(
       return mp;
     }
     mp = mp->next;
-  } 
+  }
   return NULL;
 }
 
 static void
-configure_mpoint(
-    MPoint* mp,
-    const data_set_t *ds,
-    const value_list_t *vl
-    ) {
-
-  //  strncpy(mp->plugin, vl->plugin, sizeof(mp->plugin));
-  //  strncpy(mp->plugin_instance, vl->plugin_instance, sizeof(mp->plugin_instance));
-  //  strncpy(mp->type, vl->type, sizeof (mp->type));
-  //  strncpy(mp->type_instance, vl->type_instance, sizeof (mp->type_instance));
+configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
+{
+  int i = 0;
+  int offset = ++i;
 
   mp->mp_defs = (OmlMPDef*)malloc((ds->ds_num + 6 + 1) * sizeof(OmlMPDef));
 
-  int i = 0;
   mp->mp_defs[i].name = "time"; mp->mp_defs[i].param_types = OML_UINT64_VALUE;
   mp->mp_defs[++i].name = "host"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
   mp->mp_defs[++i].name = "plugin"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
@@ -132,7 +110,6 @@ configure_mpoint(
   mp->mp_defs[++i].name = "type"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
   mp->mp_defs[++i].name = "type_instance"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
 
-  int offset = ++i;
   for (i = 0; i < ds->ds_num; i++) {
     data_source_t* d = &ds->ds[i];
     OmlMPDef* md = &mp->mp_defs[i + offset];
@@ -160,16 +137,14 @@ configure_mpoint(
 }
 
 static MPoint*
-create_mpoint(
-    const char* name,
-    const data_set_t *ds,
-    const value_list_t *vl
-    ) {
+create_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
+{
   MPoint* mp;
+  MPoint* pmp = session.mpoint;
+
   // Create MPoint and insert it into session's existing MP chain.
   mp = (MPoint*)malloc(sizeof(MPoint));
   strncpy(mp->name, name, DATA_MAX_NAME_LEN);
-  MPoint* pmp = session.mpoint;
   mp->next = pmp;
   session.mpoint = mp;
   configure_mpoint(mp, ds, vl);
@@ -177,11 +152,8 @@ create_mpoint(
 }
 
 static MPoint*
-find_mpoint(
-    const char* name,
-    const data_set_t *ds,
-    const value_list_t *vl
-    ) {
+find_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
+{
   MPoint* mp = find_mpoint_struct(name);
 
   if (mp == NULL) {
@@ -217,16 +189,14 @@ find_mpoint(
 }
 
 static int
-oml_write (
-    const data_set_t *ds,
-    const value_list_t *vl,
-    user_data_t __attribute__((unused)) *user_data
-    ) {
-  MPoint* mp = find_mpoint(ds->type, ds, vl);
-  if (mp == NULL || !session.oml_intialized) return(0);
-
-  OmlValueU v[64];
+oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute__((unused)) *user_data)
+{
   int header = 6;
+  int i = 0;
+  OmlValueU v[64];
+  MPoint* mp = find_mpoint(ds->type, ds, vl);
+
+  if (mp == NULL || !session.oml_intialized) { return(0); }
 
   omlc_zero_array(v, 64);
 
@@ -244,7 +214,6 @@ oml_write (
   omlc_set_string(v[4], vl->type != NULL ? (char*)vl->type : "");
   omlc_set_string(v[5], vl->type_instance != NULL ? (char*)vl->type_instance : "");
 
-  int i = 0;
   for (; i < ds->ds_num; i++) {
     data_source_t* d = &ds->ds[i];
     value_t* vi = &vl->values[i];
@@ -266,10 +235,8 @@ oml_write (
 }
 
 static int
-oml_config(
-    const char *key,
-    const char *value
-    ) {
+oml_config(const char *key, const char *value)
+{
   if (strcasecmp ("NodeID", key) == 0) {
     session.node_id = (char*)malloc(strlen(value) + 1);
     strncpy(session.node_id, value, strlen(value));
@@ -287,7 +254,8 @@ oml_config(
   return(0);
 }
 
-static void o_log_collectd(int log_level, const char* format, ...)
+static void
+o_log_collectd(int log_level, const char* format, ...)
 {
   va_list va;
   va_start(va, format);
@@ -315,9 +283,8 @@ static void o_log_collectd(int log_level, const char* format, ...)
 }
 
 static int
-oml_init(
-    void
-    ) {
+oml_init(void)
+{
   const char* app_name = "collectd";
   const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd", "--oml-collect", "file:-"};
   int argc = 6;
@@ -330,9 +297,8 @@ oml_init(
   return omlc_init(app_name, &argc, argv, o_log_collectd);
 }
 
-  void
+void
 module_register(void)
-
 {
   memset(&session, 0, sizeof(Session));
   time(&start_time);
