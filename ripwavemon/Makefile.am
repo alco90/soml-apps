@@ -8,7 +8,7 @@ pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = ripwavemon-oml2
 ripwavemon_oml2_SOURCES = ripwavemon.c
-ripwavemon_oml2_LDADD = -loml2 -lpopt
+ripwavemon_oml2_LDADD = -loml2 -locomm -lpopt
 
 pkgdata_DATA = $(appname).rb
 

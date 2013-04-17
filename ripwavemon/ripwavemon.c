@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #include <stdint.h>
 #include <netinet/ip.h>
+#include <errno.h>
+#include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
 #ifdef HAVE_CONFIG_H
@@ -72,7 +74,7 @@ prepare_socket(void)
   struct sockaddr_in sai_bind;
 
   if ((sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-    perror("error: socket()");
+    logerror("Could not open socket: %s\n", strerror(errno));
     return -1;
   }
 
@@ -82,7 +84,7 @@ prepare_socket(void)
   sai_bind.sin_port = htons(NAVINI_REPORT_PORT);
 
   if (bind(sockfd, (struct sockaddr*) &sai_bind, sizeof(sai_bind)) != 0) {
-    perror("error: bind()");
+    logerror("Could not bind socket: %s\n", strerror(errno));
     return -1;
   }
 
@@ -93,12 +95,12 @@ int
 prepare_oml(int argc, const char **argv)
 {
   if (omlc_init("ripwavemon", &argc, argv, NULL) != 0) {
-    fprintf(stderr, "ERROR\tCould not initialise OML\n");
+    logerror("Could not initialise OML\n");
     return -1;
   }
   oml_register_mps();
   if (omlc_start() != 0) {
-    fprintf(stderr, "ERROR\tCould not start OML\n");
+    logerror("Could not start OML\n");
     return -1;
   }
 
@@ -117,7 +119,7 @@ receive_reports (int sockfd)
   while (1) {
     len = recv(sockfd, (void*) &report, sizeof(report), MSG_WAITALL);
     if (len != sizeof(report)) {
-      fprintf(stderr, "WARN\tReceived packet of unexpected size (%d instead of %d); first 32 bytes:",
+      logwarn("Received packet of unexpected size (%d instead of %d); first 32 bytes:",
           (int)len, (int)sizeof(report));
       for((p=(unsigned int *)&report); (p-(unsigned int *)&report)<4; p++)
         fprintf(stderr, " %08x", *p);
@@ -164,7 +166,7 @@ int
 main(int argc, const char **argv)
 {
 
-  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+  loginfo("%s\n", PACKAGE_STRING);
 
   int sockfd;
 
