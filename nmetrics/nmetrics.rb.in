@@ -12,8 +12,7 @@ OML. }
   a.defProperty('cpu', 'Report cpu usage', ?c,
         :type => :flag, :impl => { :var_name => 'report_cpu' })
   a.defProperty('interface',
-        'Report usage for the specified network interface (can \
-be used multiple times)', ?i,
+        'Report usage for the specified network interface (can be used multiple times)', ?i,
         :type => :string,
         :impl => { :var_name => 'if_name', :popt_val => 'i' })
   a.defProperty('memory', 'Report memory usage', ?m,
