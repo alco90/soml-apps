@@ -47,6 +47,7 @@ class PingWrapper
     @count = 0
     @interval = 1
     @verbose = 1
+    @inet6 = ''
 
     leftover = OML4R::init(args, :appName => 'ping') do |argParser|
       argParser.banner = "Runs the system ping and reports measurements via OML\n Use -h or --help for a list of options\n\n"
@@ -54,6 +55,7 @@ class PingWrapper
       argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = count.to_i()}
       argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = interval.to_i()}
       argParser.on("-q","--[no]-quiet ","Don't show ping output on the console"){ @verbose = 0 }
+      argParser.on("-6","--[no]-inet6 ","Use ping6 rather than ping"){ @inet6 = "6"}
     end
 
     if @addr.nil? and leftover.length > 0
@@ -79,7 +81,7 @@ class PingWrapper
   end
 
   def ping()
-    output = `/bin/ping -n -c 1 #{@addr}`
+    output = `/bin/ping#{@inet6} -n -c 1 #{@addr}`
     process_output(output)
     sleep @interval
   end
