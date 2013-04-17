@@ -8,7 +8,7 @@ pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = gpslogger-oml2
 gpslogger_oml2_SOURCES = gpslogger.c
-gpslogger_oml2_LDADD = -loml2 -lgps -lm
+gpslogger_oml2_LDADD = -loml2 -locomm -lgps -lm
 
 pkgdata_DATA = $(appname).rb
 

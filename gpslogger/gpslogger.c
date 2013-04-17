@@ -138,7 +138,7 @@ static int socket_mainloop(void)
 #if GPSD_API_MAJOR_VERSION >= 5
   gpsdata = malloc(sizeof(struct gps_data_t));
   if (!gpsdata) {
-    fprintf(stderr, "ERROR\tCannot allocate memory for gpsdata structure: %s\n", strerror(errno));
+    logerror("Cannot allocate memory for gpsdata structure: %s\n", strerror(errno));
     exit(1);
   }
   if(gps_open(source.server, source.port, gpsdata) < 0) {
@@ -146,8 +146,7 @@ static int socket_mainloop(void)
   gpsdata = gps_open(source.server, source.port);
   if (!gpsdata) {
 #endif
-    fprintf(stderr,
-        "ERROR\tNo gpsd running or network error: %s (%d)\n",
+    logerror("No gpsd running or network error: %s (%d)\n",
         gps_errstr(errno), errno);
     exit(1);
   }
@@ -169,7 +168,7 @@ static int socket_mainloop(void)
     data = select(gpsdata->gps_fd + 1, &fds, NULL, NULL, &tv);
 
     if (data == -1) {
-      (void)fprintf(stderr,"ERROR\tDid not receive data from gpsd: %s\n", strerror(errno));
+      logerror("Did not receive data from gpsd: %s\n", strerror(errno));
       break;
     }
     else if (data) {
@@ -199,7 +198,7 @@ int main (int argc, const char **argv)
   char *progname=strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
-  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+  loginfo("%s\n", PACKAGE_STRING);
 
   /* Get basename */
   p2 = strtok(p, "/");
@@ -211,14 +210,13 @@ int main (int argc, const char **argv)
   /* The canonical name is `gpslogger-oml2', so it clearly does not start with `om' */
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "gpslogger_oml2", MIN(l,13))) {
-    fprintf(stderr,
-        "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `gpslogger-oml2' instead\n", p);
+    logwarn("Binary name `%s' is deprecated and will disappear soon, please use `gpslogger-oml2' instead\n", p);
   }
   free(progname);
 
   result = omlc_init ("gpslogger", &argc, argv, NULL);
   if (result == -1) {
-    fprintf (stderr, "ERROR\tCould not initialise OML\n");
+    logerror("ERROR\tCould not initialise OML\n");
     exit (1);
   }
 
