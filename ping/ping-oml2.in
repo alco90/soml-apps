@@ -53,7 +53,7 @@ class PingWrapper
       argParser.on("-a","--dest_addr ADDRESS","Address to ping") { |address| @addr = address.to_s() }
       argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = count.to_i()}
       argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = interval.to_i()}
-      argParser.on("-q","--quiet ","Don't show ping output on the console"){ @verbose = 0}
+      argParser.on("-q","--[no]-quiet ","Don't show ping output on the console"){ @verbose = 0 }
     end
 
     unless @addr != nil
