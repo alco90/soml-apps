@@ -3,37 +3,15 @@
  * Navini (now Cisco) Ripwave pre-WiMAX modem used by, e.g. Unwired, Exetel or
  * nTelos.
  *
- * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2012
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010-2013
  *
- * Copyright (c) 2010-2012 National ICT Australia (NICTA)
+ * Copyright 2010-2013 National ICT Australia (NICTA)
  *
- * This program is based on documentation available at [0], which is dumped
- * in file navini-protocol.txt for convenience.
- * [0] http://www.hamilton.ie/gavinmc/ripwave/navini_diag.html
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Neither the name of Nicta nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +31,6 @@
 
 #define OML_FROM_MAIN
 #include "ripwavemon_oml.h"
-//#include "EPEventDef.h"
 
 #define NAVINI_REPORT_PORT  3859
 
@@ -88,7 +65,8 @@ typedef struct {            /* Offset from the start of the IP packet*/
 } navini_report_t;
 #pragma pack()
 
-int prepare_socket(void)
+int
+prepare_socket(void)
 {
   int sockfd;
   struct sockaddr_in sai_bind;
@@ -111,7 +89,8 @@ int prepare_socket(void)
   return sockfd;
 }
 
-int prepare_oml(int argc, const char **argv)
+int
+prepare_oml(int argc, const char **argv)
 {
   if (omlc_init("ripwavemon", &argc, argv, NULL) != 0) {
     fprintf(stderr, "ERROR\tCould not initialise OML\n");
@@ -126,7 +105,8 @@ int prepare_oml(int argc, const char **argv)
   return 0;
 }
 
-void receive_reports (int sockfd)
+void
+receive_reports (int sockfd)
 {
   navini_report_t report;
   ssize_t len;
@@ -180,7 +160,8 @@ void receive_reports (int sockfd)
   }
 }
 
-int main(int argc, const char **argv)
+int
+main(int argc, const char **argv)
 {
 
   fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
@@ -202,10 +183,10 @@ int main(int argc, const char **argv)
 }
 
 /*
-   Local Variables:
-mode: C
-tab-width: 2
-indent-tabs-mode: nil
-End:
-vim: sw=2:sts=2:expandtab
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
 */
