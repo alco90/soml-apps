@@ -25,6 +25,7 @@
 #include <sys/un.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
 #ifdef HAVE_CONFIG_H
@@ -50,7 +51,7 @@
 int exit_loop = 0;
 
 void sigfun(int sig) {
-  fprintf(stderr, "INFO\tCaught signal %d, exiting...\n", sig);
+  loginfo("Caught signal %d, exiting...\n", sig);
   exit_loop = 1;
 }
 
@@ -65,7 +66,7 @@ int main(int argc, const char *argv[]) {
   struct sigaction new_action, old_action;
   struct timeval tv;
 
-  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+  loginfo("%s\n", PACKAGE_STRING);
 
   /* FIXME: Initialisation should be done by scaffold */
   g_opts_storage.interface = DEFAULT_IF;
@@ -77,7 +78,7 @@ int main(int argc, const char *argv[]) {
 
   if (g_opts_storage.local_path) {
     if (g_opts_storage.interface)
-      fprintf(stderr, "WARN\t both --interface (%s) and --socket (%s) were specified; using the latter\n",
+      logwarn(" both --interface (%s) and --socket (%s) were specified; using the latter\n",
           g_opts_storage.interface, g_opts_storage.local_path);
     strncpy(local_path, g_opts_storage.local_path, UNIX_PATH_MAX);
   } else {
@@ -85,7 +86,7 @@ int main(int argc, const char *argv[]) {
   }
   if (g_opts_storage.ctrl_interface) {
     if (g_opts_storage.interface)
-      fprintf(stderr, "WARN\t both --interface (%s) and --ctrl_interface (%s) were specified; using the latter\n",
+      logwarn(" both --interface (%s) and --ctrl_interface (%s) were specified; using the latter\n",
           g_opts_storage.interface, g_opts_storage.ctrl_interface);
     strncpy(sock_path, g_opts_storage.ctrl_interface, UNIX_PATH_MAX);
   } else {
@@ -96,7 +97,7 @@ int main(int argc, const char *argv[]) {
   oml_register_mps();
 
   if ((s = socket(PF_UNIX, SOCK_DGRAM, 0)) == -1) {
-    fprintf(stderr, "ERROR\tCould not create socket: %s\n", strerror(errno));
+    logerror("Could not create socket: %s\n", strerror(errno));
     exit_loop = 2;
     goto cleanup_socket;
   }
@@ -104,7 +105,7 @@ int main(int argc, const char *argv[]) {
   local.sun_family = AF_UNIX;
   strcpy(local.sun_path, local_path);
   if(bind(s, (struct sockaddr *) &local, sizeof(local)) < 0) {
-    fprintf(stderr, "ERROR\tCould not bind socket to '%s': %s\n", local_path, strerror(errno));
+    logerror("Could not bind socket to '%s': %s\n", local_path, strerror(errno));
     exit_loop = 2;
     goto cleanup_socket;
   }
@@ -113,17 +114,17 @@ int main(int argc, const char *argv[]) {
   strcpy(remote.sun_path, sock_path);
   len = strlen(remote.sun_path) + sizeof(remote.sun_family);
   if (connect(s, (struct sockaddr *)&remote, len) == -1) {
-    fprintf(stderr, "ERROR\tCould not connect to wpa_supplicant socket '%s': %s\n", sock_path, strerror(errno));
+    logerror("Could not connect to wpa_supplicant socket '%s': %s\n", sock_path, strerror(errno));
     exit_loop = 2;
     goto cleanup_socket;
   }
 
   if(send(s, "ATTACH", 6, 0) < 0) {
-    fprintf(stderr, "ERROR\tCould not send 'ATTACH' command to wpa_supplicant: %s\n", strerror(errno));
+    logerror("Could not send 'ATTACH' command to wpa_supplicant: %s\n", strerror(errno));
     exit_loop = 3;
     goto cleanup_socket;
   }
-  fprintf(stderr, "INFO\tAttached to wpa_supplicant socket '%s'\n", sock_path);
+  loginfo("Attached to wpa_supplicant socket '%s'\n", sock_path);
 
   new_action.sa_handler = sigfun;
   sigemptyset (&new_action.sa_mask);
@@ -182,10 +183,10 @@ int main(int argc, const char *argv[]) {
         strcpy(temp, str); /* Prepare to avoid duplicate messages */
       }
     } else if (t < 0) {
-      fprintf(stderr, "ERROR\tCould not receive anything from wpa_supplicant: %s\n", strerror(errno));
+      logerror("Could not receive anything from wpa_supplicant: %s\n", strerror(errno));
       exit_loop = 4;
     } else {
-      fprintf(stderr, "INFO\tServer closed connection\n");
+      loginfo("Server closed connection\n");
       exit_loop = 1;
     }
   }
@@ -195,7 +196,7 @@ int main(int argc, const char *argv[]) {
 cleanup_socket:
   close(s);
   if(remove(local_path) == -1) {
-    fprintf(stderr, "ERROR\tCould not connect remove socket '%s': %s\n", local_path, strerror(errno));
+    logerror("Could not connect remove socket '%s': %s\n", local_path, strerror(errno));
   }
   exit(exit_loop - 1);
 }
