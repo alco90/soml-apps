@@ -7,27 +7,15 @@
  * To compile: gcc -o gpslogger gpslogger.c -loml2 -lgps
  *
  * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2010
- * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2013
  *
- * Copyright (c) 2010-2012 National ICT Australia (NICTA)
+ * Copyright 2010-2013 National ICT Australia (NICTA)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
  */
 
 #include <stdlib.h>
@@ -61,7 +49,11 @@ struct fixsource_t
   char *device;
 };
 
-static void log_fix(struct gps_fix_t *fix, struct tm *time)
+static struct gps_fix_t gpsfix;
+struct fixsource_t source;
+
+static void
+log_fix(struct gps_fix_t *fix, struct tm *time)
 {
   static int header_printed = 0;
   char time_string [100];
@@ -71,10 +63,11 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
       time->tm_year+1900, time->tm_mon+1, time->tm_mday,
       time->tm_hour, time->tm_min, time->tm_sec);
 
-  if (fix->mode==MODE_NO_FIX)
+  if (fix->mode==MODE_NO_FIX) {
     (void)snprintf (mode, sizeof(mode), "none");
-  else
+  } else {
     (void)snprintf (mode, sizeof(mode), "%dd", fix->mode);
+  }
 
   if (verbose) {
     if (!header_printed) {
@@ -96,10 +89,10 @@ static void log_fix(struct gps_fix_t *fix, struct tm *time)
       fix->climb,
       mode,
       time_string);
-
 }
 
-static void conditionally_log_fix(struct gps_fix_t *gpsfix)
+static void
+conditionally_log_fix(struct gps_fix_t *gpsfix)
 {
   int_time = floor(gpsfix->time);
   if ((int_time != old_int_time) && gpsfix->mode >= MODE_2D) {
@@ -110,27 +103,26 @@ static void conditionally_log_fix(struct gps_fix_t *gpsfix)
   }
 }
 
-static void quit_handler (int signum)
+static void
+quit_handler (int signum)
 {
   omlc_close();
   exit(0);
 }
 
-static struct gps_fix_t gpsfix;
-
-struct fixsource_t source;
-
-static void process(struct gps_data_t *gpsdata,
-    char *buf UNUSED, size_t len UNUSED)
+static void
+process(struct gps_data_t *gpsdata, char *buf UNUSED, size_t len UNUSED)
 {
   /* this is where we implement source-device filtering */
-  if (gpsdata->dev.path[0] && source.device!=NULL && strcmp(source.device, gpsdata->dev.path) != 0)
+  if (gpsdata->dev.path[0] && source.device!=NULL && strcmp(source.device, gpsdata->dev.path) != 0) {
     return;
+  }
 
   conditionally_log_fix(&gpsdata->fix);
 }
 
-static int socket_mainloop(void)
+static int
+socket_mainloop(void)
 {
   fd_set fds;
   struct gps_data_t *gpsdata;
@@ -156,7 +148,7 @@ static int socket_mainloop(void)
 #endif
   gps_stream(gpsdata, WATCH_ENABLE|WATCH_NEWSTYLE, NULL);
 
-  for(;;) {
+  while(1) {
     int data;
     struct timeval tv;
 
@@ -183,7 +175,8 @@ static int socket_mainloop(void)
   return 0;
 }
 
-static void usage(const char* progname)
+static void
+usage(const char* progname)
 {
   fprintf(stderr,
       "usage: %s [-h] [-v] [server[:port:[device]]]\n"
@@ -193,7 +186,8 @@ static void usage(const char* progname)
       progname);
 }
 
-int main (int argc, const char **argv)
+int
+main (int argc, const char **argv)
 {
   char *progname=strdup(argv[0]), *p=progname, *p2;
   int result, l;
