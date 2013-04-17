@@ -1,15 +1,24 @@
-#include "udp_outport.h"
-//#include "udpsock_port_helper.h"
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
 
-//#include "stream.h"
 #include <iostream>
-using namespace std;
 #include <netdb.h>
 #include <arpa/inet.h>
-//#include <fcntl.h>
 #include <ocomm/o_log.h>
 #include <sys/time.h>
 #include <time.h>
+
+#include "udp_outport.h"
+
+using namespace std;
 
 #ifdef WITH_OML
 #define OML_FROM_MAIN
@@ -17,9 +26,7 @@ using namespace std;
 #endif
 
 UDPOutPort::UDPOutPort()
-
 {
-
   //cerr << "DEBUG\tCreation of udp_out"<< endl;
 #ifdef WITH_OML
   //cerr << "DEBUG\tRegistering MPs"<< endl;
@@ -29,7 +36,6 @@ UDPOutPort::UDPOutPort()
 
 void
 UDPOutPort::defOpts()
-
 {
   Socket::defOpts();
 
@@ -37,7 +43,7 @@ UDPOutPort::defOpts()
   defOpt("nonblock", POPT_ARG_STRING, NULL, "Use Non-blocking UDP", "on|off");
 }
 
-/** Init Funciton to initialize a socket port.
+/** Init Function to initialize a socket port.
  *  Init will do
  *  - create socket
  *  - bind socket
@@ -53,13 +59,11 @@ UDPOutPort::defOpts()
  *
  *
  */
-void UDPOutPort::init()
+void
+UDPOutPort::init()
 {
-
   struct timeval time;
-  int i = gettimeofday(&time, NULL);
   timestamp = time.tv_sec;
-
 
   if (sockfd_ != 0) return; // already initialized
 
@@ -83,7 +87,6 @@ void UDPOutPort::init()
 
 void
 UDPOutPort::initSocket()
-
 {
   if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw "Error while opening UDP socket";
@@ -102,7 +105,7 @@ UDPOutPort::sendPacket(Packet* pkt)
   gettimeofday(&tv, NULL);
   double now = tv.tv_sec - timestamp + 0.000001 * tv.tv_usec;
 
- // cerr << "DEBUG\t" << timestamp << endl;
+  // cerr << "DEBUG\t" << timestamp << endl;
   pkt->stampPacket(0x01);
   pkt->stampShortVal(pkt->getFlowId());
   pkt->stampLongVal(pkt->getSequenceNum());
@@ -120,19 +123,27 @@ UDPOutPort::sendPacket(Packet* pkt)
 
 #ifdef WITH_OML
   oml_inject_udp_out(g_oml_mps->udp_out,
-		  now,
-		  pkt->getFlowId(),
-		  pkt->getSequenceNum(),
-		  pktLength,
-		  dsthost_,
-		  dstport_);
+      now,
+      pkt->getFlowId(),
+      pkt->getSequenceNum(),
+      pktLength,
+      dsthost_,
+      dstport_);
 #endif
   return pkt;
 }
 
 void
 UDPOutPort::closeSender()
-
 {
   Socket::close();
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

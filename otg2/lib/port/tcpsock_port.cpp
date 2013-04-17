@@ -1,21 +1,32 @@
-#include "tcpsock_port.h"
-#include "tcpsock_port_helper.h"
-//#include "stream.h"
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
+
 #include <iostream>
-using namespace std;
 #include <netdb.h>
 #include <arpa/inet.h>
 
-#define BACKLOG   10  ///< Maximum 10 connections for a TCP server
+#include "tcpsock_port.h"
+#include "tcpsock_port_helper.h"
+
+using namespace std;
+
+/**  Maximum 10 connections for a TCP server */
+#define BACKLOG   10
 
 TCPSockPort::TCPSockPort()
-
 {
 }
 
 /** Init Funciton to initialize a TCP socket port
  *
-
  * The port bind to its own address, generate a TCP socket.
  * This TCP socket will be used by sender to send packets, and for receiver to "listen".
  * Packet reception will use new socket file desciptor.
@@ -30,11 +41,10 @@ TCPSockPort::TCPSockPort()
  * Usually, port state should changed from uninitialized to running
  * but in case of port being paused from beginning, we keep it paused.
  */
-
-void TCPSockPort::init()
-
+void
+TCPSockPort::init()
 {
-  if (sockfd_ != 0) return; // already initialized
+  if (sockfd_ != 0) { return; } // already initialized
 
   InternetPort::init();
 
@@ -49,7 +59,6 @@ void TCPSockPort::init()
 
 void
 TCPSockPort::initSocket()
-
 {
   if ((sockfd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("ERROR\tsocket()");
@@ -57,42 +66,23 @@ TCPSockPort::initSocket()
   }
 }
 
-
-
 /** The main send function of TCP Socket Port.
  * Be sure the sockfd_ is already connected to a remote TCP server
  * First, check if the port is still in "running" state.
  * Then, simply call send() to send packet
  */
-void TCPSockPort::sendPacket(Packet *pkt)
+void
+TCPSockPort::sendPacket(Packet *pkt)
 {
-  //if (state_ == paused) return;
   int len = send(sockfd_, pkt->getPayload(), pkt->getPayloadSize(), 0);
-  if (len == -1) perror("send");
-  //pkt_->txMeasure_->setTxTime((long)(portclock_.getCurrentTime()*1e6) );
-  //otgMeasureReport();
+  if (len == -1) { perror("send"); }
 }
 
-
-
-//const struct poptOption*
-//TCPSockPort::getOptions()
-//
-//{
-//  char* prefix;
-//  struct poptOption* opts;
-//  opts = (struct poptOption*)calloc(6, sizeof(struct poptOption));
-//  struct poptOption* p = opts;
-//
-//  popt_set(p++, prefix, "hostname", '\0', POPT_ARG_STRING, (void*)localhost, 0,
-//         "Name of local host", "[name]");
-//  popt_set(p++, prefix, "port", '\0', POPT_ARG_INT, (void*)&localport, 0,
-//         "Local port to bind to", "[int]");
-//  popt_set(p++, prefix, "dsthostname", '\0', POPT_ARG_STRING, (void*)dsthost, 0,
-//         "Name of destination host", "[name]");
-//  popt_set(p++, prefix, "dstport", '\0', POPT_ARG_INT, (void*)&dstport, 0,
-//         "Destination port to send to", "[int]");
-//  popt_set(p);
-//
-//  return opts;
-//}
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

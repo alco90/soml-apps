@@ -1,16 +1,25 @@
-#include "tcpsock_gate.h"
-#include "tcpsock_gate_helper.h"
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
 
-#include "stream.h"
 #include <iostream>
-using namespace std;
 #include <netdb.h>
 #include <arpa/inet.h>
-//#include "dummysink.h"
+
+#include "tcpsock_gate.h"
+#include "tcpsock_gate_helper.h"
+#include "stream.h"
+
+using namespace std;
 
 #define BACKLOG   10  ///< Maximum 10 connections for a TCP server
-
-
 
 /** Init Funciton to initialize a TCP socket port
  *  default port number is set to 4500 for receiver, hostname is set to "localhost"
@@ -26,10 +35,9 @@ using namespace std;
  * The program use INADDR_ANY as the address filled in address parameters of bind().
  * So, we need an empty hostname with the port number.
  */
-
-void TCPSockGate::init()
+void
+TCPSockGate::init()
 {
-
   SockGate::init();
   if ((sockfd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("ERROR\tsocket()");
@@ -38,20 +46,18 @@ void TCPSockGate::init()
   Address *emptyAddr = new Address("", myaddr_.getPort());
   struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
   if (  bind(sockfd_, addr, sizeof(struct sockaddr_in)) < 0)
-     throw "TCP Socket Bind error";
+    throw "TCP Socket Bind error";
   cerr << "INFO\tListening for TCP connections on port" << myaddr_.getPort() << << endl;
   // TCP revceiver is actually a TCP server
   listen(sockfd_, BACKLOG);
-
 }
 
-
-/**
- *  Function to start an endless loop for Listing TCP connections
+/** Function to start an endless loop for Listing TCP connections
  *  This Marks the beginning of an independent receiving thread
  *  Each incomming connection will be assigned to a flow.
  */
-void TCPSockGate::startReceive()
+void
+TCPSockGate::startReceive()
 {
   int i,fdmax, newfd;
   fd_set readfds, master;
@@ -59,62 +65,52 @@ void TCPSockGate::startReceive()
   FD_ZERO(&master);
   FD_SET(sockfd_,&master);
   fdmax = sockfd_;
-  while (1)
-  {
-        readfds =  master;
-        select(fdmax+1, &readfds, (fd_set *)0, (fd_set *)0, NULL);
-        for ( i=0; i<=fdmax; i++)
-	  if (FD_ISSET(i, &readfds))
-	    {
-               if (i == sockfd_)
-	       {
-	            newfd =  acceptNewConnection();
-                    FD_SET(newfd, &master);  // add to master set
-                       if (newfd > fdmax)    // keep track of the maximum
-                              fdmax = newfd;
+  while (1) {
+    readfds =  master;
+    select(fdmax+1, &readfds, (fd_set *)0, (fd_set *)0, NULL);
 
-	       }
-	       else{
-                 if (receivePacket(i)== false)
-		               FD_CLR(i, &master);
-		 else
-		    inboundPacket();
-	       }
-	    }
+    for ( i=0; i<=fdmax; i++) {
+      if (FD_ISSET(i, &readfds)) {
+        if (i == sockfd_) {
+          newfd =  acceptNewConnection();
+          FD_SET(newfd, &master);  // add to master set
+          if (newfd > fdmax) {   // keep track of the maximum
+            fdmax = newfd;
+          }
 
-   }   // end while
+        } else if (receivePacket(i)== false) {
+          FD_CLR(i, &master);
+
+        } else {
+          inboundPacket();
+        }
+      }
+    }
+  }
 }
 
-/**
- * This will use rlcurr_ to receive a packet.
- *
- */
-bool TCPSockGate::receivePacket(int fd)
+/** This will use rlcurr_ to receive a packet. */
+bool
+TCPSockGate::receivePacket(int fd)
 {
   rlcurr_ = searchFlowbyFd(fd);
-  //rlcuur_->getID is the flow id (socket fd) of this flow
-  //pkt_ = rlcurr_->packetcache_;
   int len = (int)recv(rlcurr_->getID(), pkt_->getPayload(), pkt_->getBufferSize(),0);
-  if (len == -1) perror("recvfrom");
-  if (len <= 0  )
-    {
-      close(rlcurr_->getID()); // Connection has been closed by the other end (==0) or error occurs
-      return false;
-    }
+  if (len == -1) { perror("recvfrom"); }
+  if (len <= 0  ) {
+    close(rlcurr_->getID()); // Connection has been closed by the other end (==0) or error occurs
+    return false;
+  }
   pkt_->rxMeasure_->setReceivedLength(len);
-  //pkt_->rxMeasure_->setRxTime((long)(gateclock_.getCurrentTime()*1e6) );
 
   return true;
 }
 
-
-/**
- * Function to accept new connections
+/** Function to accept new connections
  * After reaching maximum connections, the default sockfd_ should be closed to prohibit new connections
- * @return the new socket file descriptor
+ * \return the new socket file descriptor
  */
-
-int  TCPSockGate::acceptNewConnection()
+int
+TCPSockGate::acceptNewConnection()
 {
   struct sockaddr_in tmpSockAddr; // connector's address information
   int sin_size =  sizeof(struct sockaddr_in);
@@ -127,18 +123,24 @@ int  TCPSockGate::acceptNewConnection()
   cerr << "INFO\tAccepting a new connection" << endl;
   decodeSockAddress(&itsaddr_, &tmpSockAddr);
   addFlow(newfd, &itsaddr_);
-  //decodeSockAddress(rltail_->getAddr(), &tmpSockAddr);
 
- //add some code to prohibit new connecitons if there are already 10 connections. Fix ME!!!
+  // FIXME add some code to prohibit new connections if there are already 10 connections.
 
   return newfd;
 }
 
-
-const struct poptOption* TCPSockGate::getOptions()
-
+const struct poptOption*
+TCPSockGate::getOptions()
 {
-  //  return tcp_sock_gate_get_options(this, NULL);
+  // FIXME return tcp_sock_gate_get_options(this, NULL);
   return NULL;
 }
 
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

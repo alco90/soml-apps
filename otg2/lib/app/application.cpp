@@ -1,3 +1,13 @@
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
 
 #ifdef WITH_OML
 extern "C" {
@@ -38,24 +48,23 @@ phase1[] = {
 
 static struct poptOption
 phase2[] = {
-    { "help", 'h', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, NULL, HELP_FLAG, "Show help", "[component]"},
-    { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
-    { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
-    { "sender", '\0', POPT_ARG_STRING, NULL, 0},
-    { "source", '\0', POPT_ARG_STRING, NULL, 0},
-    { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
-    { "debug-level", 'd', POPT_ARG_INT, NULL, 0, "Debug level - error:-2 .. debug: 1-3"},
-    { "logfile", 'l', POPT_ARG_STRING, NULL, 0, "File to log to"},
-    { "version", 'v', 0, 0, 'v', "Print version information and exit" },
-    { "exit", '\0', POPT_ARG_NONE, NULL, 1, "Stop the generator and exit" },
-    { "pause", '\0', POPT_ARG_NONE, NULL, 2, "pause the generator and exit" },
-    { "resume", '\0', POPT_ARG_NONE, NULL, 3, "resume the generator" },
-    { NULL, 0, 0, NULL, 0 }
+  { "help", 'h', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, NULL, HELP_FLAG, "Show help", "[component]"},
+  { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
+  { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
+  { "sender", '\0', POPT_ARG_STRING, NULL, 0},
+  { "source", '\0', POPT_ARG_STRING, NULL, 0},
+  { NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0},
+  { "debug-level", 'd', POPT_ARG_INT, NULL, 0, "Debug level - error:-2 .. debug: 1-3"},
+  { "logfile", 'l', POPT_ARG_STRING, NULL, 0, "File to log to"},
+  { "version", 'v', 0, 0, 'v', "Print version information and exit" },
+  { "exit", '\0', POPT_ARG_NONE, NULL, 1, "Stop the generator and exit" },
+  { "pause", '\0', POPT_ARG_NONE, NULL, 2, "pause the generator and exit" },
+  { "resume", '\0', POPT_ARG_NONE, NULL, 3, "resume the generator" },
+  { NULL, 0, 0, NULL, 0 }
 };
 
 
-/**
- *  Genral structure of an OTx application
+/** General structure of an OTx application
  *
  * The major purpose of this function are:
  * - handle command-line inputs, before starting the program and at run-time.
@@ -68,16 +77,13 @@ phase2[] = {
  * Here. we are going to have multiple streams in one OTG.
  * using multiple thread. the main thread is handling commands.
  * each stream is a seperate thread, by calling th stream_init functon, the stream is independently sending packets
- *
  */
-
 Application::Application(int argc, const char * argv[], const char* defLogFile)
 {
   throw("Application::Application(argc, argv,...) is deprecated; use Application::Application(\"appname\", argc, argv,...) instead");
 }
 
-Application::Application(const char *appname, int argc, const char * argv[], const char* defLogFile,
-		const char* applongname, const char* copyright)
+Application::Application(const char *appname, int argc, const char * argv[], const char* defLogFile, const char* applongname, const char* copyright)
 {
   app_name_ = appname;
   app_long_name_ = applongname == NULL ? appname : applongname;
@@ -128,33 +134,29 @@ Application::~Application()
 #endif
 }
 
-
-/**
-*  Parse options for phase 1: Protocol and Generator Type
-*/
+/**  Parse options for phase 1: Protocol and Generator Type */
 void
 Application::parseOptionsPhase1()
-
 {
   int rc;
   poptContext optCon = poptGetContext(NULL, argc_, argv_, phase1_, 0);
   while ((rc = poptGetNextOpt(optCon)) != -1) {
     switch (rc) {
-      case HELP_FLAG:
-        showHelp(optCon, component_name_);
-        exit(0);
-      case USAGE_FLAG:
-        poptPrintUsage(optCon, stdout, 0);
-        exit(0);
-      case VERSION_FLAG:
-        printVersion();
-        exit(0);
-      case POPT_ERROR_BADOPT:
-        // ignore here
-        break;
-      default:
-        cerr << "ERROR\tUnknown flag operation '" << rc << "'." << endl;
-        exit(-1);
+    case HELP_FLAG:
+      showHelp(optCon, component_name_);
+      exit(0);
+    case USAGE_FLAG:
+      poptPrintUsage(optCon, stdout, 0);
+      exit(0);
+    case VERSION_FLAG:
+      printVersion();
+      exit(0);
+    case POPT_ERROR_BADOPT:
+      // ignore here
+      break;
+    default:
+      cerr << "ERROR\tUnknown flag operation '" << rc << "'." << endl;
+      exit(-1);
     }
   }
   poptFreeContext(optCon);
@@ -164,10 +166,8 @@ Application::parseOptionsPhase1()
 }
 
 void
-Application::showHelp(
-  poptContext optCon,
-  char*       component_name
-) {
+Application::showHelp(poptContext optCon, char* component_name)
+{
   if (component_name == NULL) {
     // common help
     poptPrintHelp(optCon, stdout, 0);
@@ -178,44 +178,36 @@ Application::showHelp(
       cerr << "WARN\tUnknown component '" << component_name << "'" <<endl;
     } else {
       poptContext ctxt =
-          poptGetContext(NULL, argc_, argv_, opts, POPT_CONTEXT_NO_EXEC);
+        poptGetContext(NULL, argc_, argv_, opts, POPT_CONTEXT_NO_EXEC);
       poptPrintHelp(ctxt, stdout, 0);
     }
   }
 }
 
-/**
-*  Parse options in second Phase.
-*  Check all port and generator parameters except "type" which has already been parsed.
-*  in Phase I.
-*/
+/** Parse options in second Phase.
+ * Check all port and generator parameters except "type" which has already been parsed.
+ * in Phase I.
+ */
 void
 Application::parseOptionsPhase2()
-
 {
   int rc;
   poptContext optCon = poptGetContext(NULL, argc_, argv_, phase2_, 0);
   while ((rc = poptGetNextOpt(optCon)) >= 0);
   if (rc < -1) {
     cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
-            << " (" << poptStrerror(rc) << ")" << endl;
+      << " (" << poptStrerror(rc) << ")" << endl;
     poptPrintUsage(optCon, stderr, 0);
     exit(-1);
   }
 
-//  const char** leftover = poptGetArgs(optCon);
-//  if (leftover != NULL) {
-//    cerr << "ERROR\tAdditional argument '" << leftover[0] << "' found" << endl;
-//    goto err;
-//  }
   poptFreeContext(optCon);
   return;
 }
 
 int
-Application::parseRuntimeOptions(
-  char * msg
-) {
+Application::parseRuntimeOptions(char * msg)
+{
   int argc;
   const char** argv;
   char strin[MAX_INPUT_SIZE];
@@ -228,33 +220,33 @@ Application::parseRuntimeOptions(
     msg = strin;
   }
   poptParseArgvString(msg, &argc, &argv);
-//  char* component_name;
-//  phase2_[0].arg = &component_name;
+  //  char* component_name;
+  //  phase2_[0].arg = &component_name;
   poptContext optCon = poptGetContext(NULL, argc, argv, phase2_, POPT_CONTEXT_KEEP_FIRST);
 
   int rc;
   while ((rc = poptGetNextOpt(optCon)) > 0) {
     switch(rc) {
-      case 1: // Stop
-        stream_->exitStream();
-        exit(0);  //exit terminate process and all its threads
-      case 2:
-        stream_->pauseStream();
-        break;
-      case 3:
-        stream_->resumeStream();
-        break;
-      case HELP_FLAG:
-        showHelp(optCon, component_name_);
-        break;
-      case VERSION_FLAG:
-        printVersion();
-        break;
+    case 1: // Stop
+      stream_->exitStream();
+      exit(0);  //exit terminate process and all its threads
+    case 2:
+      stream_->pauseStream();
+      break;
+    case 3:
+      stream_->resumeStream();
+      break;
+    case HELP_FLAG:
+      showHelp(optCon, component_name_);
+      break;
+    case VERSION_FLAG:
+      printVersion();
+      break;
     }
   }
   if (rc < -1) {
     cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
-            << " (" << poptStrerror(rc) << ")" << endl;
+      << " (" << poptStrerror(rc) << ")" << endl;
   }
   poptFreeContext(optCon);
   dynamic_cast<IComponent*>(sender_)->update();
@@ -265,7 +257,6 @@ Application::parseRuntimeOptions(
 
 void
 Application::run()
-
 {
 
   parseOptionsPhase1();
@@ -304,29 +295,23 @@ Application::run()
 
   stream_->run();
 
-  int rc;
   char msg[MAX_INPUT_SIZE];
   while (1) {
     cin.getline(msg, MAX_INPUT_SIZE );
-    rc = parseRuntimeOptions(msg);
+    parseRuntimeOptions(msg);
   }
 }
 
 void
 Application::printVersion()
-
 {
   cerr << app_long_name_ << " " << OTG2_VERSION << endl;
   cerr << copyright_ << endl;
 }
 
 void
-Application::setSenderInfo(
-  const char* longName,
-  char        shortName,        /* may be ’\0’ */
-  const char*       descrip,        /* description for autohelp -- may be NULL */
-  const char*       argDescrip
-) {
+Application::setSenderInfo(const char* longName, char shortName, const char* descrip, const char* argDescrip)
+{
   struct poptOption& p1 = phase1_[2];
   struct poptOption& p2 = phase2_[3];
 
@@ -337,12 +322,8 @@ Application::setSenderInfo(
 }
 
 void
-Application::setSourceInfo(
-  const char* longName,
-  char        shortName,        /* may be ’\0’ */
-  const char* descrip,        /* description for autohelp -- may be NULL */
-  const char* argDescrip
-) {
+Application::setSourceInfo(const char* longName, char shortName, const char* descrip, const char* argDescrip)
+{
   struct poptOption& p1 = phase1_[3];
   struct poptOption& p2 = phase2_[4];
 
@@ -351,3 +332,12 @@ Application::setSourceInfo(
   p1.descrip = p2.descrip = descrip;
   p1.argDescrip = p2.argDescrip = argDescrip;
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

@@ -1,3 +1,14 @@
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
+
 #ifndef STREAM_H
 #define STREAM_H
 
@@ -5,50 +16,57 @@
 #include "otg2/source.h"
 #include "otg2/packet.h"
 #include "otg2/sender.h"
-#include <otg2/component.h>
-
+#include "otg2/component.h"
 
 class Stream : public Component
-
 {
 public:
   Stream(short id = 1);
-  
+
   void setSource(ISource* source) { source_ = source; }
   void setSender(Sender* sender) { sender_ = sender; }
   void run();
-  
+
   void startStream();
   void pauseStream();
   void resumeStream();
   void exitStream();
-  
+
   void init() {}
-  
+
   // should only be used internally
   void _run();
-  
-protected:
-  inline const char*
-  getNamespace() { return "flow"; }
-  
-  void
-  defOpts();
-  
-  unsigned long seqno_; ///< number of packets sent or received  by this stream 
-  ISource*       source_; ///< the generator to feed packets to this stream
-  Sender*       sender_; /// the port for sending packets out.
-  short         streamid_; /// stream identifier. 
-  
-  //double starttime_;  ///< starting time of a stream
-  UnixTime streamclock_; ///<Contorl the timing of stream
 
-  bool paused_; ///< indicate whether stream is paused
-  
-  int active_;  // set to true while stream is active
+protected:
+  inline const char* getNamespace() { return "flow"; }
+
+  void defOpts();
+
+  /**  number of packets sent or received  by this stream */
+  unsigned long seqno_;
+  /**  the generator to feed packets to this stream */
+  ISource*       source_;
+  Sender*       sender_; /// the port for sending packets out.
+  short         streamid_; /// stream identifier.
+
+  /** Contorl the timing of stream */
+  UnixTime streamclock_;
+
+  /**  indicate whether stream is paused */
+  bool paused_;
+
+  /**  set to true while stream is active */
+  int active_;
   pthread_t thread_;
 };
 
-
-  
 #endif
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/

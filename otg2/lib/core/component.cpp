@@ -1,27 +1,32 @@
+/*
+ * Copyright 2004-2010 WINLAB, Rutgers University, USA
+ * Copyright 2007-2013 National ICT Australia (NICTA)
+ *
+ * This software may be used and distributed solely under the terms of
+ * the MIT license (License).  You should find a copy of the License in
+ * COPYING or at http://opensource.org/licenses/MIT. By downloading or
+ * using this software you accept the terms and the liability disclaimer
+ * in the License.
+ */
 
 #include <stdlib.h>
 #include <string.h>
-#include <otg2/component.h>
 
-/**
- * Constructor.
- */
+#include "otg2/component.h"
 
+/** Constructor.  */
 Component::Component()
-
 {
   opts_ = NULL;
 }
 
 void
 Component::update()
-
 {
 }
 
-const struct poptOption* 
+const struct poptOption*
 Component::getOptions()
-
 {
   if (opts_ == NULL) {
     opts_length_ = 20;
@@ -34,19 +39,13 @@ Component::getOptions()
 
 const char*
 Component::getNamespace()
-
 {
   return NULL;
 }
 
 void
-Component::defOpt( 
-  const char * longName,
-  int argInfo,
-  void* arg,
-  const char* descrip,
-  const char * argDescrip
-) {
+Component::defOpt(const char * longName, int argInfo, void* arg, const char* descrip, const char * argDescrip)
+{
   struct poptOption* o = &opts_[opts_count_++];
   const char* nameSpace = this->getNamespace();
 
@@ -64,3 +63,12 @@ Component::defOpt(
   o->descrip = descrip;
   o->argDescrip = argDescrip;
 }
+
+/*
+ Local Variables:
+ mode: C
+ tab-width: 2
+ indent-tabs-mode: nil
+ End:
+ vim: sw=2:sts=2:expandtab
+*/
