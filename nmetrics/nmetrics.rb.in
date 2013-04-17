@@ -14,7 +14,7 @@ OML. }
   a.defProperty('interface',
         'Report usage for the specified network interface (can be used multiple times)', ?i,
         :type => :string,
-        :impl => { :var_name => 'if_name', :popt_val => 'i' })
+        :impl => { :var_name => 'if_name', :popt_val => '"eth0"' })
   a.defProperty('memory', 'Report memory usage', ?m,
         :type => :flag, :impl => { :var_name => 'report_memory' })
   a.defProperty('sample-interval',

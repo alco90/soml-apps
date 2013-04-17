@@ -8,7 +8,7 @@ pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = nmetrics-oml2
 nmetrics_oml2_SOURCES = nmetrics.c
-nmetrics_oml2_LDADD = -loml2 -lsigar -lpopt
+nmetrics_oml2_LDADD = -loml2 -locomm -lsigar -lpopt
 nmetrics_oml2_CPPFLAGS = $(LIBSIGAR_CFLAGS)
 
 pkgdata_DATA = $(appname).rb
