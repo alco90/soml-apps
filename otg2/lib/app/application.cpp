@@ -84,13 +84,13 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   app_long_name_ = applongname == NULL ? appname : applongname;
   copyright_ = copyright == NULL ? COPYRIGHT : copyright;
 
-  o_log(O_LOG_INFO, "%s %s\n", app_long_name_, OTG2_VERSION);
+  loginfo("%s %s\n", app_long_name_, OTG2_VERSION);
 
   omlc_init(app_name_, &argc, argv, NULL);
 
   argc_ = argc;
   argv_ = argv;
-  //cerr << "DEBUG\tInitialisation of the application" <<endl;
+  logdebug("Initialisation of the application\n");
   clockref_ = -1;
 
   component_name_ = NULL;
@@ -99,7 +99,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   logfile_name_ = defLogFile;
 
   stream_ = new Stream();
-  //cerr << "DEBUG\tInitialisation of the application after Stream creation" <<endl;
+  logdebug("Initialisation of the application after Stream creation");
 
   phase1_ = phase1;
   phase1_[0].arg = &component_name_;
@@ -108,7 +108,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   phase1_[4].arg = (void*)stream_->getOptions();
   phase1_[5].arg = &log_level_;
   phase1_[6].arg = &logfile_name_;
-  //cerr << "DEBUG\tInitialisation of the application end of phase 1" <<endl;
+  logdebug("Initialisation of the application end of phase 1\n");
   phase2_ = phase2;
   phase2_[0].arg = &component_name_;
   phase2_[4].argDescrip = "FIXED";
@@ -116,7 +116,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   phase2_[6].argDescrip = "FIXED";
   phase2_[7].argDescrip = "FIXED";
   phase2_[8].argDescrip = "FIXED";
-  //cerr << "DEBUG\tInitialisation of the application end of phase 2" <<endl;
+  logdebug("Initialisation of the application end of phase 2\n");
 
 }
 
@@ -146,7 +146,7 @@ Application::parseOptionsPhase1()
       // ignore here
       break;
     default:
-      cerr << "ERROR\tUnknown flag operation '" << rc << "'." << endl;
+      logerror("Unknown flag operation %d\n", rc);
       exit(-1);
     }
   }
@@ -166,7 +166,7 @@ Application::showHelp(poptContext optCon, char* component_name)
     // help about a component. Let's find it.
     const struct poptOption* opts= getComponentOptions(component_name);
     if (opts == NULL) {
-      cerr << "WARN\tUnknown component '" << component_name << "'" <<endl;
+      logwarn("Unknown component '%s'\n", component_name);
     } else {
       poptContext ctxt =
         poptGetContext(NULL, argc_, argv_, opts, POPT_CONTEXT_NO_EXEC);
@@ -186,8 +186,7 @@ Application::parseOptionsPhase2()
   poptContext optCon = poptGetContext(NULL, argc_, argv_, phase2_, 0);
   while ((rc = poptGetNextOpt(optCon)) >= 0);
   if (rc < -1) {
-    cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
-      << " (" << poptStrerror(rc) << ")" << endl;
+    logerror("%s (%s)\n", poptBadOption(optCon, POPT_BADOPTION_NOALIAS), poptStrerror(rc));
     poptPrintUsage(optCon, stderr, 0);
     exit(-1);
   }
@@ -236,8 +235,7 @@ Application::parseRuntimeOptions(char * msg)
     }
   }
   if (rc < -1) {
-    cerr << "ERROR\t" << poptBadOption(optCon, POPT_BADOPTION_NOALIAS)
-      << " (" << poptStrerror(rc) << ")" << endl;
+    logerror("%s (%s)\n", poptBadOption(optCon, POPT_BADOPTION_NOALIAS), poptStrerror(rc));
   }
   poptFreeContext(optCon);
   dynamic_cast<IComponent*>(sender_)->update();
@@ -255,29 +253,29 @@ Application::run()
   source_ = createSource(source_name_);
 
   if (source_ == NULL) {
-    cerr << "ERROR\tUnknown source '" << source_name_ << "'." << endl;
+    logerror("Unknown source '%s'\n", source_name_);
     exit(-1);
   }
 
   sender_ = createSender(sender_name_);
 
   if (sender_ == NULL) {
-    cerr << "ERROR\tUnknown sender '" << sender_name_ << "'." << endl;
+    logerror("Unknown sender '%s'\n", sender_name_);
     exit(-1);
   }
-  //cerr << "DEBUG\tSender/Source created" <<endl;
+  logdebug("Sender/Source created\n");
 
   phase2_[1].arg = (void*)sender_->getConfigurable()->getOptions();
   phase2_[2].arg = (void*)source_->getConfigurable()->getOptions();
   parseOptionsPhase2();
-  //cerr << "DEBUG\tParsing phase 2 finished" <<endl;
+  logdebug("Parsing phase 2 finished\n");
 
   source_->getConfigurable()->init();
   sender_->getConfigurable()->init();
   stream_->setSource(source_);
   stream_->setSender(sender_);
 
-  //cerr << "DEBUG\tStream configured" <<endl;
+  logdebug("Stream configured\n");
 
   omlc_start();
 
@@ -293,8 +291,8 @@ Application::run()
 void
 Application::printVersion()
 {
-  cerr << app_long_name_ << " " << OTG2_VERSION << endl;
-  cerr << copyright_ << endl;
+  loginfo("%s %s\n", app_long_name_, OTG2_VERSION);
+  loginfo("%s\n", copyright_);
 }
 
 void

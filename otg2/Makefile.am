@@ -40,7 +40,8 @@ CLEANFILES =  otg2_oml.h \
 	      $(appotg2).rb \
 	      $(appotr2).rb
 
-otgrlibs = -lpthread libotg2.la
+omllibs= -loml2 -locomm -lpthread
+otgrlibs = $(omllibs) libotg2.la
 
 bin_PROGRAMS = otg2-oml2 otr2-oml2
 
@@ -93,11 +94,11 @@ libotg2_la_SOURCES = \
 	lib/otg2/stream.h \
 	lib/otg2/unixtime.h
 
-libotg2_la_LIBADD = -locomm \
+libotg2_la_LIBADD = \
+	$(omllibs) -lpopt \
 	$(builddir)/lib/core/libotg2core.la \
 	$(builddir)/lib/port/libotg2port.la \
-	$(builddir)/lib/generator/libotg2generator.la \
-	-lpopt -lpthread -loml2
+	$(builddir)/lib/generator/libotg2generator.la
 
 target_otg2 = $(installed_otg2)$(EXEEXT)
 target_otr2 = $(installed_otr2)$(EXEEXT)

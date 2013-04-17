@@ -12,11 +12,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <ocomm/o_log.h>
 
 #include "randomvariable.h"
-
-using std::cerr;
-using std::endl;
 
 double
 UniformRandomVariable::getSample()
@@ -25,7 +23,7 @@ UniformRandomVariable::getSample()
   // Set evil seed (initial seed)
   srand( (unsigned)time( NULL ) );
   x = (double) rand()/RAND_MAX;
-  //cerr << "DEBUG\t" << x << endl;
+  logdebug("Uniform random number: %f\n", x);
   return x;
 }
 

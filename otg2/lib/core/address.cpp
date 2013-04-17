@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string.h>
+#include <ocomm/o_log.h>
 
 #include "otg2/address.h"
 
@@ -97,10 +98,9 @@ char*
 Address::convertHWAddrToColonFormat()
 {
   char *colonformat =  new char[17];
-  //printf("HW Address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",u[0], u[1], u[2], u[3], u[4], u[5]);
   sprintf(colonformat,"%02X:%02X:%02X:%02X:%02X:%02X",
       macaddr_[0],macaddr_[1],macaddr_[2],macaddr_[3],macaddr_[4],macaddr_[5]);
-  // cerr << "DEBUG\t" << colonformat << endl;
+  logdebug("%s\n", colonformat);
   return colonformat;
 
 }

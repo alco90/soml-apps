@@ -10,6 +10,7 @@
  */
 
 #include <iostream>
+#include <ocomm/o_log.h>
 
 #include "otg2/otr2_app.h"
 
@@ -22,7 +23,7 @@ int main(int argc, const char * argv[])
     otr->run();
 
   } catch (const char *reason ) {
-    cerr << "ERROR\t" << reason << endl;
+    logerror("%s\n", reason);
     return -1;
   }
 

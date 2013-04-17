@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include <ocomm/o_log.h>
 
 #include "expo_generator.h"
 
@@ -80,7 +81,7 @@ Expo_Generator::nextPacket(Packet* p)
   rem_--;
   lastPktStamp_ += t;
   p->setTxTime(lastPktStamp_);
-  //cerr << "DEBUG\t" << lastPktStamp_ <<endl;
+  logdebug("Last packet sent at %d\n", lastPktStamp_);
   return p;
 }
 

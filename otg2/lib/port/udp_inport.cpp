@@ -72,7 +72,7 @@ UDPInPort::nextPacket(Packet* pkt)
   char* buf =  pkt->getBufferPtr(maxPktLength_);
   int len = (int)recvfrom(sockfd_, buf, pkt->getBufferSize(), 0, (struct sockaddr*)&tmpSockAddr, (socklen_t *)&length);
   if (len == -1) {
-    perror("recvfrom");
+    logerror("Error in recvfrom(): %s\n", strerror(errno));
     delete pkt;
     return NULL;
   }
@@ -80,7 +80,7 @@ UDPInPort::nextPacket(Packet* pkt)
   pkt->setPayloadSize(len);
   char* senderHost = inet_ntoa(tmpSockAddr.sin_addr);
   int senderPort = ntohs(tmpSockAddr.sin_port);
-  o_log(O_LOG_DEBUG2, "Receiving UDP packet of size '%d' from '%s:%d'\n",
+  logdebug("Receiving UDP packet of size '%d' from '%s:%d'\n",
       len, senderHost, senderPort);
 
   // UDP will stamp packet id, other protocols will not use this feature

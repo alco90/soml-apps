@@ -12,6 +12,8 @@
 #include <iostream>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <errno.h>
+#include <ocomm/o_log.h>
 
 #include "tcpsock_gate.h"
 #include "tcpsock_gate_helper.h"
@@ -40,7 +42,7 @@ TCPSockGate::init()
 {
   SockGate::init();
   if ((sockfd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("ERROR\tsocket()");
+    logerror("Error in socket(): %s\n", strerror(errno));
     throw "Could not create TCP socket";
   }
   Address *emptyAddr = new Address("", myaddr_.getPort());
@@ -48,7 +50,7 @@ TCPSockGate::init()
   if (  bind(sockfd_, addr, sizeof(struct sockaddr_in)) < 0) {
     throw "TCP Socket Bind error";
   }
-  cerr << "INFO\tListening for TCP connections on port" << myaddr_.getPort() << << endl;
+  loginfo("Listening for TCP connections on port %d\n", myaddr_.getPort());
   // TCP revceiver is actually a TCP server
   listen(sockfd_, BACKLOG);
 }
@@ -96,7 +98,9 @@ TCPSockGate::receivePacket(int fd)
 {
   rlcurr_ = searchFlowbyFd(fd);
   int len = (int)recv(rlcurr_->getID(), pkt_->getPayload(), pkt_->getBufferSize(),0);
-  if (len == -1) { perror("recvfrom"); }
+  if (len == -1) {
+    logerror("Error in recv(): %s\n", strerror(errno));
+  }
   if (len <= 0  ) {
     close(rlcurr_->getID()); // Connection has been closed by the other end (==0) or error occurs
     return false;
@@ -118,10 +122,10 @@ TCPSockGate::acceptNewConnection()
   int newfd = accept(sockfd_, (struct sockaddr *)&tmpSockAddr, (socklen_t*)&sin_size);
 
   if ( newfd == -1){
-    perror("ERROR\taccept()");
+    logerror("Error in accopt(): %s\n", strerror(errno));
     throw "Could not accept new connection";
   }
-  cerr << "INFO\tAccepting a new connection" << endl;
+  loginfo("Accepting a new connection\n");
   decodeSockAddress(&itsaddr_, &tmpSockAddr);
   addFlow(newfd, &itsaddr_);
 

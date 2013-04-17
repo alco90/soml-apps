@@ -12,6 +12,8 @@
 #include <iostream>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <errno.h>
+#include <ocomm/o_log.h>
 
 #include "tcpsock_port.h"
 #include "tcpsock_port_helper.h"
@@ -51,17 +53,17 @@ TCPSockPort::init()
   struct sockaddr_in addr;
   setSockAddress(desthost_, destport_, &addr);
   if (connect(sockfd_, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) {
-    perror("ERROR\tconnect()");
+    logerror("Error in connect(): %s\n", strerror(errno));
     throw "Could not connect to TCP server";
   }
-  cerr << "INFO Connected to TCP server" << endl;
+  loginfo("Connected to TCP server\n");
 }
 
 void
 TCPSockPort::initSocket()
 {
   if ((sockfd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("ERROR\tsocket()");
+    logerror("Error in socket(): %s\n", strerror(errno));
     throw "Could not create TCP socket";
   }
 }
@@ -75,7 +77,9 @@ void
 TCPSockPort::sendPacket(Packet *pkt)
 {
   int len = send(sockfd_, pkt->getPayload(), pkt->getPayloadSize(), 0);
-  if (len == -1) { perror("send"); }
+  if (len == -1) {
+    logerror("Error in send(): %s\n", strerror(errno));
+  }
 }
 
 /*

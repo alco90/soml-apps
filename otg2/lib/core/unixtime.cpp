@@ -10,6 +10,7 @@
  */
 
 #include <iostream>
+#include <ocomm/o_log.h>
 
 #include "otg2/unixtime.h"
 
@@ -48,7 +49,7 @@ UnixTime::getAbsoluteTime()
 {
   struct timeval tp;
   gettimeofday(&tp, NULL);
-  //cerr << "DEBUG\t" << tp.tv_sec + tp.tv_usec/1e6 - abs_origin_ <<endl;
+  logdebug("Absolute time: %d\n", tp.tv_sec + tp.tv_usec/1e6 - abs_origin_);
   return (tp.tv_sec + tp.tv_usec/1e6 - abs_origin_);
 }
 

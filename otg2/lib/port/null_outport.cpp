@@ -34,7 +34,7 @@ Packet*
 NullOutPort::sendPacket(Packet* pkt)
 {
   int pktLength = pkt->getPayloadSize();
-  o_log(O_LOG_DEBUG2, "Consuming  packet of size '%d'\n", pktLength);
+  logdebug("Consuming  packet of size '%d'\n", pktLength);
   return pkt;
 }
 

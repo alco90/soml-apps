@@ -25,8 +25,7 @@ using namespace std;
 
 UDPOutPort::UDPOutPort()
 {
-  //cerr << "DEBUG\tCreation of udp_out"<< endl;
-  //cerr << "DEBUG\tRegistering MPs"<< endl;
+  logdebug("Registering MPs\n");
   oml_register_mps();
 }
 
@@ -74,7 +73,7 @@ UDPOutPort::init()
 
   if (bcastflag_ == 1) {
     if (setsockopt(sockfd_, SOL_SOCKET, SO_BROADCAST, &bcastflag_, sizeof(bcastflag_)) == -1) {
-      perror("setsockopt");
+      logerror("Error in setsockopt(): %s\n", strerror(errno));
       throw "Set broadcast option failed.";
     }
   }
@@ -101,7 +100,6 @@ UDPOutPort::sendPacket(Packet* pkt)
   gettimeofday(&tv, NULL);
   double now = tv.tv_sec - timestamp + 0.000001 * tv.tv_usec;
 
-  // cerr << "DEBUG\t" << timestamp << endl;
   pkt->stampPacket(0x01);
   pkt->stampShortVal(pkt->getFlowId());
   pkt->stampLongVal(pkt->getSequenceNum());
@@ -110,10 +108,10 @@ UDPOutPort::sendPacket(Packet* pkt)
   int  destLength = sizeof(struct sockaddr_in);
   int pktLength = pkt->getPayloadSize();
 
-  o_log(O_LOG_DEBUG2, "Sending UDP packet of size '%d' to '%s:%d'\n", pktLength, dsthost_, dstport_);
+  logdebug("Sending UDP packet of size '%d' to '%s:%d'\n", pktLength, dsthost_, dstport_);
   int len = sendto(sockfd_, pkt->getPayload(), pktLength, 0, dest, destLength);
   if (len == -1) {
-    perror("send");
+    logerror("Error in sendto(): %s\n", strerror(errno));
     throw "Sending Error.";
   }
 

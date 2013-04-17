@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <errno.h>
 #include <ocomm/o_log.h>
 
 #include "otg2/port.h"  // defines defaults
@@ -62,14 +63,14 @@ Socket::init()
   initSocket();
   if (nblockflag_  == 1) {
     if (fcntl(sockfd_, F_SETFL, O_NONBLOCK)  == -1) {
-      perror("fcntl");
+      logerror("Error in fcntl(): %s\n", strerror(errno));
       throw "Failed to set non-blocking option for a socket...";
     }
   }
 
   //Address *emptyAddr = new Address("", myaddr_.getPort());
   setSockAddress(localhost_, localport_, &addr);
-  o_log(O_LOG_DEBUG, "Binding port to '%s:%d'\n", localhost_, localport_);
+  logdebug("Binding port to '%s:%d'\n", localhost_, localport_);
   if (bind(sockfd_, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))  < 0 ) {
     throw "Socket Bind Error";
   }
@@ -102,8 +103,8 @@ Socket::setSockAddress(const char* hostname, int port, struct sockaddr_in *addre
     tmp = inet_aton(hostname, &(address->sin_addr));
     if (tmp == 0) {  // if a hostname is passed, call DNS
       if ((hp = gethostbyname(hostname)) == NULL) {
-        herror("gethostbyname");
-        throw "Error in Resolving hostname!" ;
+        logerror("Error in gethostbyname(): %s\n", hstrerror(errno));
+        throw "Error resolving hostname!" ;
       }
       memcpy((char *)&address->sin_addr, (char *)hp->h_addr, hp->h_length);
     }
