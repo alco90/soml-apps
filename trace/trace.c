@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
 #ifdef HAVE_CONFIG_H
@@ -457,7 +458,7 @@ main(int argc, const char *argv[])
   char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
-  fprintf(stderr, "INFO\t" PACKAGE_STRING "\n");
+  loginfo("%s\n", PACKAGE_STRING);
 
   /* Get basename */
   p2 = strtok(p, "/");
@@ -469,8 +470,7 @@ main(int argc, const char *argv[])
   /* The canonical name is `trace-oml2', so it clearly does not start with `om' */
   l = strlen(p);
   if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "trace_oml2", MIN(l,13))) {
-	  fprintf(stderr,
-              "WARN\tBinary name `%s' is deprecated and will disappear soon, please use `trace-oml2' instead\n", p);
+	  logwarn("Binary name `%s' is deprecated and will disappear soon, please use `trace-oml2' instead\n", p);
   }
   free(progname);
 
@@ -486,7 +486,7 @@ main(int argc, const char *argv[])
   while ((c = poptGetNextOpt(optCon)) > 0) {}
 
   if (g_opts->interface == NULL) {
-    fprintf(stderr, "ERROR\tMissing interface (use -i)\n");
+    logerror("Missing interface (use -i)\n");
     return 1;
   }
 
@@ -496,7 +496,7 @@ main(int argc, const char *argv[])
 
     radio_dev_type = fopen(radiotap_dev,"rb");
     if(radio_dev_type == NULL){
-      fprintf(stderr, "WARN\tYou need to enable radiotap by setting value `803' in `%s'.\n"
+      logwarn("You need to enable radiotap by setting value `803' in `%s'.\n"
              "INFO\tRadiotap measurements are disabled for this run.\n", radiotap_dev);
       g_opts->radiotap = 0;
     }

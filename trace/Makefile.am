@@ -8,7 +8,7 @@ pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = trace-oml2
 trace_oml2_SOURCES = trace.c
-trace_oml2_LDADD = -loml2 -ltrace -lpopt
+trace_oml2_LDADD = -loml2 -locomm -ltrace -lpopt
 
 pkgdata_DATA = $(appname).rb
 
