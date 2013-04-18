@@ -10,7 +10,7 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, trace-oml2, wlanconfig-oml2
+Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, trace-oml2
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef
 Conflicts: oml-client, oml2-apps-all
@@ -23,8 +23,7 @@ Description: A meta-package that installs the complite OML2 applications collect
      * otg2-oml2: the otg2/otr2 programs for generating background traffic;
      * ping-oml2: a simple OML4R wrapper around the system ping tool;
      * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
-     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
-     * wlanconfig-oml2: record wireless lan information from wlanconfig.
+     * trace-oml2: wrapper around libtrace with OML2 measurement recording.
 
 Package: oml2-apps-omfdef
 Section: net
@@ -140,16 +139,6 @@ Description: Measure and record libtrace data using OML
  resulting measurements are recorded using the OML measurement
  library.  Currently implemented measurement points include radiotap
  information, IP, TCP, and UDP protocol data.
-
-
-Package: wlanconfig-oml2
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9
-Replaces: oml-client, oml2-wlanconfig
-Conflicts: oml-client, oml2-wlanconfig
-Description: Record WLAN information from wlanconfig using OML
- wlanconfig-oml2 provides WLAN information taken from the wlanconfig
- program.
 
 
 Package: wpamon-oml2
