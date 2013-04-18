@@ -45,6 +45,14 @@ defApplication('oml:app:ping', 'ping') do |a|
     m.defMetric('runtime',:double)
     m.defMetric('runtime_unit',:string)
   end
+
+  a.defMeasurement('rtt_stats') do |m|
+    m.defMetric('min',:double)
+    m.defMetric('avg',:double)
+    m.defMetric('max',:double)
+    m.defMetric('mdev',:double)
+    m.defMetric('rtt_unit',:string)
+  end
 end
 
 # Example use with OMF:
