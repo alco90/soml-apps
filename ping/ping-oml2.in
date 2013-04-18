@@ -6,7 +6,7 @@
 # measurements via OML
 #
 # Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2012
-# Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012
+# Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2013
 #
 # Copyright (c) 2012 National ICT Australia (NICTA)
 #
@@ -44,18 +44,21 @@ class PingWrapper
 
   def initialize(args)
     @addr = nil
-    @count = 0
-    @interval = 1
-    @verbose = 1
+    @count = ''
+    @interval = ''
+    @verbose = true
     @inet6 = ''
+    @numeric = ''
+    @pingio = nil
 
     leftover = OML4R::init(args, :appName => 'ping') do |argParser|
       argParser.banner = "Runs the system ping and reports measurements via OML\n Use -h or --help for a list of options\n\n"
       argParser.on("-a","--dest_addr ADDRESS","Address to ping (the -a switch is optional)") { |address| @addr = address.to_s() }
-      argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = count.to_i()}
-      argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = interval.to_i()}
-      argParser.on("-q","--[no]-quiet ","Don't show ping output on the console"){ @verbose = 0 }
+      argParser.on("-c","--count NUMBER","Number of pings (default: infinite)"){ |count| @count = "-c #{count.to_i()}"}
+      argParser.on("-i","--interval NUMBER","Interval between pings (seconds)"){ |interval| @interval = "-i #{interval.to_i()}"}
+      argParser.on("-q","--[no]-quiet ","Don't show ping output on the console"){ @verbose = false }
       argParser.on("-6","--[no]-inet6 ","Use ping6 rather than ping"){ @inet6 = "6"}
+      argParser.on("-n","--[no]-numeric ","No attempt will be made to lookup symbolic names for host addresses"){ @numeric = '-n' }
     end
 
     if @addr.nil? and leftover.length > 0
@@ -65,35 +68,49 @@ class PingWrapper
     end
   end
 
-  def process_output(output)
-    lines = output.split("\n")
-    row=lines[1]
-    column = row.split(" ")
-    column[3].delete!(":")
-    ttl=column[5].split('=')
-    rtt=column[6].split('=')
-
-    if @verbose
-      puts row
+  def process_output(row)
+    parse = /^\d+ bytes from (?<host>.*): icmp_seq=(?<icmp_seq>\d+) ttl=(?<ttl>\d+) time=(?<time>[0-9.]+) (?<timeunit>[a-zA-Z]+)/.match(row)
+    if not parse.nil?
+      MPStat.inject(parse[:host], parse[:ttl], parse[:time], parse[:timeunit])
     end
-
-    MPStat.inject(column[3], ttl[1], rtt[1], column[7])
   end
 
   def ping()
-    output = `/bin/ping#{@inet6} -n -c 1 #{@addr}`
-    process_output(output)
-    sleep @interval
+    @pingio = IO.popen("/bin/ping#{@inet6} #{@numeric} #{@count} #{@interval} #{@addr}")
+    while true
+      row = @pingio.readline
+      puts row if @verbose
+      process_output(row)
+    end
   end
 
   def start()
-    if @count != 0
-      (1..@count).each{
-	ping
-      }
-    else
-      loop {ping}
+    return if not @pingio.nil?
+
+    # Handle for OMF's 'exit' command
+    a = Thread.new do
+      $stdin.each do |line|
+	if /^exit/ =~ line
+	  Process.kill("INT", 0)
+	end
+      end
     end
+
+    # Handle Ctrl+C and OMF's SIGTERM
+    Signal.trap("INT", stop )
+    Signal.trap("TERM", stop)
+
+    begin
+      ping
+    rescue EOFError
+      # This error is expected
+    end
+  end
+
+  def stop()
+    return if @pingio.nil?
+    # Kill the ping process, which will result in EOFError from ping()
+    Process.kill("INT", @pingio.pid)
   end
 
 end #end of class
