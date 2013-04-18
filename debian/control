@@ -12,11 +12,10 @@ Priority: optional
 Architecture: all
 Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, trace-oml2
 Replaces: oml-client, oml2-apps-all
-Suggests: oml2-apps-omfdef
+Suggests: oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
-Description: A meta-package that installs the complite OML2 applications collection
+Description: A meta-package that installs the complete standalone OML2 applications collection
  This package installs all the OML2 Application packages:
-     * collectd-write-oml2: writer plugin for collectd;
      * gpslogger-oml2: measure GPS data from gpds;
      * iperf-oml2: iperf with OML2 measurement recording;
      * nmetrics-oml2: node metrics using libsigar;
@@ -24,6 +23,15 @@ Description: A meta-package that installs the complite OML2 applications collect
      * ping-oml2: a simple OML4R wrapper around the system ping tool;
      * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
      * trace-oml2: wrapper around libtrace with OML2 measurement recording.
+
+Package: oml2-apps-full
+Section: net
+Priority: optional
+Architecture: all
+Depends: collectd-write-oml2
+Description: A meta-package that installs the complite OML2 applications collection
+ This package installs the oml2-apps package, and the following additional ones:
+     * collectd-write-oml2: writer plugin for collectd.
 
 Package: oml2-apps-omfdef
 Section: net
