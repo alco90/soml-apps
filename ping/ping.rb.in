@@ -31,11 +31,19 @@ defApplication('oml:app:ping', 'ping') do |a|
   a.defProperty('quiet', 'Don\'t show ping output on the console', 'q', {:type => :boolean, :dynamic => false})
   a.defProperty('inet6', 'Use ping6 rather than ping', '6', {:type => :boolean, :dynamic => false})
 
-  a.defMeasurement('myping') do |m|
+  a.defMeasurement('ping') do |m|
     m.defMetric('dest_addr',:string)
     m.defMetric('ttl',:uint32)
     m.defMetric('rtt',:double)
     m.defMetric('rtt_unit',:string)
+  end
+
+  a.defMeasurement('summary') do |m|
+    m.defMetric('ntransmitted',:uint32)
+    m.defMetric('nreceived',:uint32)
+    m.defMetric('lossratio',:double)
+    m.defMetric('runtime',:double)
+    m.defMetric('runtime_unit',:string)
   end
 end
 

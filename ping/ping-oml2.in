@@ -40,6 +40,15 @@ class MPStat < OML4R::MPBase
   param :rtt_unit, :type => :string
 end
 
+class MPSummary < OML4R::MPBase
+  name :summary
+  param :ntransmitted, :type => :uint32
+  param :nreceived, :type => :uint32
+  param :lossratio, :type => :double
+  param :runtime, :type => :double
+  param :runtime_unit, :type => :string
+end
+
 class PingWrapper
 
   def initialize(args)
@@ -69,9 +78,13 @@ class PingWrapper
   end
 
   def process_output(row)
-    parse = /^\d+ bytes from (?<host>.*): icmp_seq=(?<icmp_seq>\d+) ttl=(?<ttl>\d+) time=(?<time>[0-9.]+) (?<timeunit>[a-zA-Z]+)/.match(row)
-    if not parse.nil?
+    if not (parse =
+	/^\d+ bytes from (?<host>.*): icmp_seq=(?<icmp_seq>\d+) ttl=(?<ttl>\d+) time=(?<time>[0-9.]+) (?<timeunit>[a-zA-Z]+)/.match(row)).nil?  # One sample
       MPStat.inject(parse[:host], parse[:ttl], parse[:time], parse[:timeunit])
+
+    elsif not (parse = /^(?<transmitted>\d+).*transmitted, (?<received>\d+).*received, (?<loss>[0-9.]+)%.*loss, time (?<time>[0-9.]+) *(?<timeunit>[a-zA-Z]+)/.match(row)).nil?  # Summary
+      MPSummary.inject(parse[:transmitted], parse[:received], parse[:loss], parse[:time], parse[:timeunit])
+
     end
   end
 
