@@ -47,7 +47,6 @@ This package installs all the OML2 Application packages:
     * ping-oml2: a simple OML4R wrapper around the system ping tool;
     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
-    * wlanconfig-oml2: record wireless lan information from wlanconfig;
     * wpamon-oml2: connect to wpa_supplicant's control socket and reports Wi-Fi
       events.
 
