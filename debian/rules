@@ -9,16 +9,12 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-
-
-
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
-	COLLECTD=`apt-get source collectd | sed -n "s^.*extracting collectd in ^--with-collectd=${PWD}/^p"`; \
-	# --with-collectd-version is a backup in case apt-get source didn't work
-	./configure --sysconfdir=/etc --prefix=/usr ${COLLECTD} --with-collectd-version=4.10.1
+	# For OBS: extract the collectd source we uploaded ourselves
+	-test -e collectd_4.10.1.orig.tar.gz && tar xfz collectd_4.10.1.orig.tar.gz -C collectd
+	./configure --sysconfdir=/etc --prefix=/usr --with-collectd-version=4.10.1
 
 	touch configure-stamp
 
