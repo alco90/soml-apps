@@ -54,8 +54,7 @@ This package installs all the OML2 Application packages:
 %setup -q
 
 %build
-(cd collectd; tar xjf $RPM_SOURCE_DIR/collectd-4.10.8.tar.bz2; cd -) || true
-test -e ../../SOURCES/collectd_4.10.1.orig.tar.gz && tar xfz ../../SOURCES/collectd_4.10.1.orig.tar.gz -C collectd
+test -e ../../SOURCES/collectd.tar.gz && tar xfz ../../SOURCES/collectd.tar.gz -C collectd
 ./configure --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --with-collectd-version=4.10.1
 make %{?_smp_mflags}
 
