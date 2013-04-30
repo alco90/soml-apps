@@ -50,14 +50,20 @@ AC_MSG_CHECKING([whether collectd source is available in ${collectd_srcdir} (cha
 AS_IF([test -d ${collectd_srcdir}],
      [AC_MSG_RESULT([yes])],
      [AC_MSG_RESULT([no])
-     AC_CHECK_PROGS([getter], [wget curl])
-     AS_CASE([$getter],
-	     [wget], [getter="$getter -nv -O -"],
-	     [curl], [getter="$getter -o -"],
-	     AC_MSG_ERROR([no support download tool found...]))
-     AC_MSG_NOTICE([downloading collectd-${collectdver} source (change version with --collectd-version)...])
-     $getter http://collectd.org/files/collectd-${collectdver}.tar.bz2 | tar xj
-     collectd_srcdir=${PWD}/collectd-${collectdver}
+     collectd_src=collectd-${collectdver}
+     collectd_srcdir=${PWD}/${collectd_src}
+     collectd_archive=/tmp/${collectd_src}.tar.bz2
+     AS_IF([test -e ${collectd_archive} ], [
+	   AC_MSG_NOTICE([collectd source archive found in ${collectd_archive}])], [
+	   AC_CHECK_PROGS([getter], [wget curl])
+	   AS_CASE([$getter],
+		   [wget], [getter="$getter -nv -O ${collectd_archive}"],
+		   [curl], [getter="$getter -o ${collectd_archive}"],
+		   AC_MSG_ERROR([no support download tool found...]))
+	   AC_MSG_NOTICE([downloading ${collectd_src} source to ${collectd_archive} (change version with --collectd-version)...])
+	   $getter http://collectd.org/files/collectd-${collectdver}.tar.bz2
+	   ])
+     tar xjf ${collectd_archive}
      ])
 AS_IF([test -f ${collectd_srcdir}/src/config.h],
      [],

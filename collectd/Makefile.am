@@ -15,5 +15,8 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+clean-local:
+	-test -d collectd-@collectd_version@/ && $(MAKE) -C collectd-@collectd_version@/ clean
+
 distclean-local:
 	rm -rf collectd-@collectd_version@/ collectd_config.log
