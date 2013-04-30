@@ -1,88 +1,94 @@
+#
+# Copyright 2009-2013 National ICT Australia (NICTA)
+#
+# This software may be used and distributed solely under the terms of
+# the MIT license (License).  You should find a copy of the License in
+# COPYING or at http://opensource.org/licenses/MIT. By downloading or
+# using this software you accept the terms and the liability disclaimer
+# in the License.
+#
+defApplication('oml:app:nmetrics', 'nmetrics') do |app|
 
-defApplication('oml:app:nmetrics', 'nmetrics') do |a|
+  app.version(2, 9, -0)
+  app.shortDescription = 'Monitoring node statistcs'
+  app.description = %{'nmetrics' is monitoring various node specific statistics,
+such as CPU, memory and network usage and reports them through OML.
+  }
+  app.path = "@bindir@/nmetrics-oml2"
 
-  a.version(2, 9, -0)
-#  a.revision = 1
-  a.shortDescription = 'Monitoring node statistcs'
-  a.description = %{
-'nmetrics' is monitoring various node specific statistics,
-such as CPU, memory and network usage and reports them through
-OML. }
+  app.defProperty('cpu', 'Report cpu usage', '-c',
+		  :type => 'boolean', :mnemonic => 'c',
+		  :var_name => 'report_cpu')
+  app.defProperty('interface', 'Report usage for the specified network interface (can be used multiple times)', '-i',
+		  :type => :string, :mnemonic => 'i',
+		  :default => '"eth0"', :var_name => 'if_name')
+  app.defProperty('memory', 'Report memory usage', '-m',
+		  :type => 'boolean', :mnemonic => 'm',
+		  :var_name => 'report_memory')
+  app.defProperty('sample-interval', 'Time between consecutive measurements', '-s',
+		  :type => :int, :unit => 'seconds', :mnemonic => 's',
+		  :var_name => 'sample_interval')
 
-  a.defProperty('cpu', 'Report cpu usage', ?c,
-        :type => :boolean, :impl => { :var_name => 'report_cpu' })
-  a.defProperty('interface',
-        'Report usage for the specified network interface (can be used multiple times)', ?i,
-        :type => :string,
-        :impl => { :var_name => 'if_name', :popt_val => '"eth0"' })
-  a.defProperty('memory', 'Report memory usage', ?m,
-        :type => :boolean, :impl => { :var_name => 'report_memory' })
-  a.defProperty('sample-interval',
-        'Time between consecutive measurements [sec]', ?s,
-        :type => :int, :unit => 'seconds', :default => 1,
-        :impl => { :var_name => 'sample_interval' })
-
-  a.defMeasurement("memory") do |m|
-    m.defMetric('ram', 'uint64')
-    m.defMetric('total', 'uint64')
-    m.defMetric('used', 'uint64')
-    m.defMetric('free', 'uint64')
-    m.defMetric('actual_used', 'uint64')
-    m.defMetric('actual_free', 'uint64')
+  app.defMeasurement("memory") do |m|
+    m.defMetric('ram', :uint64)
+    m.defMetric('total', :uint64)
+    m.defMetric('used', :uint64)
+    m.defMetric('free', :uint64)
+    m.defMetric('actual_used', :uint64)
+    m.defMetric('actual_free', :uint64)
   end
 
-  a.defMeasurement("cpu") do |m|
-    m.defMetric('user', 'uint64')
-    m.defMetric('sys', 'uint64')
-    m.defMetric('nice', 'uint64')
-    m.defMetric('idle', 'uint64')
-    m.defMetric('wait', 'uint64')
-    m.defMetric('irq', 'uint64')
-    m.defMetric('soft_irq', 'uint64')
-    m.defMetric('stolen', 'uint64')
-    m.defMetric('total', 'uint64')
+  app.defMeasurement("cpu") do |m|
+    m.defMetric('user', :uint64)
+    m.defMetric('sys', :uint64)
+    m.defMetric('nice', :uint64)
+    m.defMetric('idle', :uint64)
+    m.defMetric('wait', :uint64)
+    m.defMetric('irq', :uint64)
+    m.defMetric('soft_irq', :uint64)
+    m.defMetric('stolen', :uint64)
+    m.defMetric('total', :uint64)
   end
 
-  a.defMeasurement("network") do |m|
-    m.defMetric('name', 'string')
-    m.defMetric('rx_packets', 'uint64')
-    m.defMetric('rx_bytes', 'uint64')
-    m.defMetric('rx_errors', 'uint64')
-    m.defMetric('rx_dropped', 'uint64')
-    m.defMetric('rx_overruns', 'uint64')
-    m.defMetric('rx_frame', 'uint64')
-    m.defMetric('tx_packets', 'uint64')
-    m.defMetric('tx_bytes', 'uint64')
-    m.defMetric('tx_errors', 'uint64')
-    m.defMetric('tx_dropped', 'uint64')
-    m.defMetric('tx_overruns', 'uint64')
-    m.defMetric('tx_collisions', 'uint64')
-    m.defMetric('tx_carrier', 'uint64')
-    m.defMetric('speed', 'uint64')
+  app.defMeasurement("network") do |m|
+    m.defMetric('name', :string)
+    m.defMetric('rx_packets', :uint64)
+    m.defMetric('rx_bytes', :uint64)
+    m.defMetric('rx_errors', :uint64)
+    m.defMetric('rx_dropped', :uint64)
+    m.defMetric('rx_overruns', :uint64)
+    m.defMetric('rx_frame', :uint64)
+    m.defMetric('tx_packets', :uint64)
+    m.defMetric('tx_bytes', :uint64)
+    m.defMetric('tx_errors', :uint64)
+    m.defMetric('tx_dropped', :uint64)
+    m.defMetric('tx_overruns', :uint64)
+    m.defMetric('tx_collisions', :uint64)
+    m.defMetric('tx_carrier', :uint64)
+    m.defMetric('speed', :uint64)
   end
 
-  a.defMeasurement("procs") do |m|
-    m.defMetric('cpu_id', 'uint64')
-    m.defMetric('total', 'uint64')
-    m.defMetric('sleeping', 'uint64')
-    m.defMetric('running', 'uint64')
-    m.defMetric('zombie', 'uint64')
-    m.defMetric('stopped', 'uint64')
-    m.defMetric('idle', 'uint64')
-    m.defMetric('threads', 'uint64')
+  app.defMeasurement("procs") do |m|
+    m.defMetric('cpu_id', :uint64)
+    m.defMetric('total', :uint64)
+    m.defMetric('sleeping', :uint64)
+    m.defMetric('running', :uint64)
+    m.defMetric('zombie', :uint64)
+    m.defMetric('stopped', :uint64)
+    m.defMetric('idle', :uint64)
+    m.defMetric('threads', :uint64)
   end
 
-  a.defMeasurement("proc") do |m|
-    m.defMetric('pid', 'uint64')
-    m.defMetric('start_time', 'uint64')
-    m.defMetric('user', 'uint64')
-    m.defMetric('sys', 'uint64')
-    m.defMetric('total', 'uint64')
+  app.defMeasurement("proc") do |m|
+    m.defMetric('pid', :uint64)
+    m.defMetric('start_time', :uint64)
+    m.defMetric('user', :uint64)
+    m.defMetric('sys', :uint64)
+    m.defMetric('total', :uint64)
   end
-
-  a.path = "@bindir@/nmetrics-oml2"
 end
 
 # Local Variables:
 # mode:ruby
 # End:
+# vim: ft=ruby:sw=2

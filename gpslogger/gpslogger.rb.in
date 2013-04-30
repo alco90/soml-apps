@@ -1,13 +1,25 @@
-defApplication('oml:app:gpslogger', 'gpslogger') do |a|
+#
+# Copyright 2012-2013 National ICT Australia (NICTA)
+#
+# This software may be used and distributed solely under the terms of
+# the MIT license (License).  You should find a copy of the License in
+# COPYING or at http://opensource.org/licenses/MIT. By downloading or
+# using this software you accept the terms and the liability disclaimer
+# in the License.
+#
+defApplication('oml:app:gpslogger', 'gpslogger') do |app|
 
-  a.version(2, 9, -0)
-  a.shortDescription = 'A client for GPSd to obtain geolocation information'
-  a.description = %{
-This application connects to a local or remote GPSd and reports GPS fixes
-information, as well as the current GPS time.
+  app.version(2, 9, -0)
+  app.shortDescription = 'A client for GPSd to obtain geolocation information'
+  app.description = %{This application connects to a local or remote GPSd and
+reports GPS fixes information, as well as the current GPS time.
   }
+  app.path = "@bindir@/gpslogger-oml2"
 
-  a.defMeasurement("gps_data") do |m|
+  app.defProperty('verbose', 'Report fixes on STDOUT', '-v',
+		  :type => :boolean, :mnemonic => 'v')
+
+  app.defMeasurement("gps_data") do |m|
     m.defMetric('lat', :double)
     m.defMetric('lon', :double)
     m.defMetric('ele', :double)
@@ -17,8 +29,6 @@ information, as well as the current GPS time.
     m.defMetric('fix', :string)
     m.defMetric('time', :string)
   end
-
-  a.path = "@bindir@/gpslogger-oml2"
 end
 
 # Local Variables:

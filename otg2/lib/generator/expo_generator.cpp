@@ -35,9 +35,9 @@ Expo_Generator::Expo_Generator(int size, double rate, double ontime, double offt
 void
 Expo_Generator::defOpts()
 {
-  defOpt("size", POPT_ARG_INT, &pktSize_, "Size of packet", "bytes");
-  defOpt("ontime", POPT_ARG_FLOAT, &ontime_, "Average length of burst", "msec");
-  defOpt("offtime", POPT_ARG_FLOAT, &offtime_, "Average length of idle time", "msec");
+  defOpt("size", POPT_ARG_INT, &pktSize_, "Size of packet", "Bytes");
+  defOpt("ontime", POPT_ARG_FLOAT, &ontime_, "Average length of burst", "milliseconds");
+  defOpt("offtime", POPT_ARG_FLOAT, &offtime_, "Average length of idle time", "milliseconds");
   defOpt("rate", POPT_ARG_FLOAT, &rate_, "Data rate of the flow", "kbps");
 }
 

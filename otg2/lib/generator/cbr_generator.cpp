@@ -36,8 +36,8 @@ CBR_Generator::update()
 void
 CBR_Generator::defOpts()
 {
-  defOpt("size", POPT_ARG_INT, &pktSize_, "Size of packet", "bytes");
-  defOpt("interval", POPT_ARG_FLOAT, &pktInterval_, "Interval between consecutive packets", "msec");
+  defOpt("size", POPT_ARG_INT, &pktSize_, "Size of packet", "Bytes");
+  defOpt("interval", POPT_ARG_FLOAT, &pktInterval_, "Interval between consecutive packets", "milliseconds");
   defOpt("rate", POPT_ARG_FLOAT, &pktRate_, "Data rate of the flow", "kbps");
 }
 

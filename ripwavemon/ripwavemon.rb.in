@@ -1,35 +1,42 @@
+#
+# Copyright 2010-2013 National ICT Australia (NICTA)
+#
+# This software may be used and distributed solely under the terms of
+# the MIT license (License).  You should find a copy of the License in
+# COPYING or at http://opensource.org/licenses/MIT. By downloading or
+# using this software you accept the terms and the liability disclaimer
+# in the License.
+#
+defApplication('oml:app:ripwavemon', 'ripwavemon') do |app|
 
-defApplication('oml:app:ripwavemon', 'ripwavemon') do |a|
+  app.version(2, 9, -0)
+  app.shortDescription = 'Report statistics from a Navini RipWave modem'
+  app.description = %{This application parses periodic UDP status messages from a
+Navini RipWave modem (Unwired, Exetel, nTelos).
+  }
+  app.path = "@bindir@/ripwavemon-oml2"
 
-  a.version(2, 9, -0)
-  a.shortDescription = 'Report statistics from a Navini RipWave modem'
-  a.description = %{
-This application parses periodic UDP status messages from a Navini RipWave
-modem (Unwired, Exetel, nTelos).
-}
-
-  a.defMeasurement("ripwave_stats") do |m|
+  app.defMeasurement("ripwave_stats") do |m|
     # Measurements are in the same order as the report packet
-    m.defMetric('modemid', 'uint32', 'Modem identifier (32 bits)')
-    m.defMetric('month', 'uint32', 'Month as reported by the modem')
-    m.defMetric('day', 'uint32', 'Day as reported by the modem')
-    m.defMetric('year', 'uint32', 'Year as reported by the modem')
-    m.defMetric('hour', 'uint32', 'Hour as reported by the modem')
-    m.defMetric('minute', 'uint32', 'Minute as reported by the modem')
-    m.defMetric('second', 'uint32', 'Second as reported by the modem')
-    m.defMetric('syncstrength1', 'int32', 'Absolute Signal Strength 1 (dB)') # the report has absolute values
-    m.defMetric('btsid', 'uint32', 'Base Tranceiver Station ID (8 bits)')
-    m.defMetric('networkid', 'uint32', 'Network identifier (16 bits)')
-    m.defMetric('antenna', 'uint32', 'Antenna in use (8 bits: 0x00=upright, 0x20=patch 1, 0x40=patch 2])')
-    m.defMetric('syncstrength2', 'int32', 'Absolute Signal Strength 2 (dB)') # ditto
-    m.defMetric('snr', 'uint32', 'Signal to noise ratio (dB)')
-    m.defMetric('temperature', 'uint32', 'Temperature [deg. Celcius]')
- end
+    m.defMetric('modemid', :uint32, 'Modem identifier (32 bits)')
+    m.defMetric('month', :uint32, 'Month as reported by the modem')
+    m.defMetric('day', :uint32, 'Day as reported by the modem')
+    m.defMetric('year', :uint32, 'Year as reported by the modem')
+    m.defMetric('hour', :uint32, 'Hour as reported by the modem')
+    m.defMetric('minute', :uint32, 'Minute as reported by the modem')
+    m.defMetric('second', :uint32, 'Second as reported by the modem')
+    m.defMetric('syncstrength1', :int32, 'Absolute Signal Strength 1 (dB)') # the report has absolute values
+    m.defMetric('btsid', :uint32, 'Base Tranceiver Station ID (8 bits)')
+    m.defMetric('networkid', :uint32, 'Network identifier (16 bits)')
+    m.defMetric('antenna', :uint32, 'Antenna in use (8 bits: 0x00=upright, 0x20=patch 1, 0x40=patch 2])')
+    m.defMetric('syncstrength2', :int32, 'Absolute Signal Strength 2 (dB)') # ditto
+    m.defMetric('snr', :uint32, 'Signal to noise ratio (dB)')
+    m.defMetric('temperature', :uint32, 'Temperature [deg. Celcius]')
+  end
 
-  a.path = "@bindir@/ripwavemon-oml2"
 end
 
 # Local Variables:
 # mode:ruby
-# vim: ft=ruby:sw=2
 # End:
+# vim: ft=ruby:sw=2

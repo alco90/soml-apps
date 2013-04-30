@@ -1,47 +1,56 @@
-defApplication('oml:app:trace', 'trace') do |a|
+#
+# Copyright 2009-2013 National ICT Australia (NICTA)
+#
+# This software may be used and distributed solely under the terms of
+# the MIT license (License).  You should find a copy of the License in
+# COPYING or at http://opensource.org/licenses/MIT. By downloading or
+# using this software you accept the terms and the liability disclaimer
+# in the License.
+#
+defApplication('oml:app:trace', 'trace') do |app|
 
-  a.version(2, 9, -0)
-  a.shortDescription = 'Packet capture'
-  a.description = %{
-'trace' uses libtrace to capture packets matching the
-BPFilter, and report various header (IP, TCP, UDP,
-Radiotap,...) fields through OML.
+  app.version(2, 9, -0)
+  app.shortDescription = 'Packet capture'
+  app.description = %{'trace' uses libtrace to capture packets matching the
+BPFilter, and report various header (IP, TCP, UDP, Radiotap,...) fields through
+OML.
 
-Note The pktid field in all MPs can be used to link
-information about the multiple protocols encapsulated
-in the same packet, even in cases where multiple
-packets have been received at the same time, which
-renders the timestamp field useless as an identifier. }
+Note The pktid field in all MPs can be used to link information about the
+multiple protocols encapsulated in the same packet, even in cases where multiple
+packets have been received at the same time, which renders the timestamp field
+useless as an identifier.
+  }
+  app.path = "@bindir@/trace-oml2"
 
-  a.defProperty('filter', 'Filter expression BPFEXP', ?f,
-        :type => :string)
-  a.defProperty('snaplen', '???', ?s,
-        :type => :int, :unit => 'bytes')
-  a.defProperty('promisc', '???', ?p,
-        :type => :boolean)
-  a.defProperty('interface', 'Interface to trace', ?i,
-        :type => :string)
-  a.defProperty('radiotap', 'Enable radiotap', ?r,
-        :type => :boolean)
+  app.defProperty('filter', 'Filter expression BPFEXP', '-f',
+		  :type => :string, :mnemonic => 'f')
+  app.defProperty('snaplen', 'Snarf Bytes of data from each  packet', '-s',
+		  :type => :int, :unit => 'Bytes', :mnemonic => 's')
+  app.defProperty('promisc', 'Put  the  interface into promiscuous mode', '-p',
+		  :type => 'boolean', :mnemonic => 'p')
+  app.defProperty('interface', 'Interface to trace', '-i',
+		  :type => :string, :mnemonic => 'i', :default => '"eth0"')
+  app.defProperty('radiotap', 'Enable radiotap', '-r',
+		  :type => 'boolean', :mnemonic => 'r')
 
-  a.defMeasurement("radiotap") do |m|
-      m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
-      m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
-      m.defMetric('rate',              :uint32, ' Wireless Rate')
-      m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
-      m.defMetric('sig_strength_dBm',  :int32, ' Wireless Signal Strength in dB')
-      m.defMetric('noise_strength_dBm',:int32, ' Wireless Noise Strength in dBm')
-      m.defMetric('sig_strength',      :uint32, ' Wireless Signal Strength in dB')
-      m.defMetric('noise_strength',    :uint32, ' Wireless Noise Strength in dB')
-      m.defMetric('attenuation',       :uint32, ' Transmit Attenuation')
-      m.defMetric('attenuation_dB',    :uint32, ' Transmit Attenuation in dB')
-      m.defMetric('power',             :int32, ' Transmit Power in dBm')
-      m.defMetric('antenna',           :uint32, ' Wireless Antenna')
-      m.defMetric('sourceMAC', :string, ' Source MAC Address')
-      m.defMetric('dstMAC',    :string, ' Destination MAC Address')
- end
+  app.defMeasurement("radiotap") do |m|
+    m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
+    m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
+    m.defMetric('rate',              :uint32, ' Wireless Rate')
+    m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
+    m.defMetric('sig_strength_dBm',  :int32, ' Wireless Signal Strength in dB')
+    m.defMetric('noise_strength_dBm',:int32, ' Wireless Noise Strength in dBm')
+    m.defMetric('sig_strength',      :uint32, ' Wireless Signal Strength in dB')
+    m.defMetric('noise_strength',    :uint32, ' Wireless Noise Strength in dB')
+    m.defMetric('attenuation',       :uint32, ' Transmit Attenuation')
+    m.defMetric('attenuation_dB',    :uint32, ' Transmit Attenuation in dB')
+    m.defMetric('power',             :int32, ' Transmit Power in dBm')
+    m.defMetric('antenna',           :uint32, ' Wireless Antenna')
+    m.defMetric('sourceMAC', :string, ' Source MAC Address')
+    m.defMetric('dstMAC',    :string, ' Destination MAC Address')
+  end
 
-  a.defMeasurement("ip") do |m|
+  app.defMeasurement("ip") do |m|
     m.defMetric('pktid',    :uint64, ' internal packet ID to link MPs')
     m.defMetric('ip_tos',   :uint32, ' Type of Service')
     m.defMetric('ip_len',   :uint32, ' Total Length')
@@ -56,7 +65,7 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('ip_ts',    :double, ' timestamp of the measurement')
   end
 
-  a.defMeasurement("tcp") do |m|
+  app.defMeasurement("tcp") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('tcp_source',   :uint32, ' Source Port')
     m.defMetric('tcp_dest',     :uint32, ' Destination Port')
@@ -69,7 +78,7 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('tcp_ts',       :double, ' timestamp of the measurement')
   end
 
-  a.defMeasurement("udp") do |m|
+  app.defMeasurement("udp") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('udp_source',   :uint32, ' Source Port')
     m.defMetric('udp_dest',     :uint32, ' Destination Port')
@@ -78,14 +87,14 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('udp_ts',       :double, ' timestamp of the measurement')
   end
 
-  a.defMeasurement("ip6") do |m|
+  app.defMeasurement("ip6") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('ip6_src',      :string, ' Source Address')
     m.defMetric('ip6_dst',      :string, ' Destination Address')
     m.defMetric('ip6_ts',       :double, ' timestamp of the measurement')
   end
 
-  a.defMeasurement("ip6_mh") do |m|
+  app.defMeasurement("ip6_mh") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('mh_type',      :string, ' BU or BAck')
     m.defMetric('sequ_nb',      :uint32, ' binding sequence number')
@@ -94,17 +103,16 @@ renders the timestamp field useless as an identifier. }
     m.defMetric('payload',      :string, ' CoA for BU, nothing for BAck')
   end
 
-  a.defMeasurement("icmp6") do |m|
+  app.defMeasurement("icmp6") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('type',         :uint32, ' ICMP type')
     m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
     m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
     m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
   end
-
-  a.path = "@bindir@/trace-oml2"
 end
 
 # Local Variables:
 # mode:ruby
 # End:
+# vim: ft=ruby:sw=2
