@@ -37,7 +37,8 @@ Package: oml2-apps-omfdef
 Section: net
 Priority: optional
 Architecture: all
-Depends: oml2-apps, omf-expctl-5.4
+Depends: omf-expctl-5.4
+Suggests: oml2-apps
 Description: A meta-package that installs OML2 Applications and their OMF-5.4 definition
  This package installs all the OML2 Application packages, as well as the
  Application definition need by the OMF 5.4 experiment controller to use them.
