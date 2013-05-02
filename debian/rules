@@ -13,7 +13,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# For OBS: extract the collectd source we uploaded ourselves
-	-test -e collectd.tar.gz && tar xfz collectd.tar.gz -C collectd
+	-test -e ../SOURCES/collectd.tar.gz && tar xfz ../SOURCES/collectd.tar.gz -C collectd
 	./configure --sysconfdir=/etc --prefix=/usr --with-collectd-version=4.10.1
 
 	touch configure-stamp
