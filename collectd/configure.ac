@@ -59,7 +59,7 @@ AS_IF([test -d ${collectd_srcdir}],
 	   AS_CASE([$getter],
 		   [wget], [getter="$getter -nv -O ${collectd_archive}"],
 		   [curl], [getter="$getter -o ${collectd_archive}"],
-		   AC_MSG_ERROR([no support download tool found...]))
+		   AC_MSG_ERROR([no supported download tool found...]))
 	   AC_MSG_NOTICE([downloading ${collectd_src} source to ${collectd_archive} (change version with --collectd-version)...])
 	   $getter http://collectd.org/files/collectd-${collectdver}.tar.bz2
 	   ])
