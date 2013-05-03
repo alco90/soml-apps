@@ -82,7 +82,8 @@ AC_ARG_ENABLE([packaging],
 				    gitistag=yes
 				   ],
 				   [
-				    AC_MSG_RESULT([none])
+				    gittag=`${GIT} describe --tags --abbrev=0 --match v\* HEAD`
+				    AC_MSG_RESULT([none, latest tag is $gittag])
 				    gitistag=no
 				   ])
 
