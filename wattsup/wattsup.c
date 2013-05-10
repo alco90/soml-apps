@@ -171,97 +171,135 @@ struct wu_field {
 	unsigned int	enable;
 	char		* name;
 	char		* descr;
+	double		multiplier;
+	char		* format;
 };
 
 static struct wu_field wu_fields[wu_num_fields] = {
 	[wu_field_watts]	= {
 		.name	= "watts",
 		.descr	= "Watt Consumption",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_min_watts]	= {
 		.name	= "min-watts",
 		.descr	= "Minimum Watts Consumed",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_max_watts]	= {
 		.name	= "max-watts",
 		.descr	= "Maxium Watts Consumed",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_volts]	= {
 		.name	= "volts",
 		.descr	= "Volts Consumption",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_min_volts]	= {
 		.name	= "max-volts",
 		.descr	= "Minimum Volts Consumed",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_max_volts]	= {
 		.name	= "min-volts",
 		.descr	= "Maximum Volts Consumed",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_amps]		= {
 		.name	= "amps",
 		.descr	= "Amp Consumption",
+		.multiplier = .001,
+		.format = "%.3f",
 	},
 
 	[wu_field_min_amps]	= {
 		.name	= "min-amps",
 		.descr	= "Minimum Amps Consumed",
+		.multiplier = .001,
+		.format = "%.3f",
 	},
 
 	[wu_field_max_amps]	= {
 		.name	= "max-amps",
 		.descr	= "Maximum Amps Consumed",
+		.multiplier = .001,
+		.format = "%.3f",
 	},
 
 	[wu_field_watt_hours]	= {
 		.name	= "kwh",
 		.descr	= "Average KWH",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_mo_kwh]	= {
 		.name	= "mo-kwh",
 		.descr	= "Average monthly KWH",
+		.multiplier = 1,
+		.format = "%.1f",
 	},
 
 	[wu_field_cost]		= {
 		.name	= "cost",
 		.descr	= "Cost per watt",
+		.multiplier = .1, /* XXX: Assume cents */
+		.format = "%.1f",
 	},
 
 	[wu_field_mo_cost]	= {
 		.name	= "mo-cost",
 		.descr	= "Monthly Cost",
+		.multiplier = .1, /* XXX: Assume cents */
+		.format = "%.1f",
 	},
 
 	[wu_field_power_factor]	= {
 		.name	= "power-factor",
-		.descr	= "Ratio of Watts vs. Volt Amps",
+		.descr	= "Ratio of Watts vs. Volt Amps", /* XXX: NOT Percent */
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_duty_cycle]	= {
 		.name	= "duty-cycle",
 		.descr	= "Percent of the Time On vs. Time Off",
+		.multiplier = 1,
+		.format = "%.0f",
 	},
 
 	[wu_field_power_cycle]	= {
 		.name	= "power-cycle",
 		.descr	= "Indication of power cycle",
+		.multiplier = 1,
+		.format = "%.0f",
 	},
 
 	[wu_field_line_frequency]	= {
 		.name	= "line-frequency",
 		.descr	= "Line frequency",
+		.multiplier = .1,
+		.format = "%.1f",
 	},
 
 	[wu_field_apparent_power]	= {
 		.name	= "apparent-powey",
 		.descr	= "Apparent power",
+		.multiplier = .01, /* Confirmed by verifying equality with watts/power-factor */
+		.format = "%.2f",
 	},
 
 };
@@ -837,7 +875,7 @@ static int filter_data(struct wu_packet * p, int i, char * buf)
 	if (i < wu_num_fields) {
 		if (wu_fields[i].enable) {
 			double val = strtod(p->field[i], NULL);
-			snprintf(buf, 256, "%.1f", val / 10.0);
+			snprintf(buf, 256, wu_fields[i].format, val * wu_fields[i].multiplier);
 			return 1;
 		}
 	}
