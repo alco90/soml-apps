@@ -6,6 +6,8 @@ AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([wattsup.c])
 AC_CONFIG_HEADERS([config.h])
 
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
 # Checks for programs.
 AC_PROG_CC
 
@@ -20,4 +22,5 @@ AC_CHECK_HEADERS([fcntl.h stdlib.h string.h termios.h unistd.h])
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([fchdir memset select strcasecmp strchr strdup strpbrk strtol strtoul])
 
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
