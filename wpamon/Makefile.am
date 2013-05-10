@@ -7,7 +7,9 @@ installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
 pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = wpamon-oml2
-wpamon_oml2_SOURCES = wpamon.c
+wpamon_oml2_SOURCES = wpamon.c \
+		      $(appname)_oml.h \
+		      $(appname)_popt.h
 wpamon_oml2_LDADD = -loml2 -locomm -lpopt
 
 pkgdata_DATA = $(appname).rb

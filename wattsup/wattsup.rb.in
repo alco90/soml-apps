@@ -3,7 +3,7 @@
 #
 # [0] http://doc.mytestbed.net/doc/omf/OmfEc/Backward/AppDefinition.html
 
-defApplication('oml:app:wattsup-oml2', 'wattsup-oml2') do |app|
+defApplication('oml:app:wattsup', 'wattsup') do |app|
 
   app.version(1, 0, 0)
   app.shortDescription = 'A program for interfacing with the Watts Up? Power Meter'
@@ -34,7 +34,7 @@ This application reads these metrics and reports them using OML.
         :type => :boolean, :order => 1)
   app.defProperty('delim', 'Set field delimiter', '-f',
         :type => :string, :default => ", ", :order => 1)
-  app.defProperty('newline', 'Use '\n' as delimter instead', '-n',
+  app.defProperty('newline', 'Use "\\n" as delimter instead', '-n',
         :type => :boolean, :order => 1)
   app.defProperty('localtime', 'Print localtime with each data reading', '-t',
         :type => :boolean, :order => 1)
