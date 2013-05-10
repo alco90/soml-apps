@@ -162,6 +162,9 @@ enum {
 	wu_field_power_factor,
 	wu_field_duty_cycle,
 	wu_field_power_cycle,
+
+	wu_field_line_frequency,
+	wu_field_apparent_power,
 };
 
 struct wu_field {
@@ -249,6 +252,16 @@ static struct wu_field wu_fields[wu_num_fields] = {
 	[wu_field_power_cycle]	= {
 		.name	= "power-cycle",
 		.descr	= "Indication of power cycle",
+	},
+
+	[wu_field_line_frequency]	= {
+		.name	= "line-frequency",
+		.descr	= "Line frequency",
+	},
+
+	[wu_field_apparent_power]	= {
+		.name	= "apparent-powey",
+		.descr	= "Apparent power",
 	},
 
 };
@@ -692,6 +705,8 @@ static int wu_show_header(int fd)
 			[13] = "power factor header",
 			[14] = "duty cycle header",
 			[15] = "power cycle header",
+			[16] = "line frequency header",
+			[17] = "apparent power header",
 		}
 	};
 	int ret;
@@ -875,6 +890,8 @@ static int wu_read_data(int fd)
 			[13] = "power factor",
 			[14] = "duty cycle",
 			[15] = "power cycle",
+			[16] = "line frequency",
+			[17] = "apparent power",
 		},
 	};
 	int num_read = 0;
