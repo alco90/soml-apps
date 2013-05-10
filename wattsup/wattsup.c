@@ -3,6 +3,7 @@
  *
  *
  *	Copyright (c) 2005 Patrick Mochel
+ *	Copyright (c) 2013 National ICT Australia (NICTA), Olivier Mehani (OML instrumentation)
  *
  *	This program is released under the GPLv2
  *
@@ -26,8 +27,13 @@
 #include <getopt.h>
 #include <signal.h>
 #include <time.h>
+#include <math.h>
 
 #include <sys/stat.h>
+
+#include <oml2/omlc.h>
+#define OML_FROM_MAIN
+#include "wattsup_oml.h"
 
 static const char * wu_version = "0.02";
 
@@ -56,6 +62,8 @@ static int wu_info_all = 0;
 static int wu_no_data = 0;
 static int wu_set_only = 0;
 
+static int oml_enabled = 0;
+
 #define wu_strlen	256
 #define wu_num_fields	18
 #define wu_param_len	16
@@ -72,25 +80,29 @@ struct wu_packet {
 
 
 struct wu_data {
-	unsigned int	watts;
-	unsigned int	volts;
-	unsigned int	amps;
-	unsigned int	watt_hours;
+	double	watts;
+	double	volts;
+	double	amps;
+	double	watt_hours;
 
-	unsigned int	cost;
-	unsigned int	mo_kWh;
-	unsigned int	mo_cost;
-	unsigned int	max_watts;
+	double	cost;
+	double	mo_kWh;
+	double	mo_cost;
 
-	unsigned int	max_volts;
-	unsigned int	max_amps;
-	unsigned int	min_watts;
-	unsigned int	min_volts;
+	double	max_watts;
+	double	max_volts;
+	double	max_amps;
 
-	unsigned int	min_amps;
-	unsigned int	power_factor;
-	unsigned int	duty_cycle;
-	unsigned int	power_cycle;
+	double	min_watts;
+	double	min_volts;
+	double	min_amps;
+
+	double	power_factor;
+	double	duty_cycle;
+	double	power_cycle;
+
+	double	frequency;
+	double	apparent_power;
 };
 
 struct wu_options {
@@ -428,6 +440,62 @@ static void print_packet_filter(struct wu_packet * p,
 	msg_end();
 }
 
+#define FIELD_FROM_STRING(d, f, p, i) \
+	do {							\
+		if ('_' == *p->field[i]) {			\
+			d.f= NAN;				\
+			i++;					\
+		} else {					\
+			d.f = strtod(p->field[i], NULL) *	\
+				wu_fields[i++].multiplier;	\
+		}						\
+	} while (0)
+
+
+static void report_packet_filter(struct wu_packet * p)
+{
+	struct wu_data d;
+	int i = 0;
+	int pc = -1;
+
+	FIELD_FROM_STRING(d, watts, p, i);
+	FIELD_FROM_STRING(d, volts, p, i);
+	FIELD_FROM_STRING(d, amps, p, i);
+	FIELD_FROM_STRING(d, watt_hours, p, i);
+
+	FIELD_FROM_STRING(d, cost, p, i);
+
+	FIELD_FROM_STRING(d, mo_kWh, p, i);
+	FIELD_FROM_STRING(d, mo_cost, p, i);
+
+	FIELD_FROM_STRING(d, max_watts, p, i);
+	FIELD_FROM_STRING(d, max_volts, p, i);
+	FIELD_FROM_STRING(d, max_amps, p, i);
+
+	FIELD_FROM_STRING(d, min_watts, p, i);
+	FIELD_FROM_STRING(d, min_volts, p, i);
+	FIELD_FROM_STRING(d, min_amps, p, i);
+
+	FIELD_FROM_STRING(d, power_factor, p, i);
+	FIELD_FROM_STRING(d, duty_cycle, p, i);
+	FIELD_FROM_STRING(d, power_cycle, p, i);
+
+	FIELD_FROM_STRING(d, frequency, p, i);
+	FIELD_FROM_STRING(d, apparent_power, p, i);
+
+	oml_inject_power(g_oml_mps_wattsup->power, d.watts, d.volts, d.amps, d.watt_hours, d.frequency, d.apparent_power);
+	oml_inject_cost(g_oml_mps_wattsup->cost, d.cost);
+	oml_inject_monthly(g_oml_mps_wattsup->monthly, d.mo_kWh, d.mo_cost);
+	oml_inject_maxima(g_oml_mps_wattsup->maxima, d.max_watts, d.max_volts, d.max_amps);
+	oml_inject_minima(g_oml_mps_wattsup->minima, d.min_watts, d.min_volts, d.min_amps);
+
+	/* The power cycle count really is a positive integer; -1 represents NaN */
+	if (!isnan(d.power_cycle)) {
+		pc = (int) d.power_cycle;
+	}
+	oml_inject_meta(g_oml_mps_wattsup->meta, d.power_factor, d.duty_cycle, pc);
+
+}
 
 /*
  * Device should be something like "ttyS0"
@@ -965,6 +1033,9 @@ static int wu_read_data(int fd)
 		dbg("[%d] ", num_read);
 		num_read++;
 		print_packet_filter(&p, filter_data);
+		if (oml_enabled) {
+			report_packet_filter(&p);
+		}
 
 		if (wu_count && (++i == wu_count)) 
 			break;
@@ -1818,6 +1889,15 @@ int main(int argc, const char ** argv)
 {
 	int ret;
 	int fd = 0;
+
+	ret = omlc_init("wattsup", &argc, argv, NULL);
+	if (!ret) {
+		oml_register_mps();
+		ret = omlc_start();
+		if (!ret) {
+			oml_enabled = 1;
+		}
+	}
 
 	ret = parse_args(argc, argv);
 	if (ret)
