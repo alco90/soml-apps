@@ -65,25 +65,42 @@ This application reads these metrics and reports them using OML.
   app.defProperty('value', 'Specifies which of these to print out', '',
         :type => :string, :default => 'ALL', :order => 3)
 
-  # Declare measurement points; generate OML injection helpers with
-  #  oml2-scaffold --oml wattsup-oml2.rb
-  app.defMeasurement("sensor") do |mp|
-    mp.defMetric('val', :int32)
-    mp.defMetric('inverse', :double)
-    mp.defMetric('name', :string)
+  # Measurements reported my default when running wattsup -l ttyUSB0
+  # There might be others.
+  # Units, precision and description taken from the Watts Up communication
+  # protocol description [0]
+  #
+  # [0] https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf
+  app.defMeasurement("power") do |mp|
+    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
+    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
+    mp.defMetric('current', :double, :unit => "A", :precision => 0.001) # XXX: [0] says “amps * 10. (Thousandths of amps)”; we assume it should read “amps * 1000.”
+    mp.defMetric('energy', :double, :unit => "Wh", :precision => 0.1)
+    mp.defMetric('frequency', :double, :unit => "Hz", :precision => 0.1)
+    mp.defMetric('apparent_power', :double, :unit => "VA", :precision => 0.01)
   end
-
-  # Declare a giant Measurement Point showing all supported types
-  app.defMeasurement("example") do |mp|
-    mp.defMetric('boolean_field', :boolean)
-    mp.defMetric('string_field', :string)
-    mp.defMetric('int32_field', :int32)
-    mp.defMetric('uint32_field', :uint32)
-    mp.defMetric('int64_field', :int64)
-    mp.defMetric('uint64_field', :uint64)
-    mp.defMetric('double_field', :double)
-    mp.defMetric('blob_field', :blob)
-    mp.defMetric('guid_field', :guid)
+  app.defMeasurement("cost") do |mp|
+    mp.defMetric('cost', :double, :unit => "$", :precision => 0.001)
+  end
+  app.defMeasurement("monthly") do |mp|
+    mp.defMetric('energy', :double, :unit => "Wh", :precision => 1) # According [0], this one's precision is different
+    mp.defMetric('cost', :double, :unit => "$", :precision => 0.001)
+  end
+  app.defMeasurement("maxima") do |mp|
+    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
+    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
+    mp.defMetric('current', :double, :unit => "A", :precision => 0.001)
+  end
+  app.defMeasurement("minima") do |mp|
+    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
+    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
+    mp.defMetric('current', :double, :unit => "A", :precision => 0.001)
+  end
+  app.defMeasurement("meta") do |mp|
+    mp.defMetric('power_factor', :double, :precision => 0.1, :description => "Ratio of Watts versus Volt Amps")
+    mp.defMetric('duty_cycle', :double, :unit => "%", :description => "Ratio of the time on versus total time")
+    mp.defMetric('power_cycle', :integer,
+		 :description => "Number of power-on events; indicates that power was removed at some point during this sampling interval since last memory clear; -1 represents NaN")
   end
 
 end
