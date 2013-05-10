@@ -20,30 +20,50 @@ This application reads these metrics and reports them using OML.
 
   app.path = "@bindir@/wattsup-oml2"
 
-  # Declare command-line arguments; generate Popt parser with
-  #  oml2-scaffold --opts wattsup-oml2.rb
-  app.defProperty('loop', 'Create periodic result', '-l',
-        :type => 'boolean', :mnemonic => 'l')
-  app.defProperty('delay', 'Delay between consecutive measurements', '-d',
-        :type => 'integer', :unit => 'seconds', :mnemonic => 'd')
-
-  # Example of all supported command-line argument types; see popt(3) for more details
-  app.defProperty('boolean_var', 'Command line option of type boolean', '--boolean',
-        :type => :boolean, :var_name => 'varboolean')
-  app.defProperty('string_var', 'Command line option of type string', '--string',
-        :type => :string, :var_name => 'varstring')
-  app.defProperty('long_var', 'Command line option of type long', '--long',
-        :type => :long, :var_name => 'varlong')
-  app.defProperty('int32_var', 'Command line option of type int32', '--int32',
-        :type => :int32, :var_name => 'varint32')
-  app.defProperty('uint32_var', 'Command line option of type uint32', '--uint32',
-        :type => :uint32, :var_name => 'varuint32')
-  app.defProperty('int64_var', 'Command line option of type int64', '--int64',
-        :type => :int64, :var_name => 'varint64')
-  app.defProperty('uint64_var', 'Command line option of type uint64', '--uint64',
-        :type => :uint64, :var_name => 'varuint64')
-  app.defProperty('double_var', 'Command line option of type double', '--double',
-        :type => :double, :var_name => 'vardouble')
+  # Command line options supported by the un-instrumented application,
+  # as obtained with wattsup --help
+  app.defProperty('help', 'Display help text and exit', '-h',
+        :type => :boolean, :order => 1)
+  app.defProperty('version', 'Display version information and exit', '-V',
+        :type => :boolean, :order => 1)
+  app.defProperty('debug', 'Print out debugging messages', '-d',
+        :type => :boolean, :order => 1)
+  app.defProperty('count', 'Specify number of data samples', '-c',
+        :type => :integer, :order => 1)
+  app.defProperty('final', 'Print final interval information', '-z',
+        :type => :boolean, :order => 1)
+  app.defProperty('delim', 'Set field delimiter', '-f',
+        :type => :string, :default => ", ", :order => 1)
+  app.defProperty('newline', 'Use '\n' as delimter instead', '-n',
+        :type => :boolean, :order => 1)
+  app.defProperty('localtime', 'Print localtime with each data reading', '-t',
+        :type => :boolean, :order => 1)
+  app.defProperty('gmtime', 'Print GMT time with each data reading', '-g',
+        :type => :boolean, :order => 1)
+  app.defProperty('label', 'Show labels of each field', '-l',
+        :type => :boolean, :order => 1)
+  app.defProperty('suppress', 'Suppress printing of the field description', '-s',
+        :type => :boolean, :order => 1)
+  app.defProperty('calibrate', 'Print calibration parameters', '-b',
+        :type => :boolean, :order => 1)
+  app.defProperty('header', 'Print data field names (as read from device)', '-r',
+        :type => :boolean, :order => 1)
+  app.defProperty('interval', 'Get/Set sampling interval', '-i',
+        :type => :integer, :order => 1)
+  app.defProperty('mode', 'Get/Set display mode', '-m',
+        :type => :integer, :order => 1)
+  app.defProperty('user', 'Get/Set user parameters', '-u',
+        :type => :string, :order => 1)
+  app.defProperty('show-all', 'Show all device parameters', '-a',
+        :type => :boolean, :order => 1)
+  app.defProperty('no-data', 'Don\'t read any data (just read device info)', '-N',
+        :type => :boolean, :order => 1)
+  app.defProperty('set-only', 'Set parameters only (don\'t read them back)', '-S',
+        :type => :boolean, :order => 1)
+  app.defProperty('device', 'Serial port the device is connected at', '',
+        :type => :string, :default => '/dev/ttyUSB0', :order => 2)
+  app.defProperty('value', 'Specifies which of these to print out', '',
+        :type => :string, :default => 'ALL', :order => 3)
 
   # Declare measurement points; generate OML injection helpers with
   #  oml2-scaffold --oml wattsup-oml2.rb
