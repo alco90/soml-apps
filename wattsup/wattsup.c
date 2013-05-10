@@ -38,7 +38,7 @@ static const char * prog_name = "wattsup";
 
 static const char * sysfs_path_start = "/sys/class/tty";
 
-static char * wu_device = "ttyUSB0";
+static const char * wu_device = "ttyUSB0";
 static int wu_fd = 0;
 static int wu_count = 0;
 static int wu_debug = 0;
@@ -433,7 +433,7 @@ static void print_packet_filter(struct wu_packet * p,
  * Device should be something like "ttyS0"
  */
 
-static int open_device(char * device_name, int * dev_fd)
+static int open_device(const char * device_name, int * dev_fd)
 {
 	struct stat s;
 	int ret;
@@ -1262,7 +1262,7 @@ static int wu_store_user(int fd)
 }
 
 
-static void enable_field(char * name)
+static void enable_field(const char * name)
 {
 	int i;
 
@@ -1745,7 +1745,7 @@ static void enable_short_option(int c, char * arg)
 	}
 }
 
-static int parse_args(int argc, char ** argv)
+static int parse_args(int argc, const char ** argv)
 {
 	struct option longopts[wu_num_options + 1] = { };
 	char shortopts[wu_num_options * 2] = "";
@@ -1758,7 +1758,7 @@ static int parse_args(int argc, char ** argv)
 		int c;
 		int index;
 
-		c = getopt_long(argc, argv, shortopts, 
+		c = getopt_long(argc, (char * const *) argv, shortopts,
 				longopts, &index);
 		if (c == -1)
 			break;
@@ -1814,7 +1814,7 @@ static int parse_args(int argc, char ** argv)
 }
 
 
-int main(int argc, char ** argv)
+int main(int argc, const char ** argv)
 {
 	int ret;
 	int fd = 0;
