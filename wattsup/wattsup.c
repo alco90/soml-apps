@@ -440,7 +440,7 @@ static void print_packet_filter(struct wu_packet * p,
 	msg_end();
 }
 
-#define FIELD_FROM_STRING(d, f, p, i) \
+#define FIELD_FROM_STRING(d, f, p, i, v) \
 	do {							\
 		if ('_' == *p->field[i]) {			\
 			d.f= NAN;				\
@@ -448,6 +448,7 @@ static void print_packet_filter(struct wu_packet * p,
 		} else {					\
 			d.f = strtod(p->field[i], NULL) *	\
 				wu_fields[i++].multiplier;	\
+			v = 1;					\
 		}						\
 	} while (0)
 
@@ -457,50 +458,63 @@ static void report_packet_filter(struct wu_packet * p)
 	struct wu_data d;
 	int i = 0;
 	int pf = -1, dc = -1, pc = -1;
+	int power_valid = 0, cost_valid = 0, monthly_valid = 0, maxima_valid = 0, minima_valid = 0, meta_valid = 0;
 
-	FIELD_FROM_STRING(d, watts, p, i);
-	FIELD_FROM_STRING(d, volts, p, i);
-	FIELD_FROM_STRING(d, amps, p, i);
-	FIELD_FROM_STRING(d, watt_hours, p, i);
+	FIELD_FROM_STRING(d, watts, p, i, power_valid);
+	FIELD_FROM_STRING(d, volts, p, i, power_valid);
+	FIELD_FROM_STRING(d, amps, p, i, power_valid);
+	FIELD_FROM_STRING(d, watt_hours, p, i, power_valid);
 
-	FIELD_FROM_STRING(d, cost, p, i);
+	FIELD_FROM_STRING(d, cost, p, i, cost_valid);
 
-	FIELD_FROM_STRING(d, mo_kWh, p, i);
-	FIELD_FROM_STRING(d, mo_cost, p, i);
+	FIELD_FROM_STRING(d, mo_kWh, p, i, monthly_valid);
+	FIELD_FROM_STRING(d, mo_cost, p, i, monthly_valid);
 
-	FIELD_FROM_STRING(d, max_watts, p, i);
-	FIELD_FROM_STRING(d, max_volts, p, i);
-	FIELD_FROM_STRING(d, max_amps, p, i);
+	FIELD_FROM_STRING(d, max_watts, p, i, maxima_valid);
+	FIELD_FROM_STRING(d, max_volts, p, i, maxima_valid);
+	FIELD_FROM_STRING(d, max_amps, p, i, maxima_valid);
 
-	FIELD_FROM_STRING(d, min_watts, p, i);
-	FIELD_FROM_STRING(d, min_volts, p, i);
-	FIELD_FROM_STRING(d, min_amps, p, i);
+	FIELD_FROM_STRING(d, min_watts, p, i, minima_valid);
+	FIELD_FROM_STRING(d, min_volts, p, i, minima_valid);
+	FIELD_FROM_STRING(d, min_amps, p, i, minima_valid);
 
-	FIELD_FROM_STRING(d, power_factor, p, i);
-	FIELD_FROM_STRING(d, duty_cycle, p, i);
-	FIELD_FROM_STRING(d, power_cycle, p, i);
+	FIELD_FROM_STRING(d, power_factor, p, i, meta_valid);
+	FIELD_FROM_STRING(d, duty_cycle, p, i, meta_valid);
+	FIELD_FROM_STRING(d, power_cycle, p, i, meta_valid);
 
-	FIELD_FROM_STRING(d, frequency, p, i);
-	FIELD_FROM_STRING(d, apparent_power, p, i);
+	FIELD_FROM_STRING(d, frequency, p, i, power_valid);
+	FIELD_FROM_STRING(d, apparent_power, p, i, power_valid);
 
-	oml_inject_power(g_oml_mps_wattsup->power, d.watts, d.volts, d.amps, d.watt_hours, d.frequency, d.apparent_power);
-	oml_inject_cost(g_oml_mps_wattsup->cost, d.cost);
-	oml_inject_monthly(g_oml_mps_wattsup->monthly, d.mo_kWh, d.mo_cost);
-	oml_inject_maxima(g_oml_mps_wattsup->maxima, d.max_watts, d.max_volts, d.max_amps);
-	oml_inject_minima(g_oml_mps_wattsup->minima, d.min_watts, d.min_volts, d.min_amps);
-
-	/* The power factor, duty cycle and power cycle count really are
-	 * positive integers; -1 represents NaN */
-	if (!isnan(d.power_factor)) {
-		pf = (int) d.power_factor;
+	if (power_valid) {
+		oml_inject_power(g_oml_mps_wattsup->power, d.watts, d.volts, d.amps, d.watt_hours, d.frequency, d.apparent_power);
 	}
-	if (!isnan(d.duty_cycle)) {
-		dc = (int) d.duty_cycle;
+	if (cost_valid) {
+		oml_inject_cost(g_oml_mps_wattsup->cost, d.cost);
 	}
-	if (!isnan(d.power_cycle)) {
-		pc = (int) d.power_cycle;
+	if (monthly_valid) {
+		oml_inject_monthly(g_oml_mps_wattsup->monthly, d.mo_kWh, d.mo_cost);
 	}
-	oml_inject_meta(g_oml_mps_wattsup->meta, pf, dc, pc);
+	if (maxima_valid) {
+		oml_inject_maxima(g_oml_mps_wattsup->maxima, d.max_watts, d.max_volts, d.max_amps);
+	}
+	if (minima_valid) {
+		oml_inject_minima(g_oml_mps_wattsup->minima, d.min_watts, d.min_volts, d.min_amps);
+	}
+
+	if (meta_valid) {
+		/* The power factor, duty cycle and power cycle count really are
+		 * positive integers; -1 represents NaN */
+		if (!isnan(d.power_factor)) {
+			pf = (int) d.power_factor;
+		}
+		if (!isnan(d.duty_cycle)) {
+			dc = (int) d.duty_cycle;
+		}
+		if (!isnan(d.power_cycle)) {
+			pc = (int) d.power_cycle;
+		}
+		oml_inject_meta(g_oml_mps_wattsup->meta, pf, dc, pc);
+	}
 
 }
 
