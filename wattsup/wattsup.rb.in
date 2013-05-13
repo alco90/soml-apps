@@ -77,10 +77,10 @@ This application reads these metrics and reports them using OML.
     mp.defMetric('current', :double, :unit => "A", :precision => 0.001) # XXX: [0] says “amps * 10. (Thousandths of amps)”; we assume it should read “amps * 1000.”
     mp.defMetric('energy', :double, :unit => "Wh", :precision => 0.1)
     mp.defMetric('frequency', :double, :unit => "Hz", :precision => 0.1)
-    mp.defMetric('apparent_power', :double, :unit => "VA", :precision => 0.01)
+    mp.defMetric('apparent_power', :double, :unit => "VA", :precision => 0.1)
   end
   app.defMeasurement("cost") do |mp|
-    mp.defMetric('cost', :double, :unit => "$", :precision => 0.001)
+    mp.defMetric('cost', :double, :unit => "$", :precision => 0.01)
   end
   app.defMeasurement("monthly") do |mp|
     mp.defMetric('energy', :double, :unit => "Wh", :precision => 1) # According [0], this one's precision is different
@@ -97,8 +97,8 @@ This application reads these metrics and reports them using OML.
     mp.defMetric('current', :double, :unit => "A", :precision => 0.001)
   end
   app.defMeasurement("meta") do |mp|
-    mp.defMetric('power_factor', :double, :precision => 0.1, :description => "Ratio of Watts versus Volt Amps")
-    mp.defMetric('duty_cycle', :double, :unit => "%", :description => "Ratio of the time on versus total time")
+    mp.defMetric('power_factor', :integer, :unit => "%", :description => "Ratio of Watts versus Volt Amps; -1 represents NaN")
+    mp.defMetric('duty_cycle', :integer, :unit => "%", :description => "Ratio of the time on versus total time; -1 represents NaN")
     mp.defMetric('power_cycle', :integer,
 		 :description => "Number of power-on events; indicates that power was removed at some point during this sampling interval since last memory clear; -1 represents NaN")
   end

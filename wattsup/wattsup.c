@@ -281,9 +281,9 @@ static struct wu_field wu_fields[wu_num_fields] = {
 
 	[wu_field_power_factor]	= {
 		.name	= "power-factor",
-		.descr	= "Ratio of Watts vs. Volt Amps", /* XXX: NOT Percent */
-		.multiplier = .1,
-		.format = "%.1f",
+		.descr	= "Ratio of Watts vs. Volt Amps",
+		.multiplier = 1,
+		.format = "%.0f",
 	},
 
 	[wu_field_duty_cycle]	= {
@@ -310,8 +310,8 @@ static struct wu_field wu_fields[wu_num_fields] = {
 	[wu_field_apparent_power]	= {
 		.name	= "apparent-powey",
 		.descr	= "Apparent power",
-		.multiplier = .01, /* Confirmed by verifying equality with watts/power-factor */
-		.format = "%.2f",
+		.multiplier = .1, /* Confirmed by verifying equality with watts/power-factor */
+		.format = "%.1f",
 	},
 
 };
@@ -456,7 +456,7 @@ static void report_packet_filter(struct wu_packet * p)
 {
 	struct wu_data d;
 	int i = 0;
-	int pc = -1;
+	int pf = -1, dc = -1, pc = -1;
 
 	FIELD_FROM_STRING(d, watts, p, i);
 	FIELD_FROM_STRING(d, volts, p, i);
@@ -489,11 +489,18 @@ static void report_packet_filter(struct wu_packet * p)
 	oml_inject_maxima(g_oml_mps_wattsup->maxima, d.max_watts, d.max_volts, d.max_amps);
 	oml_inject_minima(g_oml_mps_wattsup->minima, d.min_watts, d.min_volts, d.min_amps);
 
-	/* The power cycle count really is a positive integer; -1 represents NaN */
+	/* The power factor, duty cycle and power cycle count really are
+	 * positive integers; -1 represents NaN */
+	if (!isnan(d.power_factor)) {
+		pf = (int) d.power_factor;
+	}
+	if (!isnan(d.duty_cycle)) {
+		dc = (int) d.duty_cycle;
+	}
 	if (!isnan(d.power_cycle)) {
 		pc = (int) d.power_cycle;
 	}
-	oml_inject_meta(g_oml_mps_wattsup->meta, d.power_factor, d.duty_cycle, pc);
+	oml_inject_meta(g_oml_mps_wattsup->meta, pf, dc, pc);
 
 }
 
