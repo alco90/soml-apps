@@ -48,6 +48,8 @@ static const char * wu_device = "ttyUSB0";
 static int wu_fd = 0;
 static int wu_count = 0;
 static int wu_debug = 0;
+static int wu_verbose = 0;
+static int wu_quiet = 0;
 static char *wu_delim = ", ";
 static int wu_final = 0;
 static int wu_interval = 1;
@@ -63,6 +65,7 @@ static int wu_no_data = 0;
 static int wu_set_only = 0;
 
 static int oml_enabled = 0;
+static int verbose = -1;
 
 #define wu_strlen	256
 #define wu_num_fields	18
@@ -125,6 +128,9 @@ enum {
 	wu_option_version,
 
 	wu_option_debug,
+
+	wu_option_verbose,
+	wu_option_quiet,
 
 	wu_option_count,
 	wu_option_final,
@@ -321,6 +327,9 @@ static struct wu_field wu_fields[wu_num_fields] = {
 static void msg_start(const char * fmt, ...)
 {
 	va_list(ap);
+
+	if (!verbose) { return; }
+
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
 	va_end(ap);
@@ -328,12 +337,16 @@ static void msg_start(const char * fmt, ...)
 
 static void msg_end(void)
 {
+	if (!verbose) { return; }
+
 	printf("\n");
 }
 
 static void msg(const char * fmt, ...)
 {
 	va_list ap;
+
+	if (!verbose) { return; }
 
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
@@ -1402,6 +1415,18 @@ static int wu_store_debug(int unused)
 	return 0;
 }
 
+static int wu_store_verbose(int unused)
+{
+	verbose = 1;
+	return 0;
+}
+
+static int wu_store_quiet(int unused)
+{
+	verbose = 0;
+	return 0;
+}
+
 static int wu_store_delim(int unused)
 {
 	char * s = wu_option_value(wu_option_delim);
@@ -1500,6 +1525,24 @@ static struct wu_options wu_options[] = {
 		.param		= 0,
 		.descr		= "Print out debugging messages",
 		.store		= wu_store_debug,
+	},
+
+	/*
+	 * Verbosity control options
+	 */
+	[wu_option_verbose] = {
+		.longopt	= "verbose",
+		.shortopt	= 'v',
+		.param		= 0,
+		.descr		= "Force output of data to stdout (default without OML reporting)",
+		.store		= wu_store_verbose,
+	},
+	[wu_option_quiet] = {
+		.longopt	= "quiet",
+		.shortopt	= 'q',
+		.param		= 0,
+		.descr		= "No output of data to stdout (default with OML reporting)",
+		.store		= wu_store_quiet,
 	},
 
 	/*
@@ -1861,14 +1904,16 @@ static int parse_args(int argc, const char ** argv)
 			if (optarg)
 				wu_options[index].value = strdup(optarg);
 			
-			printf("long option: val = %c, optarg = %s\n",
-			       wu_options[index].shortopt, optarg);
+			/* printf("long option: val = %c, optarg = %s\n",
+			       wu_options[index].shortopt, optarg); */
 			break;
 		case '?':
 			err("Bad parameter");
 			return ret_err(EINVAL);
 			break;
 		default:
+			/* printf("short option: val = %c, optarg = %s\n",
+			       c, optarg); */
 			enable_short_option(c, optarg);
 			break;
 		}
@@ -1919,7 +1964,6 @@ int main(int argc, const char ** argv)
 			oml_enabled = 1;
 		}
 	}
-
 	ret = parse_args(argc, argv);
 	if (ret)
 		return 0;
@@ -1929,6 +1973,16 @@ int main(int argc, const char ** argv)
 	 */
 	if ((ret = wu_check_store(wu_option_debug, 0)))
 		goto Close;
+
+	if ((ret = wu_check_store(wu_option_quiet, 0)))
+		goto Close;
+	/* Make verbose have precedence */
+	if ((ret = wu_check_store(wu_option_verbose, 0)))
+		goto Close;
+	if (verbose < 0) {
+		/* Default behaviour if nothing specified on the command line */
+		verbose = oml_enabled?0:1;
+	}
 
 	ret = open_device(wu_device, &fd);
 	if (ret)

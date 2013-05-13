@@ -24,9 +24,13 @@ This application reads these metrics and reports them using OML.
   # as obtained with wattsup --help
   app.defProperty('help', 'Display help text and exit', '-h',
         :type => :boolean, :order => 1)
-  app.defProperty('version', 'Display version information and exit', '-V',
+  app.defProperty('version', 'Display version information and exit', 'V',
         :type => :boolean, :order => 1)
   app.defProperty('debug', 'Print out debugging messages', '-d',
+        :type => :boolean, :order => 1)
+  app.defProperty('verbose', 'Force output of data to stdout', '-v',
+        :type => :boolean, :order => 1)
+  app.defProperty('quiet', 'No output of data to stdout', '-q',
         :type => :boolean, :order => 1)
   app.defProperty('count', 'Specify number of data samples', '-c',
         :type => :integer, :order => 1)
