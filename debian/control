@@ -22,7 +22,9 @@ Description: A meta-package that installs the complete standalone OML2 applicati
      * otg2-oml2: the otg2/otr2 programs for generating background traffic;
      * ping-oml2: a simple OML4R wrapper around the system ping tool;
      * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
-     * trace-oml2: wrapper around libtrace with OML2 measurement recording.
+     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
+     * wattsup-oml2: OML-instrumented monitor for WattsUp? power meters;
+     * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11 connections.
 
 Package: oml2-apps-full
 Section: net
@@ -148,6 +150,14 @@ Description: Measure and record libtrace data using OML
  resulting measurements are recorded using the OML measurement
  library.  Currently implemented measurement points include radiotap
  information, IP, TCP, and UDP protocol data.
+
+
+Package: wattsup-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, liboml2-9
+Description: OML-instrumented monitor for WattsUp? power meters
+ This application connect to a WattsUp? USB power meter, and queries
+ its reading every given interval to report them using OML.
 
 
 Package: wpamon-oml2
