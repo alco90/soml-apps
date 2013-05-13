@@ -454,15 +454,15 @@ static void print_packet_filter(struct wu_packet * p,
 }
 
 #define FIELD_FROM_STRING(d, f, p, i, v) \
-	do {							\
-		if ('_' == *p->field[i]) {			\
-			d.f= NAN;				\
-			i++;					\
-		} else {					\
-			d.f = strtod(p->field[i], NULL) *	\
-				wu_fields[i++].multiplier;	\
-			v = 1;					\
-		}						\
+	do {									\
+		if ('_' == *(p)->field[((int)(i))]) {				\
+			(d).f= NAN;						\
+		} else {							\
+			(d).f = strtod((p)->field[((int)(i))], NULL) *		\
+				wu_fields[(int)(i)].multiplier;			\
+			(v) = 1;						\
+		}								\
+		i += 1;								\
 	} while (0)
 
 
