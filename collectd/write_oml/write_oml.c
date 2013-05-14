@@ -154,37 +154,13 @@ create_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
 static MPoint*
 find_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
 {
+  pthread_mutex_lock(&session.init_lock);
   MPoint* mp = find_mpoint_struct(name);
 
   if (mp == NULL) {
-    if (session.oml_intialized) {
-      ERROR("oml_writer plugin: We assumed that all collectors already checked in, but now we found '%s'", name);
-    }
     mp = create_mpoint(name, ds, vl);
   }
-  if (! session.oml_intialized) {
-    // We are waiting for some time before we commit to a set of
-    // reportable measurements.
-    //
-    time_t now;
-    time(&now);
-    if ((now - start_time) < session.startup_delay) {
-      return NULL;  // let's wait a bit longer
-    }
-    // OK it's time to commit
-    pthread_mutex_lock(&session.init_lock);
-    if (! session.oml_intialized) { // just make sure nothing has changed since we aquired the lock
-      DEBUG("oml_writer plugin: Starting OML");
-      if(omlc_start()==0) {
-        session.oml_intialized = 1;
-      } else {
-        ERROR("oml_writer plugin: Could not initialise OML");
-        mp = NULL;
-      }
-    }
-    pthread_mutex_unlock(&session.init_lock);
-
-  }
+  pthread_mutex_unlock(&session.init_lock);
   return mp;
 }
 
@@ -291,10 +267,17 @@ oml_init(void)
 
   NOTICE("oml_writer plugin: " PACKAGE_STRING);
 
+  pthread_mutex_lock(&session.init_lock);
   if (session.node_id != NULL) argv[1] = session.node_id;
   if (session.domain != NULL) argv[3] = session.domain;
   if (session.collect_uri != NULL) argv[5] = session.collect_uri;
-  return omlc_init(app_name, &argc, argv, o_log_collectd);
+  if (!omlc_init(app_name, &argc, argv, o_log_collectd)) {
+    if(!omlc_start()) {
+      session.oml_intialized = 1;
+    }
+  }
+  pthread_mutex_unlock(&session.init_lock);
+  return !session.oml_intialized;
 }
 
 void
