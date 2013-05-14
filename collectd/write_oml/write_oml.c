@@ -47,7 +47,6 @@ static const char *config_keys[] = {
   "NodeID",
   "Domain",
   "CollectURI",
-  "StartupDelay"
 };
 static int config_keys_num = STATIC_ARRAY_SIZE(config_keys);
 
@@ -70,7 +69,6 @@ typedef struct {
   char* collect_uri;
   char* domain;
   char* node_id;
-  int   startup_delay;
 
   MPoint* mpoint;  // linked list of mpoint definitions
   int     oml_intialized;
@@ -79,7 +77,6 @@ typedef struct {
 } Session;
 
 static Session session;
-static time_t start_time;
 
 static MPoint*
 find_mpoint_struct(const char* name)
@@ -222,8 +219,6 @@ oml_config(const char *key, const char *value)
   } else if (strcasecmp ("CollectURI", key) == 0) {
     session.collect_uri = (char*)malloc(strlen(value) + 1);
     strncpy(session.collect_uri, value, strlen(value));
-  } else if (strcasecmp ("StartupDelay", key) == 0) {
-    session.startup_delay = atoi(value);
   } else {
     return(-1);
   }
@@ -284,8 +279,6 @@ void
 module_register(void)
 {
   memset(&session, 0, sizeof(Session));
-  time(&start_time);
-  session.startup_delay = 10;
   pthread_mutex_init(&session.init_lock, /* attr = */NULL);
 
   plugin_register_config("write_oml", oml_config, config_keys, config_keys_num);
