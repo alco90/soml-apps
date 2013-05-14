@@ -99,9 +99,9 @@ static void
 configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
 {
   int i = 0;
-  int offset = ++i;
+  int header = 6; /* There are 6 fields by default */
 
-  mp->mp_defs = (OmlMPDef*)malloc((ds->ds_num + 6 + 1) * sizeof(OmlMPDef));
+  mp->mp_defs = (OmlMPDef*)malloc((ds->ds_num + header + 1) * sizeof(OmlMPDef));
 
   mp->mp_defs[i].name = "time"; mp->mp_defs[i].param_types = OML_UINT64_VALUE;
   mp->mp_defs[++i].name = "host"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
@@ -112,7 +112,7 @@ configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
 
   for (i = 0; i < ds->ds_num; i++) {
     data_source_t* d = &ds->ds[i];
-    OmlMPDef* md = &mp->mp_defs[i + offset];
+    OmlMPDef* md = &mp->mp_defs[i + header];
     char* s = (char*)malloc(sizeof(d->name) + 1);
     strncpy(s, d->name, sizeof(d->name));
     md->name = s;
@@ -130,7 +130,7 @@ configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
     }
   }
   // NULL out last one
-  OmlMPDef* md = &mp->mp_defs[ds->ds_num + offset];
+  OmlMPDef* md = &mp->mp_defs[ds->ds_num + header];
   md->name = 0; md->param_types = (OmlValueT)0;
   mp->oml_mp = omlc_add_mp(mp->name, mp->mp_defs);
   DEBUG("oml_writer plugin: New measurement point %s", mp->name);
