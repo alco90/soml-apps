@@ -31,7 +31,7 @@ Section: net
 Priority: optional
 Architecture: all
 Depends: collectd-write-oml2
-Description: A meta-package that installs the complite OML2 applications collection
+Description: A meta-package that installs the complete OML2 applications collection
  This package installs the oml2-apps package, and the following additional ones:
      * collectd-write-oml2: writer plugin for collectd.
 
