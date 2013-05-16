@@ -2,15 +2,14 @@ ACLOCAL_AMFLAGS = -I m4 -Wall
 
 SCAFFOLD=oml2-scaffold
 
-appname = wpamon
+appname = wattsup
 installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
 pkgdatadir = $(datadir)/$(installed_name)
 
-bin_PROGRAMS = wpamon-oml2
-wpamon_oml2_SOURCES = wpamon.c \
-		      $(appname)_oml.h \
-		      $(appname)_popt.h
-wpamon_oml2_LDADD = -loml2 -locomm -lpopt
+bin_PROGRAMS = wattsup-oml2
+wattsup_oml2_SOURCES = wattsup.c \
+		       $(appname)_oml.h
+wattsup_oml2_LDADD = -loml2 -locomm
 
 pkgdata_DATA = $(appname).rb
 
@@ -22,8 +21,7 @@ EXTRA_DIST = autogen.sh \
 
 BUILT_SOURCES = $(top_srcdir)/.version \
 		$(appname).rb \
-		$(appname)_oml.h \
-		$(appname)_popt.h
+		$(appname)_oml.h
 
 $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
@@ -31,11 +29,7 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
 CLEANFILES = $(appname)_oml.h \
-	     $(appname)_popt.h \
 	     $(appname).rb
-
-$(appname)_popt.h: $(appname).rb
-	$(SCAFFOLD) --opts $<
 
 $(appname)_oml.h: $(appname).rb
 	$(SCAFFOLD) --oml $<
