@@ -62,14 +62,14 @@ pkgdata_DATA = $(appotg2).rb $(appotr2).rb
 $(appotg2).rb: $(appotg2).rb.in
 	VER=`echo $(VERSION) | sed "s/.*+oml//;s/\([0-9\+]\(\.[0-9]\+\)\{1,2\}\).*/\1/;s/\./, /g"`; \
 	    sed -e 's|@bindir[@]|$(bindir)|g' \
-		-e "/a\.path/s/$(appotg2)/$(installed_otg2)/" \
-		-e "s/a\.version.*/a.version($$VER)/" \
+		-e "/app\.path/s/$(appotg2)/$(installed_otg2)/" \
+		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 $(appotr2).rb: $(appotr2).rb.in
 	VER=`echo $(VERSION) | sed "s/.*+oml//;s/\([0-9\+]\(\.[0-9]\+\)\{1,2\}\).*/\1/;s/\./, /g"`; \
 	    sed -e 's|@bindir[@]|$(bindir)|g' \
-		-e "/a\.path/s/$(appotr2)/$(installed_otr2)/" \
-		-e "s/a\.version.*/a.version($$VER)/" \
+		-e "/app\.path/s/$(appotr2)/$(installed_otr2)/" \
+		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 
 $(appotg2)_oml.h: $(appotg2).rb

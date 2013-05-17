@@ -36,8 +36,8 @@ $(appname)_oml.h: $(appname).rb
 $(appname).rb: $(appname).rb.in
 	VER=`echo $(VERSION) | sed "s/.*+oml//;s/\([0-9\+]\(\.[0-9]\+\)\{1,2\}\).*/\1/;s/\./, /g"`; \
 	    sed -e 's|@bindir[@]|$(bindir)|g' \
-		-e "/a\.path/s/$(PACKAGE)/$(installed_name)/" \
-		-e "s/a\.version.*/a.version($$VER)/" \
+		-e "/app\.path/s/$(PACKAGE)/$(installed_name)/" \
+		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 
 installed_link_names = \
