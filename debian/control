@@ -41,9 +41,9 @@ Priority: optional
 Architecture: all
 Depends: omf-expctl-5.4
 Suggests: oml2-apps
-Description: A meta-package that installs OML2 Applications and their OMF-5.4 definition
- This package installs all the OML2 Application packages, as well as the
- Application definition need by the OMF 5.4 experiment controller to use them.
+Description: A meta-package that installs OMF-5.4 definitions of the OML2 applications
+ This package installs all the application definitions needed by the OMF 5.4
+ experiment controller to use the oml2-apps.
 
 
 Package: collectd-write-oml2
