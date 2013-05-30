@@ -1,3 +1,21 @@
+2013-39-30  Olivier Mehani <olivier.mehani@nicta.com.au>
+	* oml2-apps: Release 2.10.0
+	* New applications:
+	  * wattsup-oml2: Add monitor application for WattsUp? power meters (https://www.wattsupmeters.com/)
+	* Enhancements:
+	  * Update generation of final app descriptions
+	  * collectd: Remove StartupDelay configuration option, as MP can now be
+	    added after omlc_start() has been called.
+	  * ping:
+	    * Report RTT statistics at the end
+	    * Add summary MP to collect information at the end
+	    * Use a single instance of ping
+	    * Add IPv6 support
+	    * Remove -a requirement
+	  * otg: Fix segfault with --oml-noop
+	  * Don't try to build at all in disabled apps
+	* Deprecated applications: wlanconfig has been removed
+
 2012-12-19  Olivier Mehani <olivier.mehani@nicta.com.au>
 	* oml2-apps: Release 2.9.0
 	* New applications:
