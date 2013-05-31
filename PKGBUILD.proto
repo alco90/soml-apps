@@ -1,12 +1,12 @@
 # Contributor: Olivier Mehani <olivier.mehani@nicta.com.au>
 #<!GIT
 pkgname=oml2-apps
-_redmineid=809
+_redmineid=902
 #!GIT>
 #<GIT
 pkgname=oml2-apps-git
 #GIT>
-pkgver=2.9.0
+pkgver=2.10.0
 pkgrel=1
 pkgdesc="OML2 applications collection"
 arch=(i686 x86_64)
