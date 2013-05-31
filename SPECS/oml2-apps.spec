@@ -1,6 +1,6 @@
 %define name		oml2-apps
-%define version		2.9.0
-%define redmineid	809
+%define version		2.10.0
+%define redmineid	902
 
 BuildRoot:		%{_tmppath}/%{name}-%{version}
 Summary:		OML applications collection
@@ -39,16 +39,16 @@ BuildRequires:		gpsd-devel
 
 %description
 This package installs all the OML2 Application packages:
-    * collectd-write-oml2: writer plugin for collectd;
-    * gpslogger-oml2: measure GPS data from gpsd (only for Fedora);
+    * gpslogger-oml2: measure GPS data from gpds;
     * iperf-oml2: iperf with OML2 measurement recording;
     * nmetrics-oml2: node metrics using libsigar;
     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
     * ping-oml2: a simple OML4R wrapper around the system ping tool;
     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
-    * wpamon-oml2: connect to wpa_supplicant's control socket and reports Wi-Fi
-      events.
+    * wattsup-oml2: OML-instrumented monitor for WattsUp? power meters;
+    * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11 connections.
+    * collectd-write-oml2: writer plugin for collectd.
 
 %prep
 %setup -q
