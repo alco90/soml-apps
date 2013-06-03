@@ -1,9 +1,12 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
+# SED is otherwise provided by libtool.m4
+SED=sed
+
 SCAFFOLD=oml2-scaffold
 
 appname = ripwavemon
-installed_name = `echo '$(PACKAGE)' | sed '$(transform)'`
+installed_name = `echo '$(PACKAGE)' | $(SED) '$(transform)'`
 pkgdatadir = $(datadir)/$(installed_name)
 
 bin_PROGRAMS = ripwavemon-oml2
@@ -40,13 +43,13 @@ $(appname)_oml.h: $(appname).rb
 	$(SCAFFOLD) --oml $<
 
 $(appname).rb: $(appname).rb.in
-	VER=`echo $(VERSION) | sed "s/.*+oml//;s/\([0-9\+]\(\.[0-9]\+\)\{1,2\}\).*/\1/;s/\./, /g"`; \
-	    sed -e 's|@bindir[@]|$(bindir)|g' \
+	VER=`echo $(VERSION) | $(SED) "s/.*+oml//;s/\([0-9]\{1,\}\(\.[0-9]\{1,\}\)\{1,2\}\).*/\1/;s/\./, /g"`; \
+	    $(SED) -e 's|@bindir[@]|$(bindir)|g' \
 		-e "/app\.path/s/$(PACKAGE)/$(installed_name)/" \
 		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 
-installed_link_names = $(DESTDIR)$(bindir)/`echo "ripwave_monitor" | sed '$(transform)'`$(EXEEXT)
+installed_link_names = $(DESTDIR)$(bindir)/`echo "ripwave_monitor" | $(SED) '$(transform)'`$(EXEEXT)
 
 install-exec-hook:
 	for OLDNAME in $(installed_link_names); do \
