@@ -29,7 +29,7 @@ PKG_PACKAGES=
 PKG_CLEANFILES=
 
 if BUILD_ARCH
-PKG_ARCH_BASE_NAME=$(PACKAGE)-$(OML_ALT_VER)
+PKG_ARCH_BASE_NAME=$(PACKAGE)-$(OML_PKG_VER)
 PKG_ARCH_BUILD_DIR=p-arch
 PKG_ARCH_BUILD=$(PKG_ARCH_BUILD_DIR)/PKGBUILD
 
@@ -51,7 +51,7 @@ if !GITISTAG
 endif
 	cat $(PKG_ARCH_BUILD).proto | \
 		$(SED) -e "/<GIT/,/GIT>/d" | \
-		$(SED) -e "/!GIT.*/d" -e "s/^pkgver.*=.*/pkgver=$(OML_ALT_VER)/" \
+		$(SED) -e "/!GIT.*/d" -e "s/^pkgver.*=.*/pkgver=$(OML_PKG_VER)/" \
 		> $(PKG_ARCH_BUILD)
 	cd $(PKG_ARCH_BUILD_DIR); $(MAKEPKG) -p PKGBUILD -g >> PKGBUILD
 	cat $(PKG_ARCH_BUILD).proto | \
@@ -66,7 +66,7 @@ pkg-arch: $(PKG_ARCH_BUILD)
 endif #BUILD_ARCH
 
 if BUILD_DEBIAN
-PKG_DEB_BASE_NAME=$(PACKAGE)_$(VERSION)
+PKG_DEB_BASE_NAME=$(PACKAGE)_$(OML_PKG_VER)
 PKG_DEB_BUILD_DIR=p-debian
 PKG_DEB_ORIG_SRC=$(PKG_DEB_BUILD_DIR)/$(PKG_DEB_BASE_NAME).orig.tar.gz
 PKG_DEB_RULES=$(PKG_DEB_BUILD_DIR)/$(distdir)/debian/rules
@@ -102,7 +102,7 @@ endif #BUILD_DEBIAN
 if BUILD_RPM
 
 
-PKG_RPM_BASE_NAME=$(PACKAGE)-$(OML_ALT_VER)
+PKG_RPM_BASE_NAME=$(PACKAGE)-$(OML_PKG_VER)
 PKG_RPM_SPEC=$(PKG_RPM_BUILD_DIR)/SPECS/$(PACKAGE).spec
 PKG_RPM_BUILD_DIR=p-rpm
 
@@ -131,7 +131,7 @@ else
 		GZIP=$(GZIP_ENV) gzip -c >../SOURCES/$(PKG_RPM_BASE_NAME).tar.gz
 	mv $(PKG_RPM_SPEC) $(PKG_RPM_SPEC).orig
 	cat $(PKG_RPM_SPEC).orig | \
-		$(SED) -e "s/^%define version.*/%define version	$(OML_ALT_VER)/" \
+		$(SED) -e "s/^%define version.*/%define version	$(OML_PKG_VER)/" \
 		-e "s/^%define pkgver.*/%define pkgver $(VERSION)/" \
 		-e "s/^%define liboml2cur.*/%define liboml2cur $(LIBOML2_LT_VER_CUR)/" \
 		-e "s/^%define liboml2rev.*/%define liboml2rev $(LIBOML2_LT_VER_REV)/" \
