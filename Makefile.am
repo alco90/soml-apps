@@ -90,7 +90,7 @@ if !IS_DEBIAN
 	rm $(PKG_DEB_RULES).orig
 endif
 if !GITISTAG
-	cd $(PKG_DEB_BUILD_DIR)/$(distdir)/; $(DCH) -v $(VERSION)-1 "Development build (`$(GIT) describe` on branch `$(GIT) describe --contains --all HEAD`), not for general distribution; changes since $(GITLASTTAG) follow"
+	cd $(PKG_DEB_BUILD_DIR)/$(distdir)/; $(DCH) -v $(OML_PKG_VER)-1 "Development build (`$(GIT) describe` on branch `$(GIT) describe --contains --all HEAD`), not for general distribution; changes since $(GITLASTTAG) follow"
 #	The sed line reverts the order of the lines without a dependency on tac
 	cd $(PKG_DEB_BUILD_DIR)/$(distdir)/; $(GIT) log --pretty='%s' $(GITLASTTAG)..HEAD | $(SED) '1!G;h;$!d' | while read LINE; do $(DCH) -a "$${LINE}"; done
 endif
@@ -122,7 +122,7 @@ if GITISTAG
 # evaluated by the shell. Then, replace %{VAR} with ${VAR} in the Source entries
 # of the SPECFILE, and let the shell substitute these variables with their newly
 # assigned values.
-	URL=$$(eval "`$(SED) -n "s/%define\s\+\(\S\+\)\s\+\(\S\+\)$$/\1=\2/p;/Source[0-9]*:/{s/Source[0-9]*:\s*/echo /;s/%/\$$/g;p}" $(PKG_RPM_SPEC)`"); \
+	URL=$$(eval "`$(SED) -n "s/%define\s\+\(\S\+\)\s\+\(\S\+\)$$/\1=\2/p;/Source[0-9]*:[ \t]*http/{s/Source[0-9]*:\s*/echo /;s/%/\$$/g;p}" $(PKG_RPM_SPEC)`"); \
 		wget -q $${URL} -O $(PKG_RPM_BUILD_DIR)/SOURCES/`basename $${URL}`
 else
 	$(MAKE) distdir=$(PKG_RPM_BUILD_DIR)/BUILD/$(PKG_RPM_BASE_NAME) distdir
@@ -132,13 +132,7 @@ else
 	mv $(PKG_RPM_SPEC) $(PKG_RPM_SPEC).orig
 	cat $(PKG_RPM_SPEC).orig | \
 		$(SED) -e "s/^%define version.*/%define version	$(OML_PKG_VER)/" \
-		-e "s/^%define pkgver.*/%define pkgver $(VERSION)/" \
-		-e "s/^%define liboml2cur.*/%define liboml2cur $(LIBOML2_LT_VER_CUR)/" \
-		-e "s/^%define liboml2rev.*/%define liboml2rev $(LIBOML2_LT_VER_REV)/" \
-		-e "s/^%define liboml2age.*/%define liboml2age $(LIBOML2_LT_VER_AGE)/" \
-		-e "s/^%define libocommcur.*/%define libocommcur $(LIBOCOMM_LT_VER_CUR)/" \
-		-e "s/^%define libocommrev.*/%define libocommrev $(LIBOCOMM_LT_VER_REV)/" \
-		-e "s/^%define libocommage.*/%define libocommage $(LIBOCOMM_LT_VER_AGE)/" \
+		-e "s/^%define pkgver.*/%define pkgver $(OML_PKG_VER)/" \
 		> $(PKG_RPM_SPEC)
 	rm $(PKG_RPM_SPEC).orig
 endif
