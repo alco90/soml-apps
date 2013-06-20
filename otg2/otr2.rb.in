@@ -34,7 +34,7 @@ version 2 is compatible with OMLv2.
   #
   app.defMeasurement('udp_in') do |m|
     m.defMetric('ts',:double)
-    m.defMetric('flow_id',:int32)
+    m.defMetric('flow_id',:uint32)
     m.defMetric('seq_no',:uint32)
     m.defMetric('pkt_length',:uint32)
     m.defMetric('dst_host',:string)
