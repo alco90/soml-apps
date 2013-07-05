@@ -99,7 +99,7 @@ Application::Application(const char *appname, int argc, const char * argv[], con
   logfile_name_ = defLogFile;
 
   stream_ = new Stream();
-  logdebug("Initialisation of the application after Stream creation");
+  logdebug("Initialisation of the application after Stream creation\n");
 
   phase1_ = phase1;
   phase1_[0].arg = &component_name_;
