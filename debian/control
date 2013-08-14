@@ -10,7 +10,7 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: gpslogger-oml2, iperf-oml2, nmetrics-oml2, otg2-oml2, ripwavemon-oml2, trace-oml2
+Depends: gpslogger-oml2 (= ${Source-Version}), iperf-oml2 (= ${Source-Version}), nmetrics-oml2 (= ${Source-Version}), otg2-oml2 (= ${Source-Version}), ripwavemon-oml2 (= ${Source-Version}), trace-oml2 (= ${Source-Version})
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
@@ -30,7 +30,7 @@ Package: oml2-apps-full
 Section: net
 Priority: optional
 Architecture: all
-Depends: collectd-write-oml2
+Depends: collectd-write-oml2 (= ${Source-Version})
 Description: A meta-package that installs the complete OML2 applications collection
  This package installs the oml2-apps package, and the following additional ones:
      * collectd-write-oml2: writer plugin for collectd.
