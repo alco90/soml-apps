@@ -38,6 +38,7 @@
 #include "gpslogger_oml.h"
 static time_t int_time, old_int_time;
 static bool verbose = false;
+static int stop_loop = 0;
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
@@ -106,8 +107,7 @@ conditionally_log_fix(struct gps_fix_t *gpsfix)
 static void
 quit_handler (int signum)
 {
-  omlc_close();
-  exit(0);
+  stop_loop = 1;
 }
 
 static void
@@ -148,7 +148,7 @@ socket_mainloop(void)
 #endif
   gps_stream(gpsdata, WATCH_ENABLE|WATCH_NEWSTYLE, NULL);
 
-  while(1) {
+  while(!stop_loop) {
     int data;
     struct timeval tv;
 
@@ -172,7 +172,9 @@ socket_mainloop(void)
 #endif
     }
   }
-  return 0;
+
+  omlc_close();
+  exit(0);
 }
 
 static void

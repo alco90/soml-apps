@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <netinet/ip.h>
 #include <errno.h>
+#include <signal.h>
+
 #include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
@@ -66,6 +68,14 @@ typedef struct {            /* Offset from the start of the IP packet*/
   int8_t  pad9[0xa7];     /* 0xaa; pad up to 336B (0x150) */
 } navini_report_t;
 #pragma pack()
+
+static int stop_loop = 0;
+
+static void
+quit_handler (int signum)
+{
+  stop_loop = 1;
+}
 
 int
 prepare_socket(void)
@@ -116,7 +126,7 @@ receive_reports (int sockfd)
 
   printf("Modem_ID,date,time,SyncStr,BTS_ID,Net_ID,Antenna,SyncStr,SNR,Temperature\n");
 
-  while (1) {
+  while (!stop_loop) {
     len = recv(sockfd, (void*) &report, sizeof(report), MSG_WAITALL);
     if (len != sizeof(report)) {
       logwarn("Received packet of unexpected size (%d instead of %d); first 32 bytes:",
@@ -176,9 +186,12 @@ main(int argc, const char **argv)
   if (prepare_oml(argc, argv) != 0)
     exit(2);
 
+  signal (SIGTERM, quit_handler);
+  signal (SIGQUIT, quit_handler);
+  signal (SIGINT, quit_handler);
+
   receive_reports(sockfd);
 
-  /* Unlikely to be reached... */
   omlc_close();
 
   return 0;

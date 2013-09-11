@@ -219,6 +219,7 @@ Application::parseRuntimeOptions(char * msg)
     switch(rc) {
     case 1: // Stop
       stream_->exitStream();
+      delete this;
       exit(0);  //exit terminate process and all its threads
     case 2:
       stream_->pauseStream();

@@ -10,17 +10,30 @@
  */
 
 #include <iostream>
+#include <signal.h>
 #include <ocomm/o_log.h>
 
 #include "otg2/otg2_app.h"
 
 using namespace std;
 
+OTG* otg;
+
+static void
+quit_handler (int signum)
+{
+  delete otg;
+}
+
 int main(int argc, const char * argv[])
 {
   try {
-    OTG* otg = new OTG(argc, argv);
-    //otg->registerOutPortType("mp_udp", createMPOutPort);
+    otg = new OTG(argc, argv);
+
+    signal (SIGTERM, quit_handler);
+    signal (SIGQUIT, quit_handler);
+    signal (SIGINT, quit_handler);
+
     otg->run();
 
   } catch (const char *reason) {

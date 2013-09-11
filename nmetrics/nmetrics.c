@@ -18,18 +18,19 @@
  * in the License.
  */
 
-#include <config.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sigar.h>
-#include <oml2/omlc.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #else
 # define PACKAGE_STRING __FILE__
 #endif
+
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+
+#include <sigar.h>
+#include <oml2/omlc.h>
 
 #define OML_FROM_MAIN
 #include "nmetrics_oml.h"
@@ -59,6 +60,14 @@ typedef struct _if_monitor_t {
   struct _if_monitor_t* next;
 } if_monitor_t;
 
+static int stop_loop = 0;
+
+static void
+quit_handler (int signum)
+{
+  stop_loop = 1;
+}
+
 void
 run( opts_t* opts, oml_mps_t* oml_mps, if_monitor_t* first_if)
 {
@@ -67,7 +76,7 @@ run( opts_t* opts, oml_mps_t* oml_mps, if_monitor_t* first_if)
   sigar_cpu_t c;
   sigar_mem_t m;
   sigar_net_interface_stat_t is;
-  while(1) {
+  while(!stop_loop) {
     sigar_open(&sigar_p);
 
     if (opts->report_cpu) {
@@ -195,8 +204,14 @@ main(int argc, const char *argv[])
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
 
+  signal (SIGTERM, quit_handler);
+  signal (SIGQUIT, quit_handler);
+  signal (SIGINT, quit_handler);
+
   // Do some work
   run(g_opts, g_oml_mps, first);
+
+  omlc_close();
 
   return(0);
 }

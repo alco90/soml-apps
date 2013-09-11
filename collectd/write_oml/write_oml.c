@@ -275,6 +275,14 @@ oml_init(void)
   return !session.oml_intialized;
 }
 
+static int
+oml_cleanup(void)
+{
+  /* XXX: session.init_lock should probably be cleaned up here,
+   * but also initialised in oml_init */
+  return omlc_close();
+}
+
 void
 module_register(void)
 {
@@ -284,6 +292,7 @@ module_register(void)
   plugin_register_config("write_oml", oml_config, config_keys, config_keys_num);
   plugin_register_init("write_oml", oml_init);
   plugin_register_write("write_oml", oml_write, /* user_data = */ NULL);
+  plugin_register_shutdown("write_oml", oml_cleanup);
 } /* void module_register */
 
 /*

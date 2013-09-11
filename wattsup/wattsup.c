@@ -65,6 +65,7 @@ static int wu_no_data = 0;
 static int wu_set_only = 0;
 
 static int oml_enabled = 0;
+static int stop_loop = 0;
 static int verbose = -1;
 
 #define wu_strlen	256
@@ -322,7 +323,11 @@ static struct wu_field wu_fields[wu_num_fields] = {
 
 };
 
-
+static void
+quit_handler (int signum)
+{
+	stop_loop = 1;
+}
 
 static void msg_start(const char * fmt, ...)
 {
@@ -1042,7 +1047,7 @@ static int wu_read_data(int fd)
 	static const int wu_max_retry = 2;
 
 	i = 0;
-	while (1) {
+	while (!stop_loop) {
 		
 		ret = wu_read(fd, &p);
 		if (ret) {
@@ -2074,6 +2079,10 @@ int main(int argc, const char ** argv)
 
 		if ((ret = wu_start_log()))
 			goto Close;
+
+		signal (SIGTERM, quit_handler);
+		signal (SIGQUIT, quit_handler);
+		signal (SIGINT, quit_handler);
 	    
 		wu_read_data(fd);
 		
@@ -2081,6 +2090,7 @@ int main(int argc, const char ** argv)
 	}
 Close:
 	close(fd);
+	omlc_close();
 	return ret;
 }
 

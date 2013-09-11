@@ -24,6 +24,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
+
 #include <ocomm/o_log.h>
 #include <oml2/omlc.h>
 
@@ -39,6 +41,14 @@
 #include "trace_popt.h"
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
+
+static int stop_loop = 0;
+
+static void
+quit_handler (int signum)
+{
+    stop_loop = 1;
+}
 
 static void
 trace_oml_inject_ip(oml_mps_t* oml_mps, libtrace_ip_t* ip, libtrace_packet_t *packet,
@@ -436,7 +446,7 @@ run(opts_t* opts, oml_mps_t* oml_mps)
   }
 
   packet = trace_create_packet();
-  while (trace_read_packet(trace, packet) > 0) {
+  while (trace_read_packet(trace, packet) > 0 && !stop_loop) {
     per_packet(oml_mps, packet, start_time, pktid++);
   }
 
@@ -508,8 +518,13 @@ main(int argc, const char *argv[])
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
 
-  // Do some work
+  signal (SIGTERM, quit_handler);
+  signal (SIGQUIT, quit_handler);
+  signal (SIGINT, quit_handler);
+
   run(g_opts, g_oml_mps);
+
+  omlc_close();
 
   return(0);
 }

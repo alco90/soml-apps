@@ -10,16 +10,30 @@
  */
 
 #include <iostream>
+#include <signal.h>
 #include <ocomm/o_log.h>
 
 #include "otg2/otr2_app.h"
 
 using namespace std;
 
+OTR* otr;
+
+static void
+quit_handler (int signum)
+{
+  delete otr;
+}
+
 int main(int argc, const char * argv[])
 {
   try {
-    OTR* otr = new OTR(argc, argv);
+    otr = new OTR(argc, argv);
+
+    signal (SIGTERM, quit_handler);
+    signal (SIGQUIT, quit_handler);
+    signal (SIGINT, quit_handler);
+
     otr->run();
 
   } catch (const char *reason ) {
