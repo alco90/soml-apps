@@ -26,7 +26,7 @@ UDPInPort::UDPInPort()
   timestamp = time.tv_sec;
 
   localhost_ = "localhost";
-  localport_ = DEFAULT_RECV_PORT;
+  localport_ = DEFAULT_PORT;
   maxPktLength_ = DEF_PKT_LENGTH;
 
   oml_register_mps();

@@ -17,8 +17,7 @@
 #include "otg2/packet.h"
 #include "otg2/source.h"
 
-#define DEFAULT_SEND_PORT 3000
-#define DEFAULT_RECV_PORT 4000
+#define DEFAULT_PORT 3000
 
 /** Port is an abstract class for the interface to send and receive packets.
  * Ports which receive (and therefore 'produce') packet, implement the

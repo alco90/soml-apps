@@ -25,7 +25,7 @@
 Socket::Socket(): sockfd_(0)
 {
   localport_ = 0;
-  dstport_ = DEFAULT_SEND_PORT;
+  dstport_ = DEFAULT_PORT;
 }
 
 void
