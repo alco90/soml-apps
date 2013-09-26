@@ -123,7 +123,7 @@ Description: Orbit Traffic Generator
 
 Package: ping-oml2
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, ruby1.9 | rubygems, iputils-ping
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, ruby1.9.1 | rubygems, iputils-ping
 Description: OML4R wrapper for ping
  This application runs the system ping, parses its output and reports the
  measurements via OML using the OML4R rubygem.
