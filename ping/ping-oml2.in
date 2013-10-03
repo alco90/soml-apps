@@ -151,6 +151,9 @@ begin
   $stderr.puts "INFO\t@PACKAGE@ @VERSION@\n"
   app = PingWrapper.new(ARGV)
   app.start()
+  # XXX: Sleep for one second to let OML4R send the remaining data (see comments
+  # in #1485)
+  sleep 1
 rescue Interrupt
 rescue Exception => ex
   $stderr.puts "ERROR\t#{ex}\n"
