@@ -10,7 +10,7 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: gpslogger-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
+Depends: gpslogger-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version}), ping-oml2 (= ${binary:Version})
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
