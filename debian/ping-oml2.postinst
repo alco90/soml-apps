@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Trying to install the OML4R gem..." >&2
-/usr/bin/gem install oml4r || \
+/usr/bin/gem1.9.1 install oml4r || \
 	echo "Could not install the oml4r gem; ping-oml2 will not be usable until you do so manually" >&2
