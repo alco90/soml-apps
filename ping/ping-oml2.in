@@ -79,11 +79,14 @@ class PingWrapper
       argParser.on("-n","--[no]-numeric ","No attempt will be made to lookup symbolic names for host addresses"){ @numeric = '-n' }
     end
 
-    if @addr.nil? and leftover.length > 0
-      @addr = leftover[0]
-    else
-      raise "You did not specify an address to ping!"
+    if @addr.nil?
+      if leftover.length > 0
+        @addr = leftover[0]
+      else
+        raise "You did not specify an address to ping!"
+      end
     end
+
   end
 
   def process_output(row)
