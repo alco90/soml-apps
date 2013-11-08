@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
-DIST_SUBDIRS = collectd gpslogger nmetrics iperf otg2 ping ripwavemon trace wattsup wpamon
+DIST_SUBDIRS = collectd gpslogger nmetrics iperf otg2 ripwavemon trace wattsup wpamon
 SUBDIRS = @BUILT_APPS@
 
 EXTRA_DIST = autogen.sh \
