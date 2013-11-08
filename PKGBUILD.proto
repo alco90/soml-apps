@@ -16,10 +16,8 @@ depends=('oml2')
 optdepends=(
 'collectd: for the write_oml plugin'
 'gpsd: for gpslogger'
-'iputils: for ping'
 'libsigar: for nmetrics'
 'libtrace: for trace'
-'ruby: for ping'
 'wpa_supplicant: for wpamon')
 makedepends=('git')
 install='oml2-apps.install'
