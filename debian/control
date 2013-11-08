@@ -10,7 +10,7 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: gpslogger-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version}), ping-oml2 (= ${binary:Version})
+Depends: gpslogger-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
@@ -20,7 +20,6 @@ Description: A meta-package that installs the complete standalone OML2 applicati
      * iperf-oml2: iperf with OML2 measurement recording;
      * nmetrics-oml2: node metrics using libsigar;
      * otg2-oml2: the otg2/otr2 programs for generating background traffic;
-     * ping-oml2: a simple OML4R wrapper around the system ping tool;
      * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
      * trace-oml2: wrapper around libtrace with OML2 measurement recording;
      * wattsup-oml2: OML-instrumented monitor for WattsUp? power meters;
@@ -119,17 +118,6 @@ Description: Orbit Traffic Generator
  OTG provides an instrumented traffic source/sink pair, with
  measurement collection on the transmitted and received traffic
  streams using OML.
-
-
-Package: ping-oml2
-Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, ruby1.9.1, iputils-ping
-Description: OML4R wrapper for ping
- This application runs the system ping, parses its output and reports the
- measurements via OML using the OML4R rubygem.
- .
- This packages installs the latest OML4R gem from RubyGems as a post-install,
- and therefore requires an Internet connection to complete successfully.
 
 
 Package: ripwavemon-oml2
