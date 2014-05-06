@@ -4,7 +4,7 @@
  * Fetches latitude, longitude, elevation, fix mode and time from gpsd
  * and feeds them into OML.
  *
- * To compile: gcc -o gpslogger gpslogger.c -loml2 -lgps
+ * To compile: gcc -o gpslogger gpslogger.c -locomm -loml2 -lgps
  *
  * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2010
  * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2013
