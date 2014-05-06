@@ -1,5 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4 -Wall
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 # SED is otherwise provided by libtool.m4
 SED=sed
 
