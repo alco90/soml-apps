@@ -356,9 +356,6 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
   void*                 payload;
   void*                 linkptr;
   libtrace_linktype_t   linktype;
-  uint8_t               hdr_type; // determine type of mobility header
-  uint8_t               hdr_len;  // length of header in decimal
-  void*                 hdr;      // point at the beginning of the header
 
   //  size_t size_of_packet = 0;
   struct timeval tv = trace_get_timeval(packet);
@@ -377,6 +374,22 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
     break;
   case TRACE_TYPE_ETH:
       trace_oml_inject_ieee802_3(oml_mps, linktype, linkptr, packet, pktid);
+    break;
+  case TRACE_TYPE_UNKNOWN:
+  case TRACE_TYPE_HDLC_POS:
+  case TRACE_TYPE_ATM:
+  case TRACE_TYPE_NONE:
+  case TRACE_TYPE_LINUX_SLL:
+  case TRACE_TYPE_PFLOG:
+  case TRACE_TYPE_POS:
+  case TRACE_TYPE_80211_PRISM:
+  case TRACE_TYPE_AAL5:
+  case TRACE_TYPE_DUCK:
+  case TRACE_TYPE_LLCSNAP:
+  case TRACE_TYPE_PPP:
+  case TRACE_TYPE_METADATA:
+  case TRACE_TYPE_NONDATA:
+  case TRACE_TYPE_OPENBSD_LOOP:
     break;
   }
 
