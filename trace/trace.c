@@ -375,7 +375,9 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
   case TRACE_TYPE_ETH:
       trace_oml_inject_ieee802_3(oml_mps, linktype, linkptr, packet, pktid);
     break;
+#if LIBTRACE_API_VERSION >= ((3<<16)|(0<<8)|(19))
   case TRACE_TYPE_UNKNOWN:
+#endif
   case TRACE_TYPE_HDLC_POS:
   case TRACE_TYPE_ATM:
   case TRACE_TYPE_NONE:
@@ -389,7 +391,9 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
   case TRACE_TYPE_PPP:
   case TRACE_TYPE_METADATA:
   case TRACE_TYPE_NONDATA:
+#if LIBTRACE_API_VERSION >= ((3<<16)|(0<<8)|(18))
   case TRACE_TYPE_OPENBSD_LOOP:
+#endif
     break;
   }
 
@@ -451,11 +455,15 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
     break;
   }
   case TRACE_IPPROTO_ICMPV6: {
+#if LIBTRACE_API_VERSION >= ((3<<16)|(0<<8)|(18))
     libtrace_icmp6_t* icmp6 = trace_get_icmp6(packet);
     if(icmp6->type == 128 || icmp6->type == 129) { // only report ping
       uint16_t icmp_sequ_nb = icmp6->un.echo.sequence;
       trace_oml_inject_icmp(oml_mps, pktid, icmp6->type, icmp_sequ_nb, tv, 6);
     }
+#else
+    logwarn ("ICMPv6 packets capture no longer supported with libtrace<3.0.18");
+#endif
   }
   default:
     return;
