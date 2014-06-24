@@ -40,7 +40,10 @@
 #define USE_OPTS
 #include "trace_popt.h"
 
-#define MIN(x,y) ((x)<(y)?(x):(y))
+#ifndef MIN
+/* MIN is defined in sys/param.h, which is include by recent libtrace.h */
+# define MIN(x,y) ((x)<(y)?(x):(y))
+#endif
 
 static int stop_loop = 0;
 
@@ -240,7 +243,7 @@ trace_oml_inject_icmp6(oml_mps_t* oml_mps, uint64_t pktid, uint8_t type,
     oml_inject_icmp6(oml_mps->icmp6,
         pktid,
         type,
-        sequ_nb,
+        ntohs(sequ_nb),
         tv.tv_sec,
         tv.tv_usec);
 }
@@ -416,12 +419,11 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
       return;
     break;
   }
-  case TRACE_IPPROTO_ICMPV6: /* ICMP6 */ { /* XXX; doesn't libtrace know that? */
-    hdr = (hdr + hdr_len);
-    uint8_t icmp_type = *(uint8_t*)hdr;
-    if(icmp_type == 128 || icmp_type == 129) { // only report ping
-      uint16_t icmp_sequ_nb = htons(*(uint16_t*)(hdr + 6));
-      trace_oml_inject_icmp6(oml_mps, pktid, icmp_type, icmp_sequ_nb, tv);
+  case TRACE_IPPROTO_ICMPV6: {
+    libtrace_icmp6_t* icmp6 = trace_get_icmp6(packet);
+    if(icmp6->type == 128 || icmp6->type == 129) { // only report ping
+      uint16_t icmp_sequ_nb = icmp6->un.echo.sequence;
+      trace_oml_inject_icmp6(oml_mps, pktid, icmp6->type, icmp_sequ_nb, tv);
     }
   }
   default:
