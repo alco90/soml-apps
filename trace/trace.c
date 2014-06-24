@@ -55,7 +55,7 @@ quit_handler (int signum)
 
 static void
 trace_oml_inject_ip(oml_mps_t* oml_mps, libtrace_ip_t* ip, libtrace_packet_t *packet,
-               double time_now, uint64_t pktid)
+               double time_now, oml_guid_t pktid)
 {
     //OmlValueU v[12];
     char buf_addr_src[INET_ADDRSTRLEN];
@@ -85,7 +85,7 @@ trace_oml_inject_ip(oml_mps_t* oml_mps, libtrace_ip_t* ip, libtrace_packet_t *pa
 
 static void
 trace_oml_inject_tcp(oml_mps_t* oml_mps, libtrace_tcp_t* tcp, libtrace_packet_t *packet,
-                void* payload, double time_now, uint64_t pktid)
+                void* payload, double time_now, oml_guid_t pktid)
 {
     (void) payload;
     oml_inject_tcp(oml_mps->tcp,
@@ -103,7 +103,7 @@ trace_oml_inject_tcp(oml_mps_t* oml_mps, libtrace_tcp_t* tcp, libtrace_packet_t 
 
 static void
 trace_oml_inject_udp(oml_mps_t* oml_mps, libtrace_udp_t* udp, libtrace_packet_t *packet,
-                void* payload, double time_now, uint64_t pktid)
+                void* payload, double time_now, oml_guid_t pktid)
 {
     (void) payload;
     oml_inject_udp(oml_mps->udp,
@@ -117,7 +117,7 @@ trace_oml_inject_udp(oml_mps_t* oml_mps, libtrace_udp_t* udp, libtrace_packet_t 
 
 static void
 trace_oml_inject_ip6(oml_mps_t* oml_mps, libtrace_ip6_t* ip6,
-               double time_now, uint64_t pktid)
+               double time_now, oml_guid_t pktid)
 {
     char buf_addr_src[INET6_ADDRSTRLEN];
     char buf_addr_dst[INET6_ADDRSTRLEN];
@@ -137,7 +137,7 @@ trace_oml_inject_ip6(oml_mps_t* oml_mps, libtrace_ip6_t* ip6,
 }
 
 static void
-trace_oml_inject_ip6_mh(oml_mps_t* oml_mps, char* type, uint64_t pktid,
+trace_oml_inject_ip6_mh(oml_mps_t* oml_mps, char* type, oml_guid_t pktid,
     uint16_t sequ_nb, struct timeval tv, char* data)
 {
     oml_inject_ip6_mh(oml_mps->ip6_mh,
@@ -150,7 +150,7 @@ trace_oml_inject_ip6_mh(oml_mps_t* oml_mps, char* type, uint64_t pktid,
 }
 
 static void
-trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, struct timeval tv, uint64_t pktid)
+trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, struct timeval tv, oml_guid_t pktid)
 {
   uint8_t               hdr_type; // determine type of mobility header
   uint8_t               hdr_len;  // length of header in decimal
@@ -237,7 +237,7 @@ trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, stru
 }
 
 static void
-trace_oml_inject_icmp(oml_mps_t* oml_mps, uint64_t pktid, uint8_t type,
+trace_oml_inject_icmp(oml_mps_t* oml_mps, oml_guid_t pktid, uint8_t type,
                   uint16_t sequ_nb, struct timeval tv, int ipver)
 {
   /* FIXME: this is probably a useless level of indirection */
@@ -277,7 +277,7 @@ mac_to_s (uint8_t *mac, char *s, int n)
 
 static void
 trace_oml_inject_ieee802_3(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
-                     void* linkptr, libtrace_packet_t* packet, uint64_t pktid)
+                     void* linkptr, libtrace_packet_t* packet, oml_guid_t pktid)
 {
   uint8_t *mac_source;
   uint8_t *mac_dst;
@@ -295,7 +295,7 @@ trace_oml_inject_ieee802_3(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
 }
 static void
 trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
-                     void* linkptr, libtrace_packet_t* packet, uint64_t pktid)
+                     void* linkptr, libtrace_packet_t* packet, oml_guid_t pktid)
 {
   uint64_t tsft;
   uint8_t rate;
@@ -346,7 +346,7 @@ trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
 }
 
 static void
-per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint64_t pktid)
+per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_guid_t pktid)
 {
   uint32_t              remaining;
   void*                 l3;
@@ -467,7 +467,6 @@ run(opts_t* opts, oml_mps_t* oml_mps)
   struct timeval tv;
   gettimeofday(&tv, NULL);
   long start_time = tv.tv_sec;
-  uint64_t pktid = 0;
 
   trace = trace_create(opts->interface);
   if (trace_is_err(trace)) {
@@ -501,7 +500,7 @@ run(opts_t* opts, oml_mps_t* oml_mps)
 
   packet = trace_create_packet();
   while (trace_read_packet(trace, packet) > 0 && !stop_loop) {
-    per_packet(oml_mps, packet, start_time, pktid++);
+    per_packet(oml_mps, packet, start_time, omlc_guid_generate());
   }
 
   trace_destroy_packet(packet);

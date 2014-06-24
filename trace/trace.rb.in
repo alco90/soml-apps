@@ -34,12 +34,12 @@ useless as an identifier.
 		  :type => 'boolean', :mnemonic => 'r')
 
   app.defMeasurement("ieee802_3") do |m|
-    m.defMetric('pktid',     :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',     :guid, ' internal packet ID to link MPs')
     m.defMetric('sourceMAC', :string, ' Source MAC Address')
     m.defMetric('dstMAC',    :string, ' Destination MAC Address')
   end
   app.defMeasurement("radiotap") do |m|
-    m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',             :guid, ' internal packet ID to link MPs')
     m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
     m.defMetric('rate',              :uint32, ' Wireless Rate')
     m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
@@ -56,7 +56,7 @@ useless as an identifier.
   end
 
   app.defMeasurement("ip") do |m|
-    m.defMetric('pktid',    :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',    :guid, ' internal packet ID to link MPs')
     m.defMetric('ip_tos',   :uint32, ' Type of Service')
     m.defMetric('ip_len',   :uint32, ' Total Length')
     m.defMetric('ip_id',    :int32,  ' Identification')
@@ -71,7 +71,7 @@ useless as an identifier.
   end
 
   app.defMeasurement("icmp") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('type',         :uint32, ' ICMPv6 type') # XXX: Only echo request (8) and replies (0)
     m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
     m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
@@ -79,7 +79,7 @@ useless as an identifier.
   end
 
   app.defMeasurement("tcp") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('tcp_source',   :uint32, ' Source Port')
     m.defMetric('tcp_dest',     :uint32, ' Destination Port')
     m.defMetric('tcp_seq',      :uint32, ' TCP sequence Number')
@@ -92,7 +92,7 @@ useless as an identifier.
   end
 
   app.defMeasurement("udp") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('udp_source',   :uint32, ' Source Port')
     m.defMetric('udp_dest',     :uint32, ' Destination Port')
     m.defMetric('udp_len',      :uint32, ' Length of Datagram')
@@ -101,14 +101,14 @@ useless as an identifier.
   end
 
   app.defMeasurement("ip6") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('ip6_src',      :string, ' Source Address')
     m.defMetric('ip6_dst',      :string, ' Destination Address')
     m.defMetric('ip6_ts',       :double, ' timestamp of the measurement')
   end
 
   app.defMeasurement("ip6_mh") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('mh_type',      :string, ' BU or BAck')
     m.defMetric('sequ_nb',      :uint32, ' binding sequence number')
     m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
@@ -117,7 +117,7 @@ useless as an identifier.
   end
 
   app.defMeasurement("icmp6") do |m|
-    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('pktid',        :guid, ' internal packet ID to link MPs')
     m.defMetric('type',         :uint32, ' ICMPv6 type') # XXX: Only echo request (128) and replies (129)
     m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
     m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
