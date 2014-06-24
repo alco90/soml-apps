@@ -287,7 +287,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
 
   /* Get the UDP/TCP/ICMP header from the IPv4/IPv6 packet */
   switch (ethertype) {
-  case 0x0800: /* IPv4 */ {
+  case TRACE_ETHERTYPE_IP: {
     libtrace_ip_t* ip = (libtrace_ip_t*)l3;
     transport = trace_get_payload_from_ip(ip, &proto, &remaining);
     trace_oml_inject_ip(oml_mps, ip, packet, now, pktid);
@@ -296,7 +296,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
     break;
   }
 
-  case 0x86DD: /* IPv6 */ {
+  case TRACE_ETHERTYPE_IPV6: {
     libtrace_ip6_t* ip6 = (libtrace_ip6_t*)l3;
     int resume = 0;
 
@@ -389,10 +389,10 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
 
   /* Parse the udp/tcp/icmp payload */
   switch(proto) {
-  case 1:
+  case TRACE_IPPROTO_ICMP  :
     // icmp;
     return;
-  case 6:{
+  case TRACE_IPPROTO_TCP:{
     libtrace_tcp_t* tcp = trace_get_tcp(packet);
     payload = trace_get_payload_from_tcp(tcp, &remaining);
     trace_oml_inject_tcp(oml_mps, tcp, packet, payload, now, pktid);
@@ -400,7 +400,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
       return;
     break;
   }
-  case 17:{
+  case TRACE_IPPROTO_UDP:{
     libtrace_udp_t* udp = trace_get_udp(packet);
     payload = trace_get_payload_from_udp(udp, &remaining);
     trace_oml_inject_udp(oml_mps, udp, packet, payload, now, pktid);
@@ -408,7 +408,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
       return;
     break;
   }
-  case 0x3a: /* ICMP6 */ { /* XXX; doesn't libtrace know that? */
+  case TRACE_IPPROTO_ICMPV6: /* ICMP6 */ { /* XXX; doesn't libtrace know that? */
     hdr = (hdr + hdr_len);
     uint8_t icmp_type = *(uint8_t*)hdr;
     if(icmp_type == 128 || icmp_type == 129) { // only report ping
