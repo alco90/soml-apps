@@ -7,10 +7,10 @@
  * Author: Guillaume Jourjon <guillaume.jourjon@nicta.com.au>, (C) 2009
  * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2009
  * Author: Jolyon White  <jolyon.white@nicta.com.au>, (C) 2010
- * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2012
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010--2014
  * Author: François Hoguet  <françois.hoguet@nicta.com.au>, (C) 2012
  *
- * Copyright 2007-2013 National ICT Australia (NICTA)
+ * Copyright 2007-2014 National ICT Australia (NICTA)
  *
  * This software may be used and distributed solely under the terms of
  * the MIT license (License).  You should find a copy of the License in
@@ -173,6 +173,24 @@ mac_to_s (uint8_t *mac, char *s, int n)
 #define MAC_STRING_LENGTH (3*MAC_OCTETS)
 
 static void
+trace_oml_inject_ieee802_3(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
+                     void* linkptr, libtrace_packet_t* packet, uint64_t pktid)
+{
+  uint8_t *mac_source;
+  uint8_t *mac_dst;
+  char macS[MAC_STRING_LENGTH];
+  char macD[MAC_STRING_LENGTH];
+  mac_source = trace_get_source_mac(packet);
+  mac_dst = trace_get_destination_mac(packet);
+  mac_to_s (mac_source, macS, sizeof(macS) / sizeof(macS[0]));
+  mac_to_s (mac_dst, macD, sizeof(macD) / sizeof(macD[0]));
+
+  oml_inject_ieee802_3(oml_mps->ieee802_3,
+      pktid,
+      macS,
+      macD);
+}
+static void
 trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
                      void* linkptr, libtrace_packet_t* packet, uint64_t pktid)
 {
@@ -247,10 +265,18 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
   /* Get link Packet */
   linkptr = trace_get_packet_buffer( packet, &linktype, &remaining);
 
-  if(g_opts->radiotap){
-    if(linktype == 15){
+  switch(linktype) {
+  case TRACE_TYPE_80211_RADIO:
+    if(g_opts->radiotap){
       trace_oml_inject_radiotap(oml_mps, linktype, linkptr, packet, pktid);
     }
+    /* Keep going to parse normal 802.11 headers */
+  case TRACE_TYPE_80211:
+    /* XXX: Do something for 802.11 packets without radiotap headers */
+    break;
+  case TRACE_TYPE_ETH:
+      trace_oml_inject_ieee802_3(oml_mps, linktype, linkptr, packet, pktid);
+    break;
   }
 
   l3 = trace_get_layer3(packet, &ethertype, &remaining);

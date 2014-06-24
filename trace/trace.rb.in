@@ -33,6 +33,11 @@ useless as an identifier.
   app.defProperty('radiotap', 'Enable radiotap', '-r',
 		  :type => 'boolean', :mnemonic => 'r')
 
+  app.defMeasurement("ieee802_3") do |m|
+    m.defMetric('pktid',     :uint64, ' internal packet ID to link MPs')
+    m.defMetric('sourceMAC', :string, ' Source MAC Address')
+    m.defMetric('dstMAC',    :string, ' Destination MAC Address')
+  end
   app.defMeasurement("radiotap") do |m|
     m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
     m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
