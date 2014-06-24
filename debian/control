@@ -2,7 +2,7 @@ Source: oml2-apps
 Section: net
 Priority: extra
 Maintainer: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, libpopt-dev, libtrace3-dev, libsigar-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
+Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, libpopt-dev, libtrace3-dev (>= 3.0.18), libsigar-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
 Standards-Version: 3.9.1
 Homepage: http://omlapp.mytestbed.net/
 
@@ -130,7 +130,7 @@ Description: Report statistics from a Navini RipWave modem
 
 Package: trace-oml2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, libtrace3
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpopt0, liboml2-9, libtrace3 (>= 3.0.18)
 Replaces: oml-client, oml2-trace
 Conflicts: oml-client, oml2-trace
 Description: Measure and record libtrace data using OML
