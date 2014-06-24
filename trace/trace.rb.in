@@ -70,6 +70,14 @@ useless as an identifier.
     m.defMetric('ip_ts',    :double, ' timestamp of the measurement')
   end
 
+  app.defMeasurement("icmp") do |m|
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('type',         :uint32, ' ICMPv6 type') # XXX: Only echo request (8) and replies (0)
+    m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
+    m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
+    m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
+  end
+
   app.defMeasurement("tcp") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
     m.defMetric('tcp_source',   :uint32, ' Source Port')
@@ -110,7 +118,7 @@ useless as an identifier.
 
   app.defMeasurement("icmp6") do |m|
     m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
-    m.defMetric('type',         :uint32, ' ICMP type')
+    m.defMetric('type',         :uint32, ' ICMPv6 type') # XXX: Only echo request (128) and replies (129)
     m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
     m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
     m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')

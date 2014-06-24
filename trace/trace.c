@@ -237,15 +237,28 @@ trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, stru
 }
 
 static void
-trace_oml_inject_icmp6(oml_mps_t* oml_mps, uint64_t pktid, uint8_t type,
-                  uint16_t sequ_nb, struct timeval tv)
+trace_oml_inject_icmp(oml_mps_t* oml_mps, uint64_t pktid, uint8_t type,
+                  uint16_t sequ_nb, struct timeval tv, int ipver)
 {
+  /* FIXME: this is probably a useless level of indirection */
+  switch(ipver) {
+  case 4:
+    oml_inject_icmp(oml_mps->icmp,
+        pktid,
+        type,
+        ntohs(sequ_nb),
+        tv.tv_sec,
+        tv.tv_usec);
+    break;
+  case 6:
     oml_inject_icmp6(oml_mps->icmp6,
         pktid,
         type,
         ntohs(sequ_nb),
         tv.tv_sec,
         tv.tv_usec);
+    break;
+  }
 }
 
 void
@@ -400,9 +413,14 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
 
   /* Parse the udp/tcp/icmp payload */
   switch(proto) {
-  case TRACE_IPPROTO_ICMP  :
-    // icmp;
+  case TRACE_IPPROTO_ICMP  : {
+    libtrace_icmp_t* icmp = trace_get_icmp(packet);
+    if(icmp->type == 0 || icmp->type == 8) { // only report ping
+      uint16_t icmp_sequ_nb = icmp->un.echo.sequence;
+      trace_oml_inject_icmp(oml_mps, pktid, icmp->type, icmp_sequ_nb, tv, 4);
+    }
     return;
+  }
   case TRACE_IPPROTO_TCP:{
     libtrace_tcp_t* tcp = trace_get_tcp(packet);
     payload = trace_get_payload_from_tcp(tcp, &remaining);
@@ -423,7 +441,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, uint6
     libtrace_icmp6_t* icmp6 = trace_get_icmp6(packet);
     if(icmp6->type == 128 || icmp6->type == 129) { // only report ping
       uint16_t icmp_sequ_nb = icmp6->un.echo.sequence;
-      trace_oml_inject_icmp6(oml_mps, pktid, icmp6->type, icmp_sequ_nb, tv);
+      trace_oml_inject_icmp(oml_mps, pktid, icmp6->type, icmp_sequ_nb, tv, 6);
     }
   }
   default:
