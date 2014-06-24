@@ -36,3 +36,8 @@ gnulib/
 *.deps
 *.libs
 build-aux/*
+*_oml.h
+*_popt.h
+.version
+*-oml2
+p-*
