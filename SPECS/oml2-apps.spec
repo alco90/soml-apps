@@ -5,12 +5,12 @@
 BuildRoot:		%{_tmppath}/%{name}-%{version}
 Summary:		OML applications collection
 License:		MIT
-URL:			http://oml.mytestbed.net/projects/omlapp
+URL:			http://omlapp.mytestbed.net/
 Name:			%{name}
 Version:		%{version}
 Release:		1
 Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%{version}.tar.gz
-Packager:		Christoph Dwertmann <christoph.dwertmann@nicta.com.au>
+Packager:       	OML developers <oml-user@mytestbed.net>
 Prefix:			/usr
 Group:			Applications/Internet
 Requires:		glibc
