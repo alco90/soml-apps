@@ -223,28 +223,26 @@ trace_oml_parse_ip6_hdrs(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, st
   hdr_len = sizeof(ip6);
 
   while(hdr_next != TRACE_IPPROTO_NONE && !resume) {
-    switch(hdr_next) { /* add your case to treat other headers XXX; doesn't libtrace know that? */
-    case TRACE_IPPROTO_IPV6:
-      /* IPv6-in-IPv6, report the current packet, then start processing the
-       * encapsulated one */
-      trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
 
+    /* Advance hdr to the beginning of header of type hdr_next,
+     * and update its length */
+    hdr = (libtrace_ip6_ext_t*)((uint8_t*)hdr + hdr_len);
+    hdr_len = hdr->len*8 + 8; /* RFC 2460: Hdr Ext Len is in 8-octet units,
+                                 not including the first 8 octets*/
+
+    switch(hdr_next) { /* add your case to treat other headers */
+    case TRACE_IPPROTO_IPV6:
       ip6 = (libtrace_ip6_t*)hdr;
-      hdr_next = *(uint8_t*)(hdr + 6);
-      hdr_len = sizeof(ip6);
-      hdr = (hdr + hdr_len);
+      trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
+      trace_oml_parse_ip6_hdrs(oml_mps, ip6, now, tv, pktid);
+      return; /* XXX: assume this was the payload */
       break;
 
     case TRACE_IPPROTO_ROUTING: /* routing header in BAck */
-      hdr = (hdr + hdr_len);
-      hdr = ((uint8_t*)hdr + hdr_len);
-      hdr_len = *(char*)(hdr + 1)*8 + 8;
       /* XXX: Do something here */
       break;
 
     case TRACE_IPPROTO_DSTOPTS: /* destination option in BU */
-      hdr = ((uint8_t*)hdr + hdr_len);
-      hdr_len = *(char*)(hdr + 1)*8 + 8;
       /* XXX: Do something here */
       break;
 
@@ -252,21 +250,22 @@ trace_oml_parse_ip6_hdrs(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, st
                  char* mhtype;
                  char  addr_coa[INET6_ADDRSTRLEN];
 
-                 hdr = ((uint8_t*)hdr + hdr_len);
-                 hdr_type = *(uint8_t*)(hdr + 2);
-                 hdr_len = *(uint8_t*)(hdr + 1)*8 + 8;
+                 mh = (trace_oml2_ip6_mh_t*)hdr;
+                 hdr_type = mh->ip6mh_type;
 
                  switch(hdr_type) {
 
                  case TRACE_OML2_IPPROTO_MOBIL_BU: /* BU */
                    mhtype="BU";
-                   mh_sequ_nb = htons(*(uint16_t*)(hdr + 6));
+                   bu = (trace_oml2_ip6_mh_bu_t*)hdr;
+                   mh_sequ_nb = htons(bu->ip6mhbu_seqno);
                    inet_ntop(AF_INET6, (struct in6_addr*)(hdr + 16), addr_coa, INET6_ADDRSTRLEN);
                    break;
 
                  case TRACE_OML2_IPPROTO_MOBIL_BACK: /* BAck */
                    mhtype="BAck";
-                   mh_sequ_nb = htons(*(uint16_t*)(hdr + 8));
+                   ba = (trace_oml2_ip6_mh_back_t*)hdr;
+                   mh_sequ_nb = htons(ba->ip6mhba_seqno);
                    addr_coa[0] = '\0';
                    break;
                  }
