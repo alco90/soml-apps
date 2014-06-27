@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <signal.h>
+#include <stdlib.h>
 #include <ocomm/o_log.h>
 
 #include "otg2/otg2_app.h"
@@ -23,6 +24,7 @@ static void
 quit_handler (int signum)
 {
   delete otg;
+  exit(0);
 }
 
 int main(int argc, const char * argv[])
