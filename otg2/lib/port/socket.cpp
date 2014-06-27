@@ -24,6 +24,7 @@
 
 Socket::Socket(): sockfd_(0)
 {
+  localhost_ = "0.0.0.0";
   localport_ = 0;
   dstport_ = DEFAULT_PORT;
 }
