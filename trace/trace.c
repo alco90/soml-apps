@@ -149,54 +149,101 @@ trace_oml_inject_ip6_mh(oml_mps_t* oml_mps, char* type, oml_guid_t pktid,
         data);
 }
 
+/* Defining some header constants that libtrace doesn't yet */
+#define TRACE_OML2_IPPROTO_MOBIL 0x87
+#define TRACE_OML2_IPPROTO_MOBIL_BU 0x05
+#define TRACE_OML2_IPPROTO_MOBIL_BACK 0x06
+
+typedef struct trace_oml2_ip6_mh {
+  /* from include/netinet/ip6mh.h in UMIP (commit 9236e61) */
+  uint8_t         ip6mh_proto;    /* NO_NXTHDR by default */
+  uint8_t         ip6mh_hdrlen;   /* Header Len in unit of 8 Octets
+                                     excluding the first 8 Octets */
+  uint8_t         ip6mh_type;     /* Type of Mobility Header */
+  uint8_t         ip6mh_reserved; /* Reserved */
+  uint16_t        ip6mh_cksum;    /* Mobility Header Checksum */
+  /* Followed by type specific messages */
+} __attribute__ ((packed)) trace_oml2_ip6_mh_t;
+
+typedef struct trace_oml2_ip6_mh_bu {
+  /* from include/netinet/ip6mh.h in UMIP (commit 9236e61) */
+  trace_oml2_ip6_mh_t ip6mhbu_hdr;
+  uint16_t        ip6mhbu_seqno;          /* Sequence Number */
+  uint16_t        ip6mhbu_flags;
+  uint16_t        ip6mhbu_lifetime;       /* Time in unit of 4 sec */
+  /* Followed by optional Mobility Options */
+} __attribute__ ((packed)) trace_oml2_ip6_mh_bu_t;
+
+typedef struct trace_oml2_ip6_mh_back {
+  /* from include/netinet/ip6mh.h in UMIP (commit 9236e61) */
+  trace_oml2_ip6_mh_t ip6mhba_hdr;
+  uint8_t         ip6mhba_status; /* Status code */
+  uint8_t         ip6mhba_flags;
+  uint16_t        ip6mhba_seqno;
+  uint16_t        ip6mhba_lifetime;
+  /* Followed by optional Mobility Options */
+} __attribute__ ((packed)) trace_oml2_ip6_mh_back_t;
+
+
 static void
-trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, struct timeval tv, oml_guid_t pktid)
+trace_oml_parse_ip6_hdrs(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, struct timeval tv, oml_guid_t pktid)
 {
   uint8_t               hdr_type; // determine type of mobility header
   uint8_t               hdr_len;  // length of header in decimal
-  void*                 hdr;      // point at the beginning of the header
-  uint8_t*              hdr_next; // code of next header
+  libtrace_ip6_ext_t*   hdr;      // point at the beginning of the header
+  uint8_t               hdr_next; // code of next header
+
+  trace_oml2_ip6_mh_t*  mh;     // mobility header
+  trace_oml2_ip6_mh_bu_t*   bu; // binding update message in mobility header
+  trace_oml2_ip6_mh_back_t* ba; // binding acknowledgement message in mobility header
   uint16_t              mh_sequ_nb; // sequence nb of mobility header
   int resume = 0;
 
   /* PARSING IPV6 HEADERS TO FIND SPECIFIC MOBILITY HEADERS
    *
-   * possible headers:  0 = 0x00 = STEP      4 = 0x04 = IPv4
-   *                   43 = 0x2b = ROUT      6 = 0x06 = TCP
-   *                   44 = 0x2c = FRAG     17 = 0x11 = UDP
-   *                   50 = 0x32 = PRIV     41 = 0x29 = IPv6
-   *                   51 = 0x33 = AUTH     58 = 0x3a = ICMP6
-   *                   59 = 0x3b = NOMORE  132 = 0x84 = SCTP
-   *                   60 = 0x3c = DSTOPT  136 = 0x88 = UDP lite
-   *                  135 = 0x87 = MOBIL
+   * possible headers:  0 = 0x00 = STEP   = TRACE_IPPROTO_IP         4 = 0x04 = IPv4     = TRACE_IPPROTO_IPIP
+   *                   43 = 0x2b = ROUT   = TRACE_IPPROTO_ROUTING    6 = 0x06 = TCP      = TRACE_IPPROTO_TCP
+   *                   44 = 0x2c = FRAG   = TRACE_IPPROTO_FRAGMENT  17 = 0x11 = UDP      = TRACE_IPPROTO_UDP
+   *                   50 = 0x32 = PRIV   = TRACE_IPPROTO_ESP       41 = 0x29 = IPv6     = TRACE_IPPROTO_IPV6
+   *                   51 = 0x33 = AUTH   = TRACE_IPPROTO_AH        58 = 0x3a = ICMP6    = TRACE_IPPROTO_ICMPV6
+   *                   59 = 0x3b = NOMORE = TRACE_IPPROTO_NONE     132 = 0x84 = SCTP     = TRACE_IPPROTO_SCTP
+   *                   60 = 0x3c = DSTOPT = TRACE_IPPROTO_DSTOPTS  136 = 0x88 = UDP lite
+   *                  135 = 0x87 = MOBIL  = TRACE_OML2_IPPROTO_MOBIL
    *                  140 = 0x8c = SHIM6
-   * mobility header 135 -> 3rd octet values: 5=0x05=BU 6=0x06=BAck
+   * mobility header 135 -> 3rd octet values:
+   *                      5=0x05=BU       = TRACE_OML2_IPPROTO_MOBIL_BU
+   *                      6=0x06=BAck     = TRACE_OML2_IPPROTO_MOBIL_BACK
    */
-  hdr = ip6;
-  hdr_next = (uint8_t*)(ip6 + 6);
+  hdr = (libtrace_ip6_ext_t*) ip6; /* XXX: not really a libtrace_ip6_ext_t,
+                                      but this pacifies the compiler; it's
+                                      fine as long as the loop below advances
+                                      the pointer to the real option before
+                                      accessing any field */
+  hdr_next = *(uint8_t*)(ip6 + 6);
   hdr_len = 40;
 
-  while(*hdr_next != 59 && !resume) {
-    switch(*hdr_next) { /* add your case to treat other headers XXX; doesn't libtrace know that? */
+  while(hdr_next != 59 && !resume) {
+    switch(hdr_next) { /* add your case to treat other headers XXX; doesn't libtrace know that? */
     case 0x29:
       /* IPv6-in-IPv6, report the current packet, then start processing the
        * encapsulated one */
       trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
 
       ip6 = (libtrace_ip6_t*)hdr;
-      hdr_next = (uint8_t*)(hdr + 6);
+      hdr_next = *(uint8_t*)(hdr + 6);
       hdr_len = 40;
       hdr = (hdr + hdr_len);
       break;
 
     case 0x2b: /* routing header in BAck */
       hdr = (hdr + hdr_len);
+      hdr = ((uint8_t*)hdr + hdr_len);
       hdr_len = *(char*)(hdr + 1)*8 + 8;
       /* XXX: Do something here */
       break;
 
     case 0x3c: /* destination option in BU */
-      hdr = (hdr + hdr_len);
+      hdr = ((uint8_t*)hdr + hdr_len);
       hdr_len = *(char*)(hdr + 1)*8 + 8;
       /* XXX: Do something here */
       break;
@@ -205,7 +252,7 @@ trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, stru
                  char* mhtype;
                  char  addr_coa[INET6_ADDRSTRLEN];
 
-                 hdr = (hdr + hdr_len);
+                 hdr = ((uint8_t*)hdr + hdr_len);
                  hdr_type = *(uint8_t*)(hdr + 2);
                  hdr_len = *(uint8_t*)(hdr + 1)*8 + 8;
 
@@ -232,7 +279,7 @@ trace_oml_parse_ip6_mh(oml_mps_t* oml_mps, libtrace_ip6_t *ip6, double now, stru
                resume = 1; /* Not a header we know, resume normal processing */
                break;
     }
-    hdr_next = (uint8_t*)(hdr);
+    hdr_next = *(uint8_t*)(hdr);
   }
 }
 
@@ -416,7 +463,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
 
   case TRACE_ETHERTYPE_IPV6: {
     libtrace_ip6_t* ip6 = (libtrace_ip6_t*)l3;
-    trace_oml_parse_ip6_mh(oml_mps, ip6, now, tv, pktid);
+    trace_oml_parse_ip6_hdrs(oml_mps, ip6, now, tv, pktid);
     transport = trace_get_payload_from_ip6(ip6, &proto, &remaining);
     trace_oml_inject_ip6(oml_mps, ip6, now, pktid);
     if (!transport) return;
