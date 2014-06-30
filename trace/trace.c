@@ -322,7 +322,7 @@ mac_to_s (uint8_t *mac, char *s, int n)
 #define MAC_STRING_LENGTH (3*MAC_OCTETS)
 
 static void
-trace_oml_inject_ieee802_3(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
+trace_oml_inject_ethernet(oml_mps_t* oml_mps, libtrace_ethertype_t ethertype,
                      void* linkptr, libtrace_packet_t* packet, oml_guid_t pktid)
 {
   uint8_t *mac_source;
@@ -334,10 +334,11 @@ trace_oml_inject_ieee802_3(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
   mac_to_s (mac_source, macS, sizeof(macS) / sizeof(macS[0]));
   mac_to_s (mac_dst, macD, sizeof(macD) / sizeof(macD[0]));
 
-  oml_inject_ieee802_3(oml_mps->ieee802_3,
+  oml_inject_ethernet(oml_mps->ethernet,
       pktid,
       macS,
-      macD);
+      macD,
+      ethertype);
 }
 static void
 trace_oml_inject_radiotap(oml_mps_t* oml_mps, libtrace_linktype_t linktype,
@@ -408,6 +409,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
   double now = tv.tv_sec - start_time + 0.000001 * tv.tv_usec;
   /* Get link Packet */
   linkptr = trace_get_packet_buffer( packet, &linktype, &remaining);
+  l3 = trace_get_layer3(packet, &ethertype, &remaining);
 
   switch(linktype) {
   case TRACE_TYPE_80211_RADIO:
@@ -419,7 +421,7 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
     /* XXX: Do something for 802.11 packets without radiotap headers */
     break;
   case TRACE_TYPE_ETH:
-      trace_oml_inject_ieee802_3(oml_mps, linktype, linkptr, packet, pktid);
+      trace_oml_inject_ethernet(oml_mps, ethertype, linkptr, packet, pktid);
     break;
 #if LIBTRACE_API_VERSION >= ((3<<16)|(0<<8)|(19))
   case TRACE_TYPE_UNKNOWN:
@@ -443,7 +445,6 @@ per_packet(oml_mps_t* oml_mps, libtrace_packet_t* packet, long start_time, oml_g
     break;
   }
 
-  l3 = trace_get_layer3(packet, &ethertype, &remaining);
   if (!l3) {
     /* Probable ARP or something */
     return;
