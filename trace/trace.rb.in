@@ -33,10 +33,11 @@ useless as an identifier.
   app.defProperty('radiotap', 'Enable radiotap', '-r',
 		  :type => 'boolean', :mnemonic => 'r')
 
-  app.defMeasurement("ieee802_3") do |m|
+  app.defMeasurement("ethernet") do |m|
     m.defMetric('pktid',     :guid, ' internal packet ID to link MPs')
     m.defMetric('sourceMAC', :string, ' Source MAC Address')
     m.defMetric('dstMAC',    :string, ' Destination MAC Address')
+    m.defMetric('ethertype',    :uint32, ' EtherType (>= 1536) / 802.3 Length (< 1536); 16LSbs only')
   end
   app.defMeasurement("radiotap") do |m|
     m.defMetric('pktid',             :guid, ' internal packet ID to link MPs')
