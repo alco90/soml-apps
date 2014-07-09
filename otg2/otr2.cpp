@@ -23,7 +23,6 @@ OTR* otr;
 static void
 quit_handler (int signum)
 {
-  delete otr;
   exit(0);
 }
 

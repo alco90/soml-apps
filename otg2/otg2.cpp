@@ -23,7 +23,6 @@ OTG* otg;
 static void
 quit_handler (int signum)
 {
-  delete otg;
   exit(0);
 }
 
