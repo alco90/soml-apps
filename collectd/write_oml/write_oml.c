@@ -43,10 +43,13 @@
 # define PACKAGE_STRING __FILE__
 #endif
 
+#define LOGPREFIX "oml_writer plugin: "
+
 static const char *config_keys[] = {
   "NodeID",
   "Domain",
   "CollectURI",
+  "OMLLogLevel",
 };
 static int config_keys_num = STATIC_ARRAY_SIZE(config_keys);
 
@@ -71,6 +74,7 @@ typedef struct {
   char* collect_uri;
   char* domain;
   char* node_id;
+  int   loglevel;
 
   MPoint* mpoint;  // linked list of mpoint definitions
   int     oml_initialized;
@@ -136,7 +140,7 @@ configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
     }
   }
   mp->oml_mp = omlc_add_mp(mp->name, mp->mp_defs);
-  DEBUG("oml_writer plugin: New measurement point %s", mp->name);
+  INFO(LOGPREFIX "New measurement point %s", mp->name);
 }
 
 /** Create a new measurement point, and add it to the session
@@ -189,11 +193,11 @@ oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute
   omlc_zero_array(v, 64);
 
   if (vl->values_len >= 64 - header) {
-    ERROR("oml_writer plugin: Can't handle more than 64 values per measurement");
+    ERROR(LOGPREFIX "Can't handle more than 64 values per measurement");
     return(-1);
   }
 
-  DEBUG("oml_writer plugin: New data in %s (%s, %s, %s, %s, %s)",
+  DEBUG(LOGPREFIX "New data in %s (%s, %s, %s, %s, %s)",
       mp->name, vl->host, vl->plugin, vl->plugin_instance, vl->type, vl->type_instance);
   omlc_set_uint64(v[0], (uint64_t)vl->time);
   omlc_set_string(v[1], vl->host != NULL ? (char*)vl->host : "");
@@ -229,19 +233,35 @@ static int
 oml_config(const char *key, const char *value)
 {
   int ret = 0;
+  char *endptr;
 
   pthread_mutex_lock(&session.session_lock);
   if (strcasecmp ("NodeID", key) == 0) {
     session.node_id = (char*)malloc(strlen(value) + 1);
     strncpy(session.node_id, value, strlen(value));
+    INFO(LOGPREFIX "OML NodeID set to %s\n", value);
 
-  } else if (strcasecmp ("ContextName", key) == 0) {
+  } else if (strcasecmp ("Domain", key) == 0) {
     session.domain = (char*)malloc(strlen(value) + 1);
     strncpy(session.domain, value, strlen(value));
+    INFO(LOGPREFIX "OML Domain set to %s\n", value);
 
   } else if (strcasecmp ("CollectURI", key) == 0) {
     session.collect_uri = (char*)malloc(strlen(value) + 1);
     strncpy(session.collect_uri, value, strlen(value));
+    INFO(LOGPREFIX "OML Collection URI set to %s\n", value);
+
+  } else if (strcasecmp ("OMLLogLevel", key) == 0) {
+    tmp = strtol(value, &endptr, 10);
+    if (endptr == value) {
+      WARNING(LOGPREFIX "Cannot parse '%s %s' as a valid LogLevel number\n",
+          key, value);
+      ret = -1;
+
+    } else {
+      session.loglevel = tmp;
+      INFO(LOGPREFIX "OML LogLevel set to %d\n", session.loglevel);
+    }
 
   } else {
     ret = -1;
@@ -264,7 +284,7 @@ o_log_collectd(int log_level, const char* format, ...)
       WARNING(format, va);
       break;
     case O_LOG_INFO:
-      INFO(format, va);
+      NOTICE(format, va);
       break;
     case O_LOG_DEBUG:
     case O_LOG_DEBUG2:
@@ -286,7 +306,7 @@ oml_init(void)
   const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd", "--oml-collect", "file:-"};
   int argc = 6, init = 0;
 
-  NOTICE("oml_writer plugin: " PACKAGE_STRING);
+  NOTICE(LOGPREFIX "" PACKAGE_STRING);
 
   pthread_mutex_lock(&session.session_lock);
   if (session.node_id != NULL) argv[1] = session.node_id;
@@ -297,6 +317,8 @@ oml_init(void)
       init = 1;
     }
   }
+  o_set_log_level(session.loglevel);
+
   session.oml_initialized = init;
   pthread_mutex_unlock(&session.session_lock);
   return !1;
