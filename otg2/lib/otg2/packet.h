@@ -13,6 +13,7 @@
 #define OTG_PACKET_H
 
 #include <string.h>
+#include <stdint.h>
 #include "otg2/unixtime.h"
 
 #define MAX_HOSTNAME_LENGTH 256
@@ -64,8 +65,8 @@ public:
   inline void setTxTime(double time) {tx_time_ = time;}
   inline double getTxTime()  {return tx_time_;}
 
-  inline short getFlowId()       {return flowid_;}
-  inline void setFlowId(short i) {flowid_ = i;}
+  inline uint64_t getFlowId()       {return flowid_;}
+  inline void setFlowId(uint64_t i) {flowid_ = i;}
 
   inline unsigned long getSequenceNum() {return seqnum_;}
   inline void setSequenceNum(unsigned long i) {seqnum_ = i;}
@@ -82,12 +83,14 @@ public:
    * previously stamped values. In both cases, the offset
    * will be returned.
    */
-  int stampLongVal(long val, int offset = -1);
-  int stampShortVal(short val, int offset = -1);
+  int stampInt64Val(int64_t val, int offset = -1);
+  int stampInt32Val(int32_t val, int offset = -1);
+  int stampInt16Val(int16_t val, int offset = -1);
 
   /** Extract values stored in the header (of payload). */
-  long extractLongVal();
-  short extractShortVal();
+  int64_t extractInt64Val();
+  int32_t extractInt32Val();
+  int16_t extractInt16Val();
 
 
 private:
@@ -106,7 +109,7 @@ private:
   /**  Payload Pointer. */
   char* payload_;
 
-  short flowid_;
+  uint64_t flowid_;
   unsigned long seqnum_;
 
   int offset_;

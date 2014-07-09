@@ -55,12 +55,12 @@ This version 2 is compatible with OMLv2
   # Define the Measurement Points and associated metrics that are available for this application
   #
   app.defMeasurement('udp_out') do |m|
-    m.defMetric('ts',:double)
-    m.defMetric('flow_id',:uint32)
+    m.defMetric('ts',:double)	    # XXX: Redundant with OML timestamping
+    m.defMetric('flow_id',:guid)
     m.defMetric('seq_no',:uint32)
     m.defMetric('pkt_length',:uint32)
-    m.defMetric('dst_host',:string)
-    m.defMetric('dst_port',:uint32)
+    m.defMetric('dst_host',:string) # XXX: This should really be src_ or remote_host
+    m.defMetric('dst_port',:uint32) # XXX: Ditto
   end
 end
 

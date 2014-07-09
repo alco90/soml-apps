@@ -15,6 +15,7 @@
 #include <ocomm/o_log.h>
 #include <sys/time.h>
 #include <time.h>
+#include <limits.h>
 
 #include "udp_outport.h"
 
@@ -100,9 +101,10 @@ UDPOutPort::sendPacket(Packet* pkt)
   gettimeofday(&tv, NULL);
   double now = tv.tv_sec - timestamp + 0.000001 * tv.tv_usec;
 
-  pkt->stampPacket(0x01);
-  pkt->stampShortVal(pkt->getFlowId());
-  pkt->stampLongVal(pkt->getSequenceNum());
+  pkt->stampPacket(0x02);
+  pkt->stampInt16Val(pkt->getFlowId() % SHRT_MAX); /* Makeshift compatibility with older OTRs */
+  pkt->stampInt32Val(pkt->getSequenceNum());
+  pkt->stampInt64Val(pkt->getFlowId());
 
   struct sockaddr* dest = (struct sockaddr*)&dstSockAddress_;
   int  destLength = sizeof(struct sockaddr_in);

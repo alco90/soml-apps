@@ -13,6 +13,7 @@
 #include <string.h>
 #include <netinet/in.h>
 
+#include "otg2/compat.h"
 #include "otg2/packet.h"
 
 /** Default Packet constructor.
@@ -44,7 +45,7 @@ Packet::reset()
   ts_ = 0;
   tx_time_ = 0;
   size_ = 0;
-  flowid_ = -1;
+  flowid_ = 0;
   seqnum_ = 0;
   offset_ = 0;
 }
@@ -83,35 +84,62 @@ Packet::stampPacket(char version) {
 }
 
 int
-Packet::stampLongVal(long val, int offset) {
+Packet::stampInt64Val(int64_t val, int offset)
+{
+  uint64_t nv = otg_htonll((uint64_t)val);
+
   if (offset < 0) {
     offset = offset_;
-    offset_ += 4;
+    offset_ += sizeof(uint64_t);
   }
-  char* p = getBufferPtr(4 + offset, 0) + offset;
-  uint32_t uv = (uint32_t)val;
-  uint32_t nv = htonl(uv);
 
+  char* p = getBufferPtr(sizeof(uint64_t) + offset, 0) + offset;
+  *(p++) = (char)((nv >> 56) & 0xff);
+  *(p++) = (char)((nv >> 48) & 0xff);
+  *(p++) = (char)((nv >> 40) & 0xff);
+  *(p++) = (char)((nv >> 32) & 0xff);
   *(p++) = (char)((nv >> 24) & 0xff);
   *(p++) = (char)((nv >> 16) & 0xff);
   *(p++) = (char)((nv >> 8) & 0xff);
   *(p++) = (char)(nv & 0xff);
+
+
   return offset;
 }
 
 int
-Packet::stampShortVal(short val, int offset)
+Packet::stampInt32Val(int32_t val, int offset)
 {
+  uint32_t nv = htonl((uint32_t)val);
+
   if (offset < 0) {
     offset = offset_;
-    offset_ += 2;
+    offset_ += sizeof(uint32_t);
   }
-  char* p = getBufferPtr(2 + offset_, 0) + offset_;
-  uint16_t uv = (uint16_t)val;
-  uint16_t nv = htons(uv);
 
+  char* p = getBufferPtr(sizeof(uint32_t) + offset, 0) + offset;
+  *(p++) = (char)((nv >> 24) & 0xff);
+  *(p++) = (char)((nv >> 16) & 0xff);
   *(p++) = (char)((nv >> 8) & 0xff);
   *(p++) = (char)(nv & 0xff);
+
+  return offset;
+}
+
+int
+Packet::stampInt16Val(int16_t val, int offset)
+{
+  uint16_t nv = htons((uint16_t)val);
+
+  if (offset < 0) {
+    offset = offset_;
+    offset_ += sizeof(uint16_t);
+  }
+
+  char* p = getBufferPtr(sizeof(uint16_t) + offset_, 0) + offset_;
+  *(p++) = (char)((nv >> 8) & 0xff);
+  *(p++) = (char)(nv & 0xff);
+
   return offset;
 }
 
@@ -133,10 +161,28 @@ Packet::checkStamp()
   return -1;
 }
 
-long
-Packet::extractLongVal()
+int64_t
+Packet::extractInt64Val()
 {
-  if (size_ < offset_ + 4) { return 0; } // not the best solution
+  if (size_ < offset_ + (int)sizeof(uint64_t)) { return 0; } // not the best solution
+
+  unsigned char* p = (unsigned char*)payload_ + offset_;
+  uint64_t nv = 0;
+  unsigned int i;
+
+  for (i=0;i<sizeof(uint64_t);i++) {
+    nv <<= 8;
+    nv += *p++;
+  }
+  uint64_t hv = otg_ntohll(nv);
+  offset_ += sizeof(uint64_t);
+  return (int64_t)(hv);
+}
+
+int32_t
+Packet::extractInt32Val()
+{
+  if (size_ < offset_ + (int)sizeof(uint32_t)) { return 0; } // not the best solution
 
   char* p = payload_ + offset_;
   uint32_t nv = *p++ << 24;
@@ -144,23 +190,21 @@ Packet::extractLongVal()
   nv += *p++ << 8;
   nv += *p++;
   uint32_t hv = ntohl(nv);
-  offset_ += 4;
-  long v = (long)(hv);
-  return v;
+  offset_ += sizeof(uint32_t);
+  return (int32_t)(hv);
 }
 
-short
-Packet::extractShortVal()
+int16_t
+Packet::extractInt16Val()
 {
-  if (size_ < offset_ + 2) { return 0; } // not the best solution
+  if (size_ < offset_ + (int)sizeof(uint16_t)) { return 0; } // not the best solution
 
   char* p = payload_ + offset_;
   uint16_t nv = *p++ << 8;
   nv += *p++;
   uint16_t hv = ntohs(nv);
-  offset_ += 2;
-  short v = (short)(hv);
-  return v;
+  offset_ += sizeof(uint16_t);
+  return (int16_t)(hv);
 }
 
 char*

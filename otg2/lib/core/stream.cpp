@@ -19,7 +19,7 @@ using namespace std;
 
 static void* run_stream(void* ptr);
 
-Stream::Stream(short id)
+Stream::Stream(uint64_t id)
 {
   streamid_ =  id;
   seqno_ = 0;
@@ -81,7 +81,7 @@ Stream::_run()
     }
     p->reset();
     if ((p = source_->nextPacket(p)) != NULL) {
-      if (p->getFlowId() < 0) { p->setFlowId(streamid_); }
+      if (p->getFlowId() == 0) { p->setFlowId(streamid_); } /* XXX: Assume streamid_!=0, but it doesn't hurt if it is =0*/
       if (p->getSequenceNum() == 0) { p->setSequenceNum(++seqno_); }
 
       if (p->getTxTime() > 0) {

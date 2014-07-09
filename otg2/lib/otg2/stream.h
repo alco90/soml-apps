@@ -12,6 +12,8 @@
 #ifndef STREAM_H
 #define STREAM_H
 
+#include <stdint.h>
+#include <oml2/omlc.h>
 #include "otg2/unixtime.h"
 #include "otg2/source.h"
 #include "otg2/packet.h"
@@ -21,7 +23,7 @@
 class Stream : public Component
 {
 public:
-  Stream(short id = 1);
+  Stream(uint64_t id = omlc_guid_generate());
 
   void setSource(ISource* source) { source_ = source; }
   void setSender(Sender* sender) { sender_ = sender; }
@@ -45,9 +47,9 @@ protected:
   /**  number of packets sent or received  by this stream */
   unsigned long seqno_;
   /**  the generator to feed packets to this stream */
-  ISource*       source_;
+  ISource*      source_;
   Sender*       sender_; /// the port for sending packets out.
-  short         streamid_; /// stream identifier.
+  uint64_t      streamid_; /// stream identifier.
 
   /** Contorl the timing of stream */
   UnixTime streamclock_;

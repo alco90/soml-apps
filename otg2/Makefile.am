@@ -88,6 +88,7 @@ libotg2_la_SOURCES = \
 	lib/app/otr2_app.cpp \
 	lib/otg2/address.h \
 	lib/otg2/application.h \
+	lib/otg2/compat.h \
 	lib/otg2/component.h \
 	lib/otg2/generator.h \
 	lib/otg2/otg2_app.h \

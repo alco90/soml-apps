@@ -11,11 +11,12 @@
 
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <otg2/port.h>   // defines defaults
 #include <ocomm/o_log.h>
 
 #define OML_FROM_MAIN
 #include "otr2_oml.h"
+
+#include "otg2/port.h"
 #include "udp_inport.h"
 
 #define DEF_PKT_LENGTH 1024
@@ -84,10 +85,27 @@ UDPInPort::nextPacket(Packet* pkt)
       len, senderHost, senderPort);
 
   // UDP will stamp packet id, other protocols will not use this feature
-  if (pkt->checkStamp() == 1) {
-    pkt->setFlowId(pkt->extractShortVal());
-    pkt->setSequenceNum(pkt->extractLongVal());
+  char versionStamp = pkt->checkStamp();
+  switch(versionStamp) {
+  default:
+    logwarn("Unknown version stamp %#x: flow IDs and sequence numbers might be incorrect; "
+        "is the OTG sender newer than this OTR?\n", versionStamp, __FUNCTION__);
+    /* Try to handle unknown versions as the latest known*/
+
+  case 2:
+
+    pkt->extractInt16Val(); /* Skip V1 flow ID */
+    pkt->setSequenceNum(pkt->extractInt32Val());
+    pkt->setFlowId((uint64_t)pkt->extractInt64Val());
+    break;
+
+  case 1:
+    pkt->setFlowId(pkt->extractInt16Val());
+    pkt->setSequenceNum(pkt->extractInt32Val());
+    break;
+
   }
+
   pkt->setTimeStamp(-1); // mark with current time
 
   oml_inject_udp_in(g_oml_mps->udp_in,
