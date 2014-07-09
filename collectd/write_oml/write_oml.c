@@ -5,10 +5,10 @@
  * measurement points on the fly.
  *
  * Author: Max Ott  <max.ott@nicta.com.au>, (C) 2012
- * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2013
+ * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2012-2014
  * Author: Christoph Dwertmann <christoph.dwertmann@nicta.com.au>, (C) 2012
  *
- * Copyright 2012-2013 National ICT Australia (NICTA)
+ * Copyright 2012-2014 National ICT Australia (NICTA)
  *
  * This software may be used and distributed solely under the terms of
  * the MIT license (License).  You should find a copy of the License in
@@ -62,6 +62,8 @@ typedef struct MPoint {
 
   OmlMP*     oml_mp;
   OmlMPDef*  mp_defs;
+
+  pthread_mutex_t mp_lock;
   struct MPoint* next;
 } MPoint;
 
@@ -71,8 +73,9 @@ typedef struct {
   char* node_id;
 
   MPoint* mpoint;  // linked list of mpoint definitions
-  int     oml_intialized;
-  pthread_mutex_t init_lock;
+  int     oml_initialized;
+
+  pthread_mutex_t session_lock;
 
 } Session;
 
@@ -92,13 +95,19 @@ find_mpoint_struct(const char* name)
   return NULL;
 }
 
+/** Configure a new measurement point, and add it to the session
+ * XXX: This assumes mp has not been inserted into the session.mpoint list
+ * otherwise, the mp->mp_lock mutex should be held by the calling function
+ */
 static void
 configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
 {
-  int i = 0;
   int header = 6; /* There are 6 fields by default */
+  int ndef = (ds->ds_num + header + 1); /* terminating NULL */
+  int i = 0;
 
-  mp->mp_defs = (OmlMPDef*)malloc((ds->ds_num + header + 1) * sizeof(OmlMPDef));
+  mp->mp_defs = (OmlMPDef*)malloc(ndef * sizeof(OmlMPDef));
+  memset(mp->mp_defs, 0, ndef * sizeof(OmlMPDef));
 
   mp->mp_defs[i].name = "time"; mp->mp_defs[i].param_types = OML_UINT64_VALUE;
   mp->mp_defs[++i].name = "host"; mp->mp_defs[i].param_types = OML_STRING_VALUE;
@@ -126,38 +135,39 @@ configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
       case 3: md->param_types = OML_UINT64_VALUE; break;
     }
   }
-  // NULL out last one
-  OmlMPDef* md = &mp->mp_defs[ds->ds_num + header];
-  md->name = 0; md->param_types = (OmlValueT)0;
   mp->oml_mp = omlc_add_mp(mp->name, mp->mp_defs);
   DEBUG("oml_writer plugin: New measurement point %s", mp->name);
 }
 
+/** Create a new measurement point, and add it to the session
+ * XXX: The session.session_lock mutex should be held by the calling function */
 static MPoint*
 create_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
 {
   MPoint* mp;
-  MPoint* pmp = session.mpoint;
 
   // Create MPoint and insert it into session's existing MP chain.
   mp = (MPoint*)malloc(sizeof(MPoint));
+
   strncpy(mp->name, name, DATA_MAX_NAME_LEN);
-  mp->next = pmp;
-  session.mpoint = mp;
+  pthread_mutex_init(&mp->mp_lock, /* attr = */NULL);
   configure_mpoint(mp, ds, vl);
+
+  mp->next = session.mpoint;
+  session.mpoint = mp;
   return mp;
 }
 
 static MPoint*
 find_mpoint(const char* name, const data_set_t *ds, const value_list_t *vl)
 {
-  pthread_mutex_lock(&session.init_lock);
+  pthread_mutex_lock(&session.session_lock);
   MPoint* mp = find_mpoint_struct(name);
 
   if (mp == NULL) {
     mp = create_mpoint(name, ds, vl);
   }
-  pthread_mutex_unlock(&session.init_lock);
+  pthread_mutex_unlock(&session.session_lock);
   return mp;
 }
 
@@ -169,7 +179,12 @@ oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute
   OmlValueU v[64];
   MPoint* mp = find_mpoint(ds->type, ds, vl);
 
-  if (mp == NULL || !session.oml_intialized) { return(0); }
+  pthread_mutex_lock(&session.session_lock);
+  if (mp == NULL || !session.oml_initialized) {
+    pthread_mutex_unlock(&session.session_lock);
+    return(0);
+  }
+  pthread_mutex_unlock(&session.session_lock);
 
   omlc_zero_array(v, 64);
 
@@ -200,9 +215,12 @@ oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute
       case 3: omlc_set_uint64(v[i + header], vi->absolute); break;
     }
   }
+  pthread_mutex_lock(&mp->mp_lock);
   omlc_inject(mp->oml_mp, v);
-  for(i=1;i<header;i++)
+  pthread_mutex_unlock(&mp->mp_lock);
+  for(i=1;i<header;i++) {
     omlc_reset_string(v[i]);
+  }
 
   return(0);
 }
@@ -210,19 +228,27 @@ oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute
 static int
 oml_config(const char *key, const char *value)
 {
+  int ret = 0;
+
+  pthread_mutex_lock(&session.session_lock);
   if (strcasecmp ("NodeID", key) == 0) {
     session.node_id = (char*)malloc(strlen(value) + 1);
     strncpy(session.node_id, value, strlen(value));
+
   } else if (strcasecmp ("ContextName", key) == 0) {
     session.domain = (char*)malloc(strlen(value) + 1);
     strncpy(session.domain, value, strlen(value));
+
   } else if (strcasecmp ("CollectURI", key) == 0) {
     session.collect_uri = (char*)malloc(strlen(value) + 1);
     strncpy(session.collect_uri, value, strlen(value));
+
   } else {
-    return(-1);
+    ret = -1;
   }
-  return(0);
+  pthread_mutex_unlock(&session.session_lock);
+
+  return ret;
 }
 
 static void
@@ -258,36 +284,69 @@ oml_init(void)
 {
   const char* app_name = "collectd";
   const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd", "--oml-collect", "file:-"};
-  int argc = 6;
+  int argc = 6, init = 0;
 
   NOTICE("oml_writer plugin: " PACKAGE_STRING);
 
-  pthread_mutex_lock(&session.init_lock);
+  pthread_mutex_lock(&session.session_lock);
   if (session.node_id != NULL) argv[1] = session.node_id;
   if (session.domain != NULL) argv[3] = session.domain;
   if (session.collect_uri != NULL) argv[5] = session.collect_uri;
   if (!omlc_init(app_name, &argc, argv, o_log_collectd)) {
     if(!omlc_start()) {
-      session.oml_intialized = 1;
+      init = 1;
     }
   }
-  pthread_mutex_unlock(&session.init_lock);
-  return !session.oml_intialized;
+  session.oml_initialized = init;
+  pthread_mutex_unlock(&session.session_lock);
+  return !1;
 }
 
 static int
 oml_cleanup(void)
 {
-  /* XXX: session.init_lock should probably be cleaned up here,
-   * but also initialised in oml_init */
-  return omlc_close();
+  int ret;
+  MPoint *mp = session.mpoint, *omp;
+  OmlMPDef *md;
+  pthread_mutex_lock(&session.session_lock);
+
+  ret = omlc_close();
+
+  while(mp) {
+    pthread_mutex_lock(&mp->mp_lock);
+
+    md = mp->mp_defs;
+
+    while(*md->name) {
+     free((char*)md->name);
+     md++;
+    }
+
+    free(mp->mp_defs);
+    pthread_mutex_unlock(&mp->mp_lock);
+    pthread_mutex_destroy(&mp->mp_lock);
+
+    omp = mp;
+    mp = omp->next;
+    free(omp);
+  }
+
+  if(session.node_id) { free(session.node_id); }
+  if(session.domain) { free(session.domain); }
+  if(session.collect_uri) { free(session.collect_uri); }
+
+  pthread_mutex_unlock(&session.session_lock);
+
+  pthread_mutex_destroy(&session.session_lock);
+
+  return ret;
 }
 
 void
 module_register(void)
 {
   memset(&session, 0, sizeof(Session));
-  pthread_mutex_init(&session.init_lock, /* attr = */NULL);
+  pthread_mutex_init(&session.session_lock, /* attr = */NULL);
 
   plugin_register_config("write_oml", oml_config, config_keys, config_keys_num);
   plugin_register_init("write_oml", oml_init);
