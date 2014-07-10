@@ -323,6 +323,9 @@ oml_init(void)
     "--oml-collect", "file:-", "--oml-bufsize", "2048"};
   int argc = 8, init = 0;
 
+  OmlValueU v;
+  omlc_zero(v);
+
   NOTICE(LOGPREFIX "" PACKAGE_STRING);
 
   pthread_mutex_lock(&session.session_lock);
@@ -338,6 +341,16 @@ oml_init(void)
   o_set_log_level(session.loglevel);
 
   session.oml_initialized = init;
+
+  /* Inject some metadata
+   * This has the added bonus of forcing OML to establish the connection before
+   * the first oml_write can proceed */
+  omlc_set_string(v, PACKAGE_NAME);
+  omlc_inject_metadata(NULL, "appname", &v, OML_STRING_VALUE, NULL);
+  omlc_set_string(v, PACKAGE_VERSION);
+  omlc_inject_metadata(NULL, "version", &v, OML_STRING_VALUE, NULL);
+  omlc_reset_string(v);
+
   pthread_mutex_unlock(&session.session_lock);
   return !1;
 }
