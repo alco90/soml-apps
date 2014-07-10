@@ -50,6 +50,7 @@ static const char *config_keys[] = {
   "Domain",
   "CollectURI",
   "OMLLogLevel",
+  "OMLBufferSize",
 };
 static int config_keys_num = STATIC_ARRAY_SIZE(config_keys);
 
@@ -75,6 +76,7 @@ typedef struct {
   char* domain;
   char* node_id;
   int   loglevel;
+  char* buffer_size;
 
   MPoint* mpoint;  // linked list of mpoint definitions
   int     oml_initialized;
@@ -232,7 +234,7 @@ oml_write (const data_set_t *ds, const value_list_t *vl, user_data_t __attribute
 static int
 oml_config(const char *key, const char *value)
 {
-  int ret = 0;
+  int ret = 0, tmp;
   char *endptr;
 
   pthread_mutex_lock(&session.session_lock);
@@ -262,6 +264,20 @@ oml_config(const char *key, const char *value)
       session.loglevel = tmp;
       INFO(LOGPREFIX "OML LogLevel set to %d\n", session.loglevel);
     }
+
+  } else if (strcasecmp ("OMLBufferSize", key) == 0) {
+    /* Collectd parses ints and reprints them in a different, decimal, format*/
+    //NOTICE("%s %s", key, value);
+    endptr = strchr(value, '.');
+    if (endptr == value) {
+      tmp = strlen(value) + 1;
+    } else {
+      tmp = endptr - value;
+    }
+    session.buffer_size = (char*)malloc(tmp + 1);
+    strncpy(session.buffer_size, value, tmp);
+    session.buffer_size[tmp] = 0;
+    INFO(LOGPREFIX "OML Buffer Size set to %sB\n", session.buffer_size);
 
   } else {
     ret = -1;
@@ -303,8 +319,9 @@ static int
 oml_init(void)
 {
   const char* app_name = "collectd";
-  const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd", "--oml-collect", "file:-"};
-  int argc = 6, init = 0;
+  const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd",
+    "--oml-collect", "file:-", "--oml-bufsize", "2048"};
+  int argc = 8, init = 0;
 
   NOTICE(LOGPREFIX "" PACKAGE_STRING);
 
@@ -312,6 +329,7 @@ oml_init(void)
   if (session.node_id != NULL) argv[1] = session.node_id;
   if (session.domain != NULL) argv[3] = session.domain;
   if (session.collect_uri != NULL) argv[5] = session.collect_uri;
+  if (session.buffer_size != NULL) argv[7] = session.buffer_size;
   if (!omlc_init(app_name, &argc, argv, o_log_collectd)) {
     if(!omlc_start()) {
       init = 1;
@@ -356,6 +374,7 @@ oml_cleanup(void)
   if(session.node_id) { free(session.node_id); }
   if(session.domain) { free(session.domain); }
   if(session.collect_uri) { free(session.collect_uri); }
+  if(session.buffer_size) { free(session.buffer_size); }
 
   pthread_mutex_unlock(&session.session_lock);
 
