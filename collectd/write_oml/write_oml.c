@@ -320,7 +320,7 @@ oml_init(void)
 {
   const char* app_name = "collectd";
   const char* argv[] = {"--oml-id", hostname_g, "--oml-domain", "collectd",
-    "--oml-collect", "file:-", "--oml-bufsize", "2048"};
+    "--oml-collect", "file:-", "--oml-bufsize", "4096"};
   int argc = 8, init = 0;
 
   OmlValueU v;
