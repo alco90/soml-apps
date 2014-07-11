@@ -142,7 +142,7 @@ configure_mpoint(MPoint* mp, const data_set_t *ds, const value_list_t *vl)
     }
   }
   mp->oml_mp = omlc_add_mp(mp->name, mp->mp_defs);
-  INFO(LOGPREFIX "New measurement point %s", mp->name);
+  DEBUG(LOGPREFIX "New measurement point %s", mp->name);
 }
 
 /** Create a new measurement point, and add it to the session
@@ -287,32 +287,46 @@ oml_config(const char *key, const char *value)
   return ret;
 }
 
+/** Pass on logging duties to collectd
+ * XXX #1269
+ * [0] http://c-faq.com/varargs/handoff.html
+ */
 static void
 o_log_collectd(int log_level, const char* format, ...)
 {
-  va_list va;
-  va_start(va, format);
+  int date_level_skip = 21; /* Skip date and loglevel tag (e.g., 'Jul 11 13:31:23') */
+  char msg[1024 - sizeof(LOGPREFIX) + date_level_skip]; /* Collectd's plugin_log uses msg[1024] */
+  va_list ap;
+
+  /* We cannot chain two non-va_list variadic functions [0],
+   * so we process the arguments into non-variadic ones
+   * [0] http://c-faq.com/varargs/handoff.html
+   */
+  va_start (ap, format);
+  vsnprintf (msg, sizeof (msg), format, ap);
+  msg[sizeof (msg) - 1] = '\0';
+  va_end (ap);
+
   switch(log_level) {
     case O_LOG_ERROR:
-      ERROR(format, va);
+      ERROR("%s%s", LOGPREFIX, &msg[date_level_skip]);
       break;
     case O_LOG_WARN:
-      WARNING(format, va);
+      WARNING("%s%s", LOGPREFIX, &msg[date_level_skip]);
       break;
     case O_LOG_INFO:
-      NOTICE(format, va);
+      NOTICE("%s%s", LOGPREFIX, &msg[date_level_skip]);
       break;
     case O_LOG_DEBUG:
     case O_LOG_DEBUG2:
     case O_LOG_DEBUG3:
     case O_LOG_DEBUG4:
-      DEBUG(format, va);
+      DEBUG("%s%s", LOGPREFIX, &msg[date_level_skip]);
       break;
     default:
-      NOTICE(format, va);
+      NOTICE("%s%s", LOGPREFIX, &msg[date_level_skip]);
       break;
   }
-  va_end(va);
 }
 
 static int
