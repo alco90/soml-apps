@@ -1,6 +1,6 @@
 [submodule "iperf"]
 	path = iperf
-	url = git://mytestbed.net/iperf.git
+	url = ../iperf.git
 [submodule "httperf"]
 	path = httperf
 	url = ../httperf.git
