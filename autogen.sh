@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -f iperf/autogen.sh ]; then
+if [ ! -f iperf/autogen.sh -o ! -f httperf/autogen.sh ]; then
 	git submodule update --init
 fi
 

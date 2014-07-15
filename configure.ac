@@ -18,8 +18,8 @@ gl_INIT
 
 AC_SUBST([OML_PKG_VER], [`echo "$PACKAGE_VERSION" | sed 's/^\([[0-9]]\+\(\.[[0-9]]\+\)\{1,2\}\)\([[-.a-zA-Z0-9]]\+\)\?.*$/\1~\3/;s/-/./g'`])
 
-built_apps="collectd iperf ripwavemon wattsup wpamon"
-AC_CONFIG_SUBDIRS([collectd iperf ripwavemon wattsup wpamon])
+built_apps="collectd httperf iperf ripwavemon wattsup wpamon"
+AC_CONFIG_SUBDIRS([collectd httperf iperf ripwavemon wattsup wpamon])
 
 # gpslogger
 AC_CHECK_HEADER([gps.h], [
