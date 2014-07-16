@@ -39,7 +39,9 @@ BuildRequires:		gpsd-devel
 
 %description
 This package installs all the OML2 Application packages:
-    * gpslogger-oml2: measure GPS data from gpds;
+    * collectd-write-oml2: writer plugin for collectd;
+    * gpslogger-oml2: measure GPS data from gpsd;
+    * httperf-oml2: httperf with OML2 measurement recording;
     * iperf-oml2: iperf with OML2 measurement recording;
     * nmetrics-oml2: node metrics using libsigar;
     * otg2-oml2: the otg2/otr2 programs for generating background traffic;
@@ -47,7 +49,6 @@ This package installs all the OML2 Application packages:
     * trace-oml2: wrapper around libtrace with OML2 measurement recording;
     * wattsup-oml2: OML-instrumented monitor for WattsUp? power meters;
     * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11 connections.
-    * collectd-write-oml2: writer plugin for collectd.
 
 %prep
 %setup -q
