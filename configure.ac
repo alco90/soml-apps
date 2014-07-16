@@ -18,8 +18,8 @@ gl_INIT
 
 AC_SUBST([OML_PKG_VER], [`echo "$PACKAGE_VERSION" | sed 's/^\([[0-9]]\+\(\.[[0-9]]\+\)\{1,2\}\)\([[-.a-zA-Z0-9]]\+\)\?.*$/\1~\3/;s/-/./g'`])
 
-built_apps="collectd httperf iperf ripwavemon wattsup wpamon"
-AC_CONFIG_SUBDIRS([collectd httperf iperf ripwavemon wattsup wpamon])
+built_apps="collectd iperf ripwavemon wattsup wpamon"
+AC_CONFIG_SUBDIRS([collectd iperf ripwavemon wattsup wpamon])
 
 # gpslogger
 AC_CHECK_HEADER([gps.h], [
@@ -28,6 +28,16 @@ AC_CHECK_HEADER([gps.h], [
 		 ], [
 		 AC_MSG_WARN([gpslogger will not be built])
 		 notbuilt_apps="$notbuilt_apps gpslogger"
+		 ])
+
+# httperf
+AC_CHECK_LIB([event],
+		[event_init], [
+		 AC_CONFIG_SUBDIRS([httperf])
+		 built_apps="$built_apps httperf"
+		 ], [
+		 AC_MSG_WARN([httperf will not be built])
+		 notbuilt_apps="$notbuilt_apps httperf"
 		 ])
 
 # nmetrics
