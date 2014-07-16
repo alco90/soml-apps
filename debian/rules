@@ -54,6 +54,7 @@ install: build
 		install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/share/$${APP}-oml2; \
 		test $${APP} = otg2 && install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/lib/otg2; \
 		test $${APP} = iperf && install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/share/man/man1; \
+		test $${APP} = httperf && install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/share/man/man1; \
 		test $${APP} = collectd && install -dm 755 $(CURDIR)/debian/$${APP}-write-oml2/usr/lib/collectd && \
 			install -dm 755 $(CURDIR)/debian/$${APP}-write-oml2/etc/collectd ; \
 		cd $(CURDIR)/debian/tmp; find . -name "*$${APP}*" -not -type d -exec mv {} $(CURDIR)/debian/$${APP}-oml2/{} \; ;\
