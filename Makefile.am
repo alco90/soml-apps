@@ -131,8 +131,10 @@ else
 		GZIP=$(GZIP_ENV) gzip -c >../SOURCES/$(PKG_RPM_BASE_NAME).tar.gz
 	mv $(PKG_RPM_SPEC) $(PKG_RPM_SPEC).orig
 	cat $(PKG_RPM_SPEC).orig | \
-		$(SED) -e "s/^%define version.*/%define version	$(OML_PKG_VER)/" \
-		-e "s/^%define pkgver.*/%define pkgver $(OML_PKG_VER)/" \
+		$(SED) -e "s/^%define srcver[[:blank:]].*/%define srcver	$(OML_PKG_VER)/" \
+		-e "s/^%define pkgver[[:blank:]].*/%define pkgver $(OML_PKG_VER)/" \
+		-e "t" \
+		-e "s/^%define pkgvernotilde[[:blank:]].*/%define pkgvernotilde $(OML_PKG_VER)/;s/\~//" \
 		> $(PKG_RPM_SPEC)
 	rm $(PKG_RPM_SPEC).orig
 endif
