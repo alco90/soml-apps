@@ -16,6 +16,7 @@ Group:			Applications/Internet
 Requires:		glibc
 Requires:		oml2
 Requires:		popt
+Requires:		libevent
 Requires:		libpcap
 Requires:		libtrace
 Requires:		sigar
@@ -27,6 +28,7 @@ BuildRequires:		gcc-c++
 BuildRequires:		glibc-devel
 BuildRequires:		oml2-devel
 BuildRequires:		popt-devel
+BuildRequires:		libevent-devel
 BuildRequires:		libpcap-devel
 BuildRequires:		libtrace-devel
 BuildRequires:		libxml2-devel
