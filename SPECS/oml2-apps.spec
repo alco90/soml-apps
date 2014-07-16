@@ -1,15 +1,24 @@
 %define name		oml2-apps
-%define version		2.10.0
+%define srcver		2.10.0
+%define pkgver	%{srcver}
+%define pkgvernotilde	%{srcver}
 %define redmineid	902
 
-BuildRoot:		%{_tmppath}/%{name}-%{version}
+BuildRoot:		%{_tmppath}/%{name}-%{srcver}-build
 Summary:		OML applications collection
 License:		MIT
 URL:			http://omlapp.mytestbed.net/
 Name:			%{name}
-Version:		%{version}
+# Use a specific version number if need be (e.g., ~rc instead of rc for proper
+# version ordering)
+%if 0%{?fedora} < 18
+# RPM on Fedora <= 17 doesn't support ~ in version numbers
+Version:        %{pkgvernotilde}
+%else
+Version:        %{pkgver}
+%endif
 Release:		1
-Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%{version}.tar.gz
+Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%{srcver}.tar.gz
 Packager:       	OML developers <oml-user@mytestbed.net>
 Prefix:			/usr
 Group:			Applications/Internet
@@ -55,7 +64,7 @@ This package installs all the OML2 Application packages:
     * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11 connections.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{srcver}
 
 %build
 test -e ../../SOURCES/collectd.tar.gz && tar xfz ../../SOURCES/collectd.tar.gz -C collectd
