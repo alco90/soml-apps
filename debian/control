@@ -13,7 +13,7 @@ Priority: optional
 Architecture: all
 Depends: gpslogger-oml2 (= ${binary:Version}), httperf-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
 Replaces: oml-client, oml2-apps-all
-Suggests: oml2-apps-omfdef, oml2-apps-full
+Suggests: collectd-write-oml2, oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
 Description: A meta-package that installs the complete standalone OML2 applications collection
  This package installs all the OML2 Application packages:
@@ -41,7 +41,7 @@ Section: net
 Priority: optional
 Architecture: all
 Depends: omf-expctl-5.4
-Suggests: oml2-apps
+Suggests: oml2-apps, oml2-apps-full
 Description: A meta-package that installs OMF-5.4 definitions of the OML2 applications
  This package installs all the application definitions needed by the OMF 5.4
  experiment controller to use the oml2-apps.
