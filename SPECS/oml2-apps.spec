@@ -18,6 +18,7 @@ Requires:		oml2
 Requires:		popt
 Requires:		libevent
 Requires:		libpcap
+Requires:		libssl
 Requires:		libtrace
 Requires:		sigar
 BuildRequires:		tar
@@ -32,6 +33,7 @@ BuildRequires:		libevent-devel
 BuildRequires:		libpcap-devel
 BuildRequires:		libtrace-devel
 BuildRequires:		libxml2-devel
+BuildRequires:		libssl-devel
 BuildRequires:		sigar-devel
 BuildRequires:		wget
 %if 0%{?fedora}
