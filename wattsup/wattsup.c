@@ -576,13 +576,13 @@ static int open_device(const char * device_name, int * dev_fd)
 
 	dbg("%s is a registered TTY device", device_name);
 
-	fchdir(cur_fd);
+	(void)fchdir(cur_fd);
 
 
 	/*
 	 * Check if device node exists and is writable
 	 */
-	chdir("/dev");
+	(void)chdir("/dev");
 
 	ret = stat(device_name, &s);
 	if (ret < 0) {
@@ -613,7 +613,7 @@ static int open_device(const char * device_name, int * dev_fd)
 	*dev_fd = ret;
 	ret = 0;
 Done:
-	fchdir(cur_fd);
+	(void)fchdir(cur_fd);
 	close(cur_fd);
 	return ret;
 }
