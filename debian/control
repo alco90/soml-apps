@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: OML development team <oml-user-request@lists.nicta.com.au>
 Uploaders: Olivier Mehani <olivier.mehani@nicta.com.au>, Thierry Rakotoarivelo <thierry.rakotoarivelo@nicta.com.au>, Guillaume Jourjon <guillaume.jourjon@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, libpopt-dev, libtrace3-dev (>= 3.0.18), libsigar-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
+Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, libevent1-dev, libpopt-dev, libtrace3-dev (>= 3.0.18), libsigar-dev, libssl-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
 Standards-Version: 3.9.1
 Homepage: http://omlapp.mytestbed.net/
 
@@ -11,13 +11,14 @@ Package: oml2-apps
 Section: net
 Priority: optional
 Architecture: all
-Depends: gpslogger-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
+Depends: gpslogger-oml2 (= ${binary:Version}), httperf-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
 Replaces: oml-client, oml2-apps-all
 Suggests: oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
 Description: A meta-package that installs the complete standalone OML2 applications collection
  This package installs all the OML2 Application packages:
      * gpslogger-oml2: measure GPS data from gpds;
+     * httperf-oml2: httperf with OML2 measurement recording;
      * iperf-oml2: iperf with OML2 measurement recording;
      * nmetrics-oml2: node metrics using libsigar;
      * otg2-oml2: the otg2/otr2 programs for generating background traffic;
@@ -64,6 +65,20 @@ Conflicts: oml-client, oml2-gpslogger
 Description: Record and store GPS measurements using OML
  gpslogger-oml2 records a stream of GPS position measurements from an external GPS
  device and stores it using the OML measurement library and server.
+
+
+Package: httperf-oml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, liboml2-9
+Description: HTTP server performance tester, with OML support
+ httperf is a tool to measure web server  performance. It speaks the HTTP
+ protocol both in its HTTP/1.0 and HTTP/1.1 flavors and offers a variety of
+ workload generators. While running, it keeps track of a number of performance
+ metrics that are summarized in the form of statistics that are printed at
+ the end of a test run.
+ .
+ This version implements OML support following httperf development. It is based
+ on httperf 0.9.1.
 
 
 Package: iperf-oml2
