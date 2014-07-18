@@ -49,14 +49,5 @@ $(appname).rb: $(appname).rb.in
 		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 
-installed_link_names = $(DESTDIR)$(bindir)/`echo "ripwave_monitor" | $(SED) '$(transform)'`$(EXEEXT)
-
-install-exec-hook:
-	for OLDNAME in $(installed_link_names); do \
-		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
-		$(LN_S) $(installed_name) $${OLDNAME}; \
-	done
-
 uninstall-hook:
-	rm -f $(installed_link_names)
 	rm -f $(DESTDIR)/$(pkgdatadir)/$(appname).rb

@@ -159,24 +159,9 @@ main(int argc, const char *argv[])
 {
   char c;
   if_monitor_t* first = NULL;
-  char *progname = strdup(argv[0]), *p=progname, *p2;
   int result, l;
 
   loginfo("%s\n", PACKAGE_STRING);
-
-  /* Get basename */
-  p2 = strtok(p, "/");
-  while(p2) {
-    p = p2;
-    p2 = strtok(NULL, "/");
-  }
-  p2 = p;
-  /* The canonical name is `nmetrics-oml2', so it clearly does not start with `om' */
-  l = strlen(p);
-  if (!strncmp(p, "om", MIN(l,2)) || !strncmp(p, "nmetrics_oml2", MIN(l,13))) {
-    logwarn("Binary name `%s' is deprecated and will disappear soon, please use `nmetrics-oml2' instead\n", p);
-  }
-  free(progname);
 
   result = omlc_init("nmetrics", &argc, argv, NULL);
   if (result == -1) {

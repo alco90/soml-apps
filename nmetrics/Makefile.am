@@ -49,17 +49,5 @@ $(appname).rb: $(appname).rb.in
 		-e "s/app\.version.*/app.version($$VER)/" \
 		$< > $@
 
-installed_link_names = \
-		       $(DESTDIR)$(bindir)/`echo "$(appname)_oml2" | $(SED) '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo "oml2-$(appname)" | $(SED) '$(transform)'`$(EXEEXT) \
-		       $(DESTDIR)$(bindir)/`echo "omf_$(appname)" | $(SED) '$(transform)'`$(EXEEXT)
-
-install-exec-hook:
-	for OLDNAME in $(installed_link_names); do \
-		test -e $${OLDNAME} && mv $${OLDNAME} $${OLDNAME}.pre$(PACKAGE_VERSION); \
-		$(LN_S) $(installed_name) $${OLDNAME}; \
-	done
-
 uninstall-hook:
-	rm -f $(installed_link_names)
 	rm -f $(DESTDIR)/$(pkgdatadir)/$(appname).rb
