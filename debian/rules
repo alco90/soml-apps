@@ -18,8 +18,9 @@ configure-stamp:
 
 	touch configure-stamp
 
-
-build: build-stamp
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
 
 build-stamp: configure-stamp
 	dh_testdir
@@ -36,7 +37,7 @@ clean:
 	rm -f build-stamp configure-stamp
 
 	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
+	[ ! -f Makefile ] || $(MAKE) clean
 
 	dh_clean
 
@@ -48,6 +49,9 @@ install: build
 
 	# Add here commands to install the package into debian/tmp.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	# fix lintian non-empty-dependency_libs-in-la-file issue [0]
+	# [0] https://wiki.debian.org/ReleaseGoals/LAFileRemoval
+	sed -i "/dependency_libs/ s/'.*'/''/" `find $(CURDIR)/debian/tmp -name '*.la'`
 	for APP in `find $(CURDIR) -mindepth 1 -maxdepth 1 -type d -not -name .git`; do \
 		export APP=`echo $${APP} | sed s-.*/--`; \
 		install -dm 755 $(CURDIR)/debian/$${APP}-oml2/usr/bin; \

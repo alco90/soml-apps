@@ -3,47 +3,50 @@ Section: net
 Priority: extra
 Maintainer: OML development team <oml-user-request@lists.nicta.com.au>
 Uploaders: Olivier Mehani <olivier.mehani@nicta.com.au>, Thierry Rakotoarivelo <thierry.rakotoarivelo@nicta.com.au>, Guillaume Jourjon <guillaume.jourjon@nicta.com.au>
-Build-Depends: cdbs, debhelper (>= 7), dpkg-dev, pkg-config, libevent-dev, libpopt-dev, libtrace3-dev, libsigar-dev, libssl-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
-Standards-Version: 3.9.1
+Build-Depends: debhelper (>= 7), dpkg-dev, pkg-config, libevent-dev, libpopt-dev, libtrace3-dev, libsigar-dev, libssl-dev, liboml2-dev, libgps-dev, libxml2-dev, tar, bzip2
+Standards-Version: 3.9.4
 Homepage: http://omlapp.mytestbed.net/
 
 Package: oml2-apps
 Section: net
 Priority: optional
-Architecture: all
-Depends: gpslogger-oml2 (= ${binary:Version}), httperf-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
+Architecture: any
+Depends: ${misc:Depends}, gpslogger-oml2 (= ${binary:Version}), httperf-oml2 (= ${binary:Version}), iperf-oml2 (= ${binary:Version}), nmetrics-oml2 (= ${binary:Version}), otg2-oml2 (= ${binary:Version}), ripwavemon-oml2 (= ${binary:Version}), trace-oml2 (= ${binary:Version})
 Replaces: oml-client, oml2-apps-all
 Suggests: collectd-write-oml2, oml2-apps-omfdef, oml2-apps-full
 Conflicts: oml-client, oml2-apps-all
-Description: A meta-package that installs the complete standalone OML2 applications collection
- This package installs all the OML2 Application packages:
+Description: Standalone OML2 applications (metapackage)
+ This metapackage installs all the OML2 Application packages:
      * gpslogger-oml2: measure GPS data from gpds;
      * httperf-oml2: httperf with OML2 measurement recording;
      * iperf-oml2: iperf with OML2 measurement recording;
      * nmetrics-oml2: node metrics using libsigar;
      * otg2-oml2: the otg2/otr2 programs for generating background traffic;
-     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda) modem;
+     * ripwavemon-oml2: use OML to monitor the Navini Ripwave WiMAX (kinda)
+       modem;
      * trace-oml2: wrapper around libtrace with OML2 measurement recording;
      * wattsup-oml2: OML-instrumented monitor for WattsUp? power meters;
-     * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11 connections.
+     * wpamon-oml2: simple interface to wpa_supplicant allowing to report 802.11
+       connections.
 
 Package: oml2-apps-full
 Section: net
 Priority: optional
-Architecture: all
-Depends: collectd-write-oml2 (= ${binary:Version})
-Description: A meta-package that installs the complete OML2 applications collection
- This package installs the oml2-apps package, and the following additional ones:
+Architecture: any
+Depends: ${misc:Depends}, collectd-write-oml2 (= ${binary:Version})
+Description: Complete OML2 applications collection (metapackage)
+ This metapackage installs the oml2-apps package, and the following additional
+ ones:
      * collectd-write-oml2: writer plugin for collectd.
 
 Package: oml2-apps-omfdef
 Section: net
 Priority: optional
 Architecture: all
-Depends: omf-expctl-5.4
+Depends: ${misc:Depends}, omf-expctl-5.4
 Suggests: oml2-apps, oml2-apps-full
-Description: A meta-package that installs OMF-5.4 definitions of the OML2 applications
- This package installs all the application definitions needed by the OMF 5.4
+Description: OMF-5.4 definitions of the OML2 applications
+ This package contains all the application definitions needed by the OMF 5.4
  experiment controller to use the oml2-apps.
 
 
@@ -63,8 +66,8 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, gpsd, liboml2-9
 Replaces: oml-client, oml2-gpslogger
 Conflicts: oml-client, oml2-gpslogger
 Description: Record and store GPS measurements using OML
- gpslogger-oml2 records a stream of GPS position measurements from an external GPS
- device and stores it using the OML measurement library and server.
+ gpslogger-oml2 records a stream of GPS position measurements from an external
+ GPS device and stores it using the OML measurement library and server.
 
 
 Package: httperf-oml2
