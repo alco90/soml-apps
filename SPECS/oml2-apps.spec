@@ -49,6 +49,10 @@ BuildRequires:		wget
 Requires:		gpsd
 BuildRequires:		gpsd-devel
 %endif
+%if 0%{?fedora} >= 19
+BuildRequires:		rubypick
+%endif
+
 
 %description
 This package installs all the OML2 Application packages:
