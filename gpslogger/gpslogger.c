@@ -197,7 +197,7 @@ main (int argc, const char **argv)
 
   result = omlc_init ("gpslogger", &argc, argv, NULL);
   if (result == -1) {
-    logerror("ERROR\tCould not initialise OML\n");
+    logerror("Could not initialise OML\n");
     exit (1);
   }
 
