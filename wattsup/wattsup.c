@@ -3,7 +3,7 @@
  *
  *
  *	Copyright (c) 2005 Patrick Mochel
- *	Copyright (c) 2013 National ICT Australia (NICTA), Olivier Mehani (OML instrumentation)
+ *	Copyright (c) 2013-2014 National ICT Australia (NICTA), Olivier Mehani (OML instrumentation)
  *
  *	This program is released under the GPLv2
  *

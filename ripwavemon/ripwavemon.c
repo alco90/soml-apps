@@ -5,7 +5,7 @@
  *
  * Author: Olivier Mehani  <olivier.mehani@nicta.com.au>, (C) 2010-2013
  *
- * Copyright 2010-2013 National ICT Australia (NICTA)
+ * Copyright 2010-2014 National ICT Australia (NICTA)
  *
  * This software may be used and distributed solely under the terms of
  * the MIT license (License).  You should find a copy of the License in

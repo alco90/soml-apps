@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2010 WINLAB, Rutgers University, USA
- * Copyright 2007-2013 National ICT Australia (NICTA)
+ * Copyright 2007-2014 National ICT Australia (NICTA)
  *
  * This software may be used and distributed solely under the terms of
  * the MIT license (License).  You should find a copy of the License in
@@ -22,7 +22,7 @@
 
 #endif /* HAVE_CONFIG_H */
 
-#define COPYRIGHT "Copyright (c) 2005-2007 WINLAB, 2007-2013 NICTA"
+#define COPYRIGHT "Copyright (c) 2005-2007 WINLAB, 2007-2014 NICTA"
 
 #endif /* OTG2_VERSION_H_ */
 
