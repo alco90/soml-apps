@@ -30,62 +30,74 @@ such as CPU, memory and network usage and reports them through OML.
 		  :var_name => 'sample_interval')
 
   app.defMeasurement("memory") do |m|
-    m.defMetric('ram', :uint64)
-    m.defMetric('total', :uint64)
-    m.defMetric('used', :uint64)
-    m.defMetric('free', :uint64)
-    m.defMetric('actual_used', :uint64)
-    m.defMetric('actual_free', :uint64)
+    m.defMetric('ram', :uint64, :unit => "mebibyte", # unit guessed by comparing to free(1) under linux
+	       :description => "System Random Access Memory (in MiB)")
+    m.defMetric('total', :uint64, :unit => "byte",
+	       :description => "Total system memory")
+    m.defMetric('used', :uint64, :unit => "byte",
+	       :description => "Total used system memory")
+    m.defMetric('free', :uint64, :unit => "byte",
+	       :description => "Total free system memory (e.g., Linux plus cached)")
+    m.defMetric('actual_used', :uint64, :unit => "byte",
+	       :description => "Actual total used system memory (e.g., Linux minus buffers)")
+    m.defMetric('actual_free', :uint64, :unit => "byte",
+	       :description => "Actual total free system memory")
   end
 
   app.defMeasurement("cpu") do |m|
-    m.defMetric('user', :uint64)
-    m.defMetric('sys', :uint64)
-    m.defMetric('nice', :uint64)
-    m.defMetric('idle', :uint64)
-    m.defMetric('wait', :uint64)
-    m.defMetric('irq', :uint64)
-    m.defMetric('soft_irq', :uint64)
-    m.defMetric('stolen', :uint64)
-    m.defMetric('total', :uint64)
+    m.defMetric('user', :uint64, :unit => "second",
+	       :description => "Time running un-niced user processes")
+    m.defMetric('sys', :uint64, :unit => "second",
+	       :description => "Time running kernel processes")
+    m.defMetric('nice', :uint64, :unit => "second",
+	       :description => "Time running niced user processes")
+    m.defMetric('idle', :uint64, :unit => "second",
+	       :description => "Time being idle")
+    m.defMetric('wait', :uint64, :unit => "second",
+	       :description => "Time waiting for I/O completion")
+    m.defMetric('irq', :uint64, :unit => "second",
+	       :description => "Time spent servicing hardware interrupts")
+    m.defMetric('soft_irq', :uint64, :unit => "second",
+	       :description => "Time spent servicing software interrupts")
+    m.defMetric('stolen', :uint64, :unit => "second",
+	       :description => "Time stolen from this VM by the hypervisor")
+    m.defMetric('total', :uint64, :unit => "second",
+	       :description => "Total system CPU time")
   end
 
   app.defMeasurement("network") do |m|
-    m.defMetric('name', :string)
-    m.defMetric('rx_packets', :uint64)
-    m.defMetric('rx_bytes', :uint64)
-    m.defMetric('rx_errors', :uint64)
-    m.defMetric('rx_dropped', :uint64)
-    m.defMetric('rx_overruns', :uint64)
-    m.defMetric('rx_frame', :uint64)
-    m.defMetric('tx_packets', :uint64)
-    m.defMetric('tx_bytes', :uint64)
-    m.defMetric('tx_errors', :uint64)
-    m.defMetric('tx_dropped', :uint64)
-    m.defMetric('tx_overruns', :uint64)
-    m.defMetric('tx_collisions', :uint64)
-    m.defMetric('tx_carrier', :uint64)
-    m.defMetric('speed', :uint64)
+    m.defMetric('name', :string,
+	       :description => "Interface name")
+    m.defMetric('rx_packets', :uint64, :unit => "packet",
+	       :description => "Received packets")
+    m.defMetric('rx_bytes', :uint64, :unit => "byte",
+	       :description => "Received data")
+    m.defMetric('rx_errors', :uint64, :unit => "error",
+	       :description => "Reception errors")
+    m.defMetric('rx_dropped', :uint64, :unit => "drop",
+	       :description => "Dropped packets on reception")
+    m.defMetric('rx_overruns', :uint64, :unit => "overrun",
+	       :description => "Reception overrun")
+    m.defMetric('rx_frame', :uint64, :unit => "frame",
+	       :description => "Received frames")
+    m.defMetric('tx_packets', :uint64, :unit => "packet",
+	       :description => "Sent packets")
+    m.defMetric('tx_bytes', :uint64, :unit => "byte",
+	       :description => "Sent data")
+    m.defMetric('tx_errors', :uint64, :unit => "error",
+	       :description => "Transmission errors")
+    m.defMetric('tx_dropped', :uint64, :unit => "drop",
+	       :description => "Dropped packets on transmission")
+    m.defMetric('tx_overruns', :uint64, :unit => "overrun",
+	       :description => "Transmission overrun")
+    m.defMetric('tx_collisions', :uint64, :unit => "collision",
+	       :description => "Collisions on transmission")
+    m.defMetric('tx_carrier', :uint64,
+	       :description => "Carrier present")
+    m.defMetric('speed', :uint64, :unit => "megabit/second",
+	       :description => "Interface speed (not implemented under Linux)") # see https://jira.hyperic.com/browse/SIGAR-220
   end
 
-  app.defMeasurement("procs") do |m|
-    m.defMetric('cpu_id', :uint64)
-    m.defMetric('total', :uint64)
-    m.defMetric('sleeping', :uint64)
-    m.defMetric('running', :uint64)
-    m.defMetric('zombie', :uint64)
-    m.defMetric('stopped', :uint64)
-    m.defMetric('idle', :uint64)
-    m.defMetric('threads', :uint64)
-  end
-
-  app.defMeasurement("proc") do |m|
-    m.defMetric('pid', :uint64)
-    m.defMetric('start_time', :uint64)
-    m.defMetric('user', :uint64)
-    m.defMetric('sys', :uint64)
-    m.defMetric('total', :uint64)
-  end
 end
 
 # Local Variables:

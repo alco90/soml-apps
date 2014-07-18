@@ -19,15 +19,24 @@ reports GPS fixes information, as well as the current GPS time.
   app.defProperty('verbose', 'Report fixes on STDOUT', '-v',
 		  :type => :boolean, :mnemonic => 'v')
 
+  # Descriptions and units based on gps.h from the GPSd destribution
   app.defMeasurement("gps_data") do |m|
-    m.defMetric('lat', :double)
-    m.defMetric('lon', :double)
-    m.defMetric('ele', :double)
-    m.defMetric('track', :double)
-    m.defMetric('speed', :double)
-    m.defMetric('climb', :double)
-    m.defMetric('fix', :string)
-    m.defMetric('time', :string)
+    m.defMetric('lat', :double, :unit => "decimal degree",
+		:description => "Latitude")
+    m.defMetric('lon', :double, :unit => "decimal degree",
+		:description => "Longitude")
+    m.defMetric('ele', :double, :unit => "metre",
+		:description => "Altitude (valid iff fix is 3d)")
+    m.defMetric('track', :double,
+		:description => "Course made good (relative to true north)")
+    m.defMetric('speed', :double, :unit => "metre/second",
+		:description => "Speed over ground")
+    m.defMetric('climb', :double,  :unit => "metre/second",
+		:description => "Vertical speed  (valid iff fix is 3d)")
+    m.defMetric('fix', :string, :unit=> "dimension",
+	       :description => "Mode of fix")
+    m.defMetric('time', :string,
+		:description => "Time of update")
   end
 end
 

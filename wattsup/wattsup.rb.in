@@ -24,8 +24,8 @@ This application reads these metrics and reports them using OML.
   # as obtained with wattsup --help
   app.defProperty('help', 'Display help text and exit', '-h',
         :type => :boolean, :order => 1)
-  app.defProperty('version', 'Display version information and exit', 'V',
-        :type => :boolean, :order => 1)
+  app.defProperty('version', 'Display version information and exit', '-V',
+	:type => :boolean, :mnemonic => 'V')
   app.defProperty('debug', 'Print out debugging messages', '-d',
         :type => :boolean, :order => 1)
   app.defProperty('verbose', 'Force output of data to stdout', '-v',
@@ -76,33 +76,50 @@ This application reads these metrics and reports them using OML.
   #
   # [0] https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf
   app.defMeasurement("power") do |mp|
-    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
-    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
-    mp.defMetric('current', :double, :unit => "A", :precision => 0.001) # XXX: [0] says “amps * 10. (Thousandths of amps)”; we assume it should read “amps * 1000.”
-    mp.defMetric('energy', :double, :unit => "Wh", :precision => 0.1)
-    mp.defMetric('frequency', :double, :unit => "Hz", :precision => 0.1)
-    mp.defMetric('apparent_power', :double, :unit => "VA", :precision => 0.1)
+    mp.defMetric('power', :double, :unit => "Watt", :precision => 0.1,
+		:description => "Immediate power usage")
+    mp.defMetric('voltage', :double, :unit => "Volt", :precision => 0.1,
+		:description => "Immediate voltage")
+    mp.defMetric('current', :double, :unit => "Ampere", :precision => 0.001, # [0] says “amps * 10. (Thousandths of amps)”; we assume it should read “amps * 1000.”
+		:description => "Immediate current")
+    mp.defMetric('energy', :double, :unit => "Watt-hour", :precision => 0.1,
+		:description => "Immediate energy use")
+    mp.defMetric('frequency', :double, :unit => "Hertz", :precision => 0.1,
+		:description => "Immediate frequency")
+    mp.defMetric('apparent_power', :double, :unit => "Volt-Ampere", :precision => 0.1,
+		:description => "Immediate apparent power usage")
   end
   app.defMeasurement("cost") do |mp|
-    mp.defMetric('cost', :double, :unit => "$", :precision => 0.01)
+    mp.defMetric('cost', :double, :unit => "currency", :precision => 0.01,
+		:description => "Immediate cost")
   end
   app.defMeasurement("monthly") do |mp|
-    mp.defMetric('energy', :double, :unit => "Wh", :precision => 1) # According [0], this one's precision is different
-    mp.defMetric('cost', :double, :unit => "$", :precision => 0.001)
+    mp.defMetric('energy', :double, :unit => "Watt-hour", :precision => 1, # According [0], this one's precision is different
+		:description => "Monthly energy use")
+    mp.defMetric('cost', :double, :unit => "$", :precision => 0.001,
+		:description => "Monthly cost")
   end
   app.defMeasurement("maxima") do |mp|
-    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
-    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
-    mp.defMetric('current', :double, :unit => "A", :precision => 0.001)
+    mp.defMetric('power', :double, :unit => "Watt", :precision => 0.1,
+		:description => "Peak power usage")
+    mp.defMetric('voltage', :double, :unit => "Volt", :precision => 0.1,
+		:description => "Peak voltage")
+    mp.defMetric('current', :double, :unit => "Ampere", :precision => 0.001,
+		:description => "Peak current")
   end
   app.defMeasurement("minima") do |mp|
-    mp.defMetric('power', :double, :unit => "W", :precision => 0.1)
-    mp.defMetric('voltage', :double, :unit => "V", :precision => 0.1)
-    mp.defMetric('current', :double, :unit => "A", :precision => 0.001)
+    mp.defMetric('power', :double, :unit => "Watt", :precision => 0.1,
+		:description => "Minimum power usage")
+    mp.defMetric('voltage', :double, :unit => "Volt", :precision => 0.1,
+		:description => "Minimum voltage")
+    mp.defMetric('current', :double, :unit => "Ampere", :precision => 0.001,
+		:description => "Minimum current")
   end
   app.defMeasurement("meta") do |mp|
-    mp.defMetric('power_factor', :integer, :unit => "%", :description => "Ratio of Watts versus Volt Amps; -1 represents NaN")
-    mp.defMetric('duty_cycle', :integer, :unit => "%", :description => "Ratio of the time on versus total time; -1 represents NaN")
+    mp.defMetric('power_factor', :integer, :unit => "%",
+		 :description => "Ratio of Watts versus Volt Amps; -1 represents NaN")
+    mp.defMetric('duty_cycle', :integer, :unit => "%",
+		 :description => "Ratio of the time on versus total time; -1 represents NaN")
     mp.defMetric('power_cycle', :integer,
 		 :description => "Number of power-on events; indicates that power was removed at some point during this sampling interval since last memory clear; -1 represents NaN")
   end

@@ -24,11 +24,16 @@ socket and reports Wi-Fi events.
 		  :type => :string, :mnemonic => 'S', :var_name => 'local_path')
 
   app.defMeasurement("network_event") do |m|
-    m.defMetric('event', :string)
-    m.defMetric('bssid', :string)
-    m.defMetric('full_status', :string)
-    m.defMetric('tv_sec', :uint32)
-    m.defMetric('tv_usec', :uint32)
+    m.defMetric('event', :string,
+		:description => "Event type")
+    m.defMetric('bssid', :string,
+	       :description => "BSSID of the remote station")
+    m.defMetric('full_status', :string,
+	       :description => "Full event string")
+    m.defMetric('tv_sec', :uint32, :unit => "second",
+	       :description => "Time of event")
+    m.defMetric('tv_usec', :uint32, :unit => "microsecond",
+	       :description => "Time of event")
   end
 end
 
