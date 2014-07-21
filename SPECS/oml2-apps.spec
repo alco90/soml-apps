@@ -1,8 +1,8 @@
 %define name		oml2-apps
-%define srcver		2.10.0
-%define pkgver	%{srcver}
-%define pkgvernotilde	%{srcver}
-%define redmineid	902
+%define srcver		2.11.0rc
+%define pkgver		2.11.0~rc
+%define pkgvernotilde		2.11.0rc
+%define redmineid	1130
 
 BuildRoot:		%{_tmppath}/%{name}-%{srcver}-build
 Summary:		OML applications collection
@@ -17,7 +17,7 @@ Version:        %{pkgvernotilde}
 %else
 Version:        %{pkgver}
 %endif
-Release:		1
+Release:	1
 Source:			http://oml.mytestbed.net/attachments/download/%{redmineid}/oml2-apps-%{srcver}.tar.gz
 Packager:       	OML developers <oml-user@mytestbed.net>
 Prefix:			/usr
