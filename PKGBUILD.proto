@@ -2,6 +2,7 @@
 #<!GIT
 pkgname=oml2-apps
 _redmineid=902
+_srcver=2.10.0
 #!GIT>
 #<GIT
 pkgname=oml2-apps-git
@@ -23,7 +24,7 @@ makedepends=('git')
 install='oml2-apps.install'
 source=(
 #<!GIT
-	http://oml.mytestbed.net/attachments/download/${_redmineid}/oml2-apps-${pkgver}.tar.gz
+	http://oml.mytestbed.net/attachments/download/${_redmineid}/oml2-apps-${_srcver}.tar.gz
 #!GIT>
 )
 
