@@ -1,3 +1,46 @@
+2014-07-21  Olivier Mehani <olivier.mehani@nicta.com.au>
+	* OML: Version 2.11.0rc
+	* New instrumented tool: httperf (#1371)
+	  * Report the same summaries as stdout (#1376)
+	  * Additional per-connection and per-call metrics (timing and size)
+	    (#1377)
+	* All applications
+	  * Added units and description in all app descriptions (#1822)
+	  * Removed support for old binary names (#724, as warned since 2.9)
+	    * They all follow the APPNAME-oml2 pattern,
+	    * except for otg2/otr2, which will remain as such.
+	  * Reporting of appname, version and cmdline in metadata (#1443,
+	    #1378)
+	* trace-oml2:
+	  * New ICMPv4 MP (#937)
+	  * New ethernet MP (#1782)
+	  * Use of OML_GUID for pkt_id (#1783)
+	  * Cleanup of IPv6 support (#930)
+	    * libtrace>=3.18 now required for ICMPv6 parsing
+	* Iperf-oml2:
+	  * Use of OML_GUID for pid and connection_id (#1783; supports
+	    up to FD_SETSIZE simultaneous sockets)
+	  * Dropped support for OMF-5.3
+	* OTG2/OTR2
+	  * Fixed some stability issues (#1467, #1796)
+	  * Use of OML_GUID for flow and flow_id (#1783)
+	  * New UDP protocol version (0x02) to support 64-bit Flow IDs
+	    * Old OTRs (<2.11) will not manage to extract information from
+	      flows sent by new OTGs (2.11)
+	    * New OTR (2.11) should be able to properly extract information
+	      from flows sent by old OTGs (<2.11)
+	* Collectd writer:
+	  * Add configurable OMLLogLevel and OMLBUfferSize (default to 4096B,
+	    #1729)
+	  * Fix logging oddity (#1269)
+	  * New options OMLBufferSize (related to #1729) and OMLLogLevel
+            (related to #1269)
+        * ping-oml2 moved to the oml4r>=2.9.10 gem to simplify dependency
+	  management
+	  * Install the binary with
+
+	      $ gem install oml4r
+
 2013-39-30  Olivier Mehani <olivier.mehani@nicta.com.au>
 	* oml2-apps: Release 2.10.0
 	* New applications:
