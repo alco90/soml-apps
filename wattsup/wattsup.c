@@ -34,6 +34,13 @@
 #include <oml2/omlc.h>
 #define OML_FROM_MAIN
 #include "wattsup_oml.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#else
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
+#endif
 
 static const char * wu_version = "0.02";
 
@@ -1999,6 +2006,7 @@ int main(int argc, const char ** argv)
 		ret = omlc_start();
 		if (!ret) {
 			oml_enabled = 1;
+			oml_inject_metadata(argc, argv);
 		}
 	}
 	ret = parse_args(argc, argv);

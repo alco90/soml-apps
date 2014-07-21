@@ -21,7 +21,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #else
-# define PACKAGE_STRING __FILE__
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
 #endif
 
 #include <stdlib.h>
@@ -191,7 +193,7 @@ main(int argc, const char *argv[])
 {
   char c;
   if_monitor_t* first = NULL;
-  int result, l;
+  int result;
 
   loginfo("%s\n", PACKAGE_STRING);
 
@@ -220,6 +222,7 @@ main(int argc, const char *argv[])
 
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
+  oml_inject_metadata(argc, argv);
 
   signal (SIGTERM, quit_handler);
   signal (SIGQUIT, quit_handler);

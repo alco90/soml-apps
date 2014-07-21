@@ -30,7 +30,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #else
-# define PACKAGE_STRING __FILE__
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
 #endif
 
 #define OML_FROM_MAIN
@@ -146,6 +148,7 @@ prepare_oml(int argc, const char **argv)
     logerror("Could not start OML\n");
     return -1;
   }
+  oml_inject_metadata(argc, argv);
 
   return 0;
 }

@@ -32,7 +32,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #else
-# define PACKAGE_STRING __FILE__
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
 #endif
 
 #define OML_FROM_MAIN
@@ -619,7 +621,7 @@ main(int argc, const char *argv[])
   char str[50] = "int:";
   char radiotap_dev[68] = "/proc/sys/net/";
   FILE *radio_dev_type;
-  int result, l;
+  int result;
 
   loginfo("%s\n", PACKAGE_STRING);
 
@@ -656,6 +658,7 @@ main(int argc, const char *argv[])
   // Initialize measurment points
   oml_register_mps();  // defined in xxx_oml.h
   omlc_start();
+  oml_inject_metadata(argc, argv);
 
   signal (SIGTERM, quit_handler);
   signal (SIGQUIT, quit_handler);

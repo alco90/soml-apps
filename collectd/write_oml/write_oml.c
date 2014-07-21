@@ -40,7 +40,9 @@
 # undef VERSION
 # include "config.h"
 #else
-# define PACKAGE_STRING __FILE__
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
 #endif
 
 #define LOGPREFIX "oml_writer plugin: "
@@ -382,6 +384,7 @@ oml_init(void)
   if (!omlc_init(app_name, &argc, argv, o_log_collectd)) {
     if(!omlc_start()) {
       init = 1;
+      oml_inject_metadata(argc, argv);
     }
   }
   o_set_log_level(session.loglevel);

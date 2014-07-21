@@ -31,7 +31,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #else
-# define PACKAGE_STRING __FILE__
+# define PACKAGE_STRING __FILE__ " " __DATE__
+# define PACKAGE_NAME __FILE__
+# define PACKAGE_VERSION __DATE__
 #endif
 
 #define OML_FROM_MAIN
@@ -224,7 +226,7 @@ oml_inject_metadata(int argc, const char **argv)
 int
 main (int argc, const char **argv)
 {
-  int result, l;
+  int result;
 
   loginfo("%s\n", PACKAGE_STRING);
 
@@ -254,13 +256,6 @@ main (int argc, const char **argv)
     }
   }
 
-  /* XXX: Remnant form gpsdclient, probably useless now
-     if (optind < argc) {
-     gpsd_source_spec(argv[optind], &source);
-     } else
-     gpsd_source_spec(NULL, &source);
-   */
-
   /* initialises the gpsfix data structure */
   gps_clear_fix(&gpsfix);
 
@@ -272,6 +267,8 @@ main (int argc, const char **argv)
   //openlog ("gpxlogger", LOG_PID | LOG_NDELAY , LOG_DAEMON);
 
   omlc_start();
+  oml_inject_metadata(argc, argv);
+
   return socket_mainloop();
 }
 

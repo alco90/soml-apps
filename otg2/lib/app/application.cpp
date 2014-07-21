@@ -313,6 +313,7 @@ Application::run()
   logdebug("Stream configured\n");
 
   omlc_start();
+  oml_inject_metadata(argc_, argv_);
 
   stream_->run();
 
