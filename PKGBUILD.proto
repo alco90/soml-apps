@@ -29,7 +29,7 @@ source=(
 )
 
 #<!GIT
-_builddir=${pkgname}-${pkgver}
+_builddir=${pkgname}-${_srcver}
 #!GIT>
 #<GIT
 _gitroot="git://mytestbed.net/oml-apps.git"
