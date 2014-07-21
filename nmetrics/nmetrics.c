@@ -154,6 +154,38 @@ run( opts_t* opts, oml_mps_t* oml_mps, if_monitor_t* first_if)
 
 }
 
+/* XXX: To be provided by oml2-scaffold templates */
+static inline void
+oml_inject_metadata(int argc, const char **argv)
+{
+  int i;
+  OmlValueU v;
+  omlc_zero(v);
+
+  /* Reconstruct command line */
+  size_t cmdline_len = 0;
+  for(i = 0; i < argc; i++) {
+    cmdline_len += strlen(argv[i]) + 1;
+  }
+  char cmdline[cmdline_len + 1];
+  cmdline[0] = '\0';
+  for(i = 0; i < argc; i++) {
+    strncat(cmdline, argv[i], cmdline_len);
+    cmdline_len -= strlen(argv[i]);
+    strncat(cmdline, " ", cmdline_len);
+    cmdline_len--;
+  }
+
+  omlc_set_string(v, PACKAGE_NAME);
+  omlc_inject_metadata(NULL, "appname", &v, OML_STRING_VALUE, NULL);
+
+  omlc_set_string(v, PACKAGE_VERSION);
+  omlc_inject_metadata(NULL, "version", &v, OML_STRING_VALUE, NULL);
+
+  omlc_set_string(v, cmdline);
+  omlc_inject_metadata(NULL, "cmdline", &v, OML_STRING_VALUE, NULL);
+  omlc_reset_string(v);
+}
 int
 main(int argc, const char *argv[])
 {
