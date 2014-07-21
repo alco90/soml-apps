@@ -32,6 +32,7 @@ Requires:		openssl
 Requires:		sigar
 BuildRequires:		tar
 BuildRequires:		bzip2
+BuildRequires:		curl
 BuildRequires:		make
 BuildRequires:		gcc
 BuildRequires:		gcc-c++
