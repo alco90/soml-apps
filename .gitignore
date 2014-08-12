@@ -41,3 +41,9 @@ build-aux/*
 .version
 *-oml2
 p-*
+collectd/collectd-*
+collectd/collectd_config.log
+otg2/otg2.rb
+otg2/otr2.rb
+wattsup/wattsup.rb
+wpamon/wpamon.rb
