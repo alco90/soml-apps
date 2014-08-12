@@ -15,7 +15,8 @@ AC_PROG_MAKE_SET
 
 gl_INIT
 
-AC_SUBST([OML_PKG_VER], [`echo "$PACKAGE_VERSION" | sed 's/^\([[0-9]]\+\(\.[[0-9]]\+\)\{1,2\}\)\([[-.a-zA-Z0-9]]\+\)\?.*$/\1~\3/;s/-/./g'`])
+AC_SUBST([OML_BASE_VER], [`echo "$PACKAGE_VERSION" | sed 's/^\([[0-9]]\+\.[[0-9]]\+\).*$/\1/'`])
+AC_SUBST([OML_PKG_VER], [`echo "$PACKAGE_VERSION" | sed 's/^\([[0-9]]\+\(\.[[0-9]]\+\)\{1,2\}\)\([[-.a-zA-Z0-9]]\+\)\?.*$/\1~\3/;s/-/./g;s/~$//'`])
 
 built_apps="collectd iperf ripwavemon wattsup wpamon"
 AC_CONFIG_SUBDIRS([collectd iperf ripwavemon wattsup wpamon])
