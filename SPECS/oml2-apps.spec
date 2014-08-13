@@ -1,8 +1,8 @@
 %define name		oml2-apps
-%define srcver		2.11.0rc
-%define pkgver		2.11.0~rc
-%define pkgvernotilde		2.11.0rc
-%define redmineid	1130
+%define srcver		2.11.0
+%define pkgver		2.11.0
+%define pkgvernotilde		2.11.0
+%define redmineid	1142
 
 BuildRoot:		%{_tmppath}/%{name}-%{srcver}-build
 Summary:		OML applications collection
