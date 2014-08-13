@@ -1,3 +1,9 @@
+2014-08-13  Olivier Mehani <olivier.mehani@nicta.com.au>
+	* OML: Version 2.11.0
+        * No changes since RC
+	* Reminder: the old oml2-APPNAME symlinks are gone,
+                    use APPNAME-oml2 instead.
+
 2014-07-21  Olivier Mehani <olivier.mehani@nicta.com.au>
 	* OML: Version 2.11.0rc
 	* New instrumented tool: httperf (#1371)
