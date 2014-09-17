@@ -1,3 +1,9 @@
+oml2-apps (2.11.0-mytestbed2) testing; urgency=low
+
+  * Add depenceny on libpcap-dev so trace-oml2 can be built.
+
+ -- Olivier Mehani <olivier.mehani@nicta.com.au>  Wed, 17 Sep 2014 15:09:23 +1000
+
 oml2-apps (2.11.0-mytestbed1) testing; urgency=low
 
   * New upstream release 2.11.0.
