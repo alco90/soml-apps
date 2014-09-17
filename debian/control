@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: OML development team <oml-user-request@lists.nicta.com.au>
 Uploaders: Olivier Mehani <olivier.mehani@nicta.com.au>, Thierry Rakotoarivelo <thierry.rakotoarivelo@nicta.com.au>, Guillaume Jourjon <guillaume.jourjon@nicta.com.au>
-Build-Depends: debhelper (>= 7), pkg-config, libevent-dev, libpopt-dev, libtrace3-dev, libsigar-dev, libssl-dev, liboml2-dev, libgps-dev, libxml2-dev, bzip2
+Build-Depends: debhelper (>= 7), pkg-config, libevent-dev, libpopt-dev, libtrace3-dev, libsigar-dev, libssl-dev, liboml2-dev, libgps-dev, libxml2-dev, bzip2, curl
 Standards-Version: 3.9.4
 Homepage: http://omlapp.mytestbed.net/
 
