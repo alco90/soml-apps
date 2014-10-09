@@ -44,60 +44,35 @@ useless as an identifier.
 		:description => 'EtherType (>= 1536) / 802.3 Length (< 1536); 16LSbs only')
   end
   app.defMeasurement("radiotap") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('tsft', :uint64, :unit => "microseconds",
-		:description => 'Wireless Timer Syncronisation Function')
-    m.defMetric('rate', :uint32, :unit => "500 kbps",
-		:description => 'Wireless Rate')
-    m.defMetric('freq', :uint32, :unit => "megahertz",
-		:description => 'Wireless Channel Frequency')
-    m.defMetric('sig_strength_dBm', :int32, :unit => "decibel-milliwatt",
-		:description => 'Wireless Signal Strength in dB')
-    m.defMetric('noise_strength_dBm',:int32, :unit => "decibel-milliwatt",
-		:description => 'Wireless Noise Strength in dBm')
-    m.defMetric('sig_strength', :uint32, :unit => "decibel",
-		:description => 'Wireless Signal Strength in dB')
-    m.defMetric('noise_strength', :uint32, :unit => "decibel",
-		:description => 'Wireless Noise Strength in dB')
-    m.defMetric('attenuation', :uint32,
-		:description => 'Transmit Attenuation (0 -> max transmit power)')
-    m.defMetric('attenuation_dB', :uint32, :unit => "decibel",
-		:description => 'Transmit Attenuation in dB')
-    m.defMetric('power', :int32, :unit => "decibel-milliwatt",
-		:description => 'Transmit Power in dBm')
-    m.defMetric('antenna', :uint32,
-		:description => 'Wireless Antenna')
-    m.defMetric('sourceMAC', :string,
-		:description => 'Source MAC Address')
-    m.defMetric('dstMAC', :string,
-		:description => 'Destination MAC Address')
+    m.defMetric('pktid',             :uint64, ' internal packet ID to link MPs')
+    m.defMetric('tsft',              :uint64, ' wireless Timer Syncronisation Function')
+    m.defMetric('rate',              :uint32, ' Wireless Rate')
+    m.defMetric('freq',              :uint32, ' Wireless Channel Frequency')
+    m.defMetric('sig_strength_dBm',  :int32, ' Wireless Signal Strength in dB')
+    m.defMetric('noise_strength_dBm',:int32, ' Wireless Noise Strength in dBm')
+    m.defMetric('sig_strength',      :uint32, ' Wireless Signal Strength in dB')
+    m.defMetric('noise_strength',    :uint32, ' Wireless Noise Strength in dB')
+    m.defMetric('attenuation',       :uint32, ' Transmit Attenuation')
+    m.defMetric('attenuation_dB',    :uint32, ' Transmit Attenuation in dB')
+    m.defMetric('power',             :int32, ' Transmit Power in dBm')
+    m.defMetric('antenna',           :uint32, ' Wireless Antenna')
+    m.defMetric('sourceMAC', :string, ' Source MAC Address')
+    m.defMetric('dstMAC',    :string, ' Destination MAC Address')
   end
 
   app.defMeasurement("ip") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('ip_tos', :uint32,
-		:description => 'Type of Service')
-    m.defMetric('ip_len', :uint32, :unit => "Byte",
-		:description => 'Total Length')
-    m.defMetric('ip_id', :int32, 'Identification')
-    m.defMetric('ip_off', :uint32, :unit => "Byte",
-		:description => 'IP Fragment offset (and flags)')
-    m.defMetric('ip_ttl', :uint32, :unit => "hop",
-		:description => 'Time to Live')
-    m.defMetric('ip_proto', :uint32, :unit => "IANA number",
-		:description => 'Protocol')
-    m.defMetric('ip_sum', :uint32,
-		:description => 'Checksum')
-    m.defMetric('ip_src', :string,
-		:description => 'Source Address')
-    m.defMetric('ip_dst', :string,
-		:description => 'Destination Address')
-    m.defMetric('ip_sizeofpacket', :uint32, :unit => "Byte",
-		:description => 'Size of the captured data')
-    m.defMetric('ip_ts', :double,
-		:description => 'Timestamp of the measurement')
+    m.defMetric('pktid',    :uint64, ' internal packet ID to link MPs',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketIdentifier'],['MD:PacketIdentifier','MD:PacketIdentifierValue','%value%']])
+    m.defMetric('ip_tos',   :uint32, ' Type of Service')
+    m.defMetric('ip_len',   :uint32, ' Total Length')
+    m.defMetric('ip_id',    :int32,  ' Identification', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:IpIdentifier'],['MD:IpIdentifier','MD:PacketAndTrainPropertiesValue','%value%']])
+    m.defMetric('ip_off',   :uint32, ' IP Fragment offset (and flags)')
+    m.defMetric('ip_ttl',   :uint32, ' Time to Live', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:FinalTtlMeasurement'],['MD:FinalTtlMeasurement','MD:SimpleMeasurementValue','%value%']])
+    m.defMetric('ip_proto', :uint32, ' Protocol', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MGC:TransportProtocol'],['MGC:TransportProtocol','MGC:protocolNumber','%value%']])
+    m.defMetric('ip_sum',   :uint32, ' Checksum')
+    m.defMetric('ip_src',   :string, ' Source Address', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:SourceIP'],['MD:SourceIP','MD:SourceIPValue','%value%'],['MD:SourceIP','MD:defaultUnit','MU:ipv4dotted']])
+    m.defMetric('ip_dst',   :string, ' Destination Address', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:DestinationIP'],['MD:DestinationIP','MD:DestinationIPValue','%value%'],['MD:DestinationIP','MD:defaultUnit','MU:ipv4dotted']])
+    m.defMetric('ip_sizeofpacket', :uint32, ' Size of the Packet', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketSize'],['MD:PacketSize','MD:PacketSizeValue','%value%'],['MD:PacketSize','MD:defaultUnit','MU:Byte']])
+    m.defMetric('ip_ts',    :double, ' timestamp of the measurement', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MGC:TimeStamp'],['MGC:TimeStamp','MGC:timestamp','%value%']])
   end
 
   app.defMeasurement("icmp") do |m|
@@ -114,80 +89,49 @@ useless as an identifier.
   end
 
   app.defMeasurement("tcp") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('tcp_source', :uint32,
-		:description => 'Source Port')
-    m.defMetric('tcp_dest', :uint32,
-		:description => 'Destination Port')
-    m.defMetric('tcp_seq', :uint32,
-		:description => 'TCP sequence Number')
-    m.defMetric('tcp_ack_seq', :uint32,
-		:description => 'Acknowledgment Number')
-    m.defMetric('tcp_window', :uint32, :unit => "Byte",
-		:description => 'Window Size')
-    m.defMetric('tcp_checksum', :uint32,
-		:description => 'Checksum')
-    m.defMetric('tcp_urgptr', :uint32,
-		:description => 'Urgent Pointer')
-    m.defMetric('tcp_packet_size', :uint32, :unit => "Byte",
-		:description => 'Size of the captured data')
-    m.defMetric('tcp_ts', :double,
-		:description => 'Timestamp of the measurement')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketIdentifier'],['MD:PacketIdentifier','MD:PacketIdentifierValue','%value%']])
+    m.defMetric('tcp_source',   :uint32, ' Source Port',[['MD:TrainPacketMeasurement','MD:hasMetricAttributes','MD:SourcePort'],['MD:SourcePort','MD:SourcePortValue', '%value%']])
+    m.defMetric('tcp_dest',     :uint32, ' Destination Port',[['MD:TrainPacketMeasurement','MD:hasMetricAttributes','MD:DestinationPort'],['MD:DestinationPort','MD:DestinationPortValue', '%value%']])
+    m.defMetric('tcp_seq',      :uint32, ' TCP sequence Number',[['MD:TrainPacketMeasurement','MD:hasMetricAttributes','MD:SequenceIndex'],['MD:SequenceIndex','MD:SequenceIndexValue', '%value%']])
+    m.defMetric('tcp_ack_seq',  :uint32, ' Acknowledgment Number')
+    m.defMetric('tcp_window',   :uint32, ' Window Size')
+    m.defMetric('tcp_checksum', :uint32, ' Checksum')
+    m.defMetric('tcp_urgptr',   :uint32, ' Urgent Pointer')
+    m.defMetric('tcp_packet_size', :uint32, ' Size of the Packet', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketSize'],['MD:PacketSize','MD:PacketSizeValue','%value%'],['MD:PacketSize','MD:defaultUnit','MU:Byte']])
+    m.defMetric('tcp_ts',       :double, ' timestamp of the measurement', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MGC:TimeStamp'],['MGC:TimeStamp','MGC:timestamp','%value%']])
   end
 
   app.defMeasurement("udp") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('udp_source', :uint32,
-		:description => 'Source Port')
-    m.defMetric('udp_dest', :uint32,
-		:description => 'Destination Port')
-    m.defMetric('udp_len', :uint32, :unit => "Byte",
-		:description => 'Length of Datagram')
-    m.defMetric('udp_checksum', :uint32,
-		:description => 'Checksum')
-    m.defMetric('udp_ts', :double,
-		:description => 'Timestamp of the measurement')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketIdentifier'],['MD:PacketIdentifier','MD:PacketIdentifierValue','%value%']])
+    m.defMetric('udp_source',   :uint32, ' Source Port',[['MD:TrainPacketMeasurement','MD:hasMetricAttributes','MD:SourcePort'],['MD:SourcePort','MD:SourcePortValue', '%value%']])
+    m.defMetric('udp_dest',     :uint32, ' Destination Port',[['MD:TrainPacketMeasurement','MD:hasMetricAttributes','MD:DestinationPort'],['MD:DestinationPort','MD:DestinationPortValue', '%value%']])
+    m.defMetric('udp_len',      :uint32, ' Length of Datagram', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketSize'],['MD:PacketSize','MD:PacketSizeValue','%value%'],['MD:PacketSize','MD:defaultUnit','MU:Byte']])
+    m.defMetric('udp_checksum', :uint32, ' Checksum')
+    m.defMetric('udp_ts',       :double, ' timestamp of the measurement', [['MD:TrainPacketMeasurement','MD:hasMeasurementData','MGC:TimeStamp'],['MGC:TimeStamp','MGC:timestamp','%value%']])
   end
 
   app.defMeasurement("ip6") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('ip6_src', :string,
-		:description => 'Source Address')
-    m.defMetric('ip6_dst', :string,
-		:description => 'Destination Address')
-    m.defMetric('ip6_ts', :double,
-		:description => 'Timestamp of the measurement')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('ip6_src',      :string, ' Source Address')
+    m.defMetric('ip6_dst',      :string, ' Destination Address')
+    m.defMetric('ip6_ts',       :double, ' timestamp of the measurement')
   end
 
   app.defMeasurement("ip6_mh") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('mh_type', :string,
-		:description => 'BU or BAck')
-    m.defMetric('sequ_nb', :uint32,
-		:description => 'Binding sequence number')
-    m.defMetric('tv_sec', :uint32, :unit => "second",
-		:description => 'Packet capture time (sec)')
-    m.defMetric('tv_usec', :uint32, :unit => "microsecond",
-		:description => 'Packet capture time (usec)')
-    m.defMetric('payload', :string,
-		:description => 'CoA for BU, nothing for BAck')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('mh_type',      :string, ' BU or BAck')
+    m.defMetric('sequ_nb',      :uint32, ' binding sequence number')
+    m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
+    m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
+    m.defMetric('payload',      :string, ' CoA for BU, nothing for BAck')
   end
 
   app.defMeasurement("icmp6") do |m|
-    m.defMetric('pktid', :guid,
-		:description => 'Internal packet ID to link MPs')
-    m.defMetric('type', :uint32,
-		:description => 'ICMPv6 type') # XXX: Only echo request (128) and replies (129)
-    m.defMetric('sequ_nb', :uint32,
-		:description => 'Sequence number for ping')
-    m.defMetric('tv_sec', :uint32, :unit => "second",
-		:description => 'Packet capture time (sec)')
-    m.defMetric('tv_usec', :uint32, :unit => "microsecond",
-		:description => 'Packet capture time (usec)')
+    m.defMetric('pktid',        :uint64, ' internal packet ID to link MPs')
+    m.defMetric('type',         :uint32, ' ICMP type')
+    m.defMetric('sequ_nb',      :uint32, ' Sequence number for ping')
+    m.defMetric('tv_sec',       :uint32, ' packet capture time (sec)')
+    m.defMetric('tv_usec',      :uint32, ' packet capture time (usec)')
   end
 end
 

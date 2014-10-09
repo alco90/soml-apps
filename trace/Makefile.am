@@ -36,10 +36,10 @@ CLEANFILES = $(appname)_oml.h \
 	     $(appname).rb
 
 $(appname)_popt.h: $(appname).rb
-	$(SCAFFOLD) --opts $<
+	$(SCAFFOLD) --opts $< --ontology ./etsi-ontology/
 
 $(appname)_oml.h: $(appname).rb
-	$(SCAFFOLD) --oml $<
+	$(SCAFFOLD) --oml $< --ontology ./etsi-ontology/
 
 $(appname).rb: $(appname).rb.in
 	VER=`echo $(VERSION) | $(SED) "s/.*+oml//;s/\([0-9]\{1,\}\(\.[0-9]\{1,\}\)\{1,2\}\).*/\1/;s/\./, /g"`; \

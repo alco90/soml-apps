@@ -55,18 +55,12 @@ This version 2 is compatible with OMLv2
   # Define the Measurement Points and associated metrics that are available for this application
   #
   app.defMeasurement('udp_out') do |m|
-    m.defMetric('ts', :double, :unit => "second",
-		:description => "Packet processing timestamp") # XXX: Redundant with OML timestamping
-    m.defMetric('flow_id', :guid,
-	       :description => "Flow identifier")
-    m.defMetric('seq_no', :uint32,
-	       :description => "Sequence number of packet in flow")
-    m.defMetric('pkt_length', :uint32, :unit => "byte",
-	       :description => "Length of packet")
-    m.defMetric('dst_host', :string,
-	       :description => "Destination address")
-    m.defMetric('dst_port', :uint32,
-	       :description => "Destination port")
+    m.defMetric('ts',:double,'ts',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:Time'],['MD:Time','MD:TimeValue','%value%']])
+    m.defMetric('flow_id',:int32,'flow_id',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:TrainIdentifier'],['MD:TrainIdentifier','MD:TrainIdentifierValue','%value%']])
+    m.defMetric('seq_no',:uint32,'seq_no',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketIdentifier'],['MD:PacketIdentifier','MD:PacketIdentifierValue','%value%']])
+    m.defMetric('pkt_length',:uint32,'pkt_length',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:PacketSize'],['MD:PacketSize','MD:PacketSizeValue','%value%']])
+    m.defMetric('dst_host',:string,'dst_host',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:DestinationIP'],['MD:DestinationIP','MD:DestinationIPValue','%value%']])
+    m.defMetric('dst_port',:uint32,'dst_port',[['MD:TrainPacketMeasurement','MD:hasMeasurementData','MD:DestinationPort'],['MD:DestinationPort','MD:DestinationPortValue','%value%']])
   end
 end
 

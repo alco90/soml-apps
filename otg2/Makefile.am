@@ -78,9 +78,9 @@ $(appotr2).rb: $(appotr2).rb.in
 		$< > $@
 
 $(appotg2)_oml.h: $(appotg2).rb
-	$(SCAFFOLD) --oml $<
+	$(SCAFFOLD) --oml $< --ontology ./etsi-ontology/
 $(appotr2)_oml.h: $(appotr2).rb
-	$(SCAFFOLD) --oml $<
+	$(SCAFFOLD) --oml $< --ontology ./etsi-ontology/
 
 libotg2_la_SOURCES = \
 	lib/app/application.cpp \
